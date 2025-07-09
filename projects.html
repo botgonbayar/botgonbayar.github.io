@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Bat Otgonbayar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #0d1117;
+            color: #58a6ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7c3aed;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #8b949e;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a:hover, nav a.active {
+            color: #58a6ff;
+            background: #21262d;
+            transform: translateY(-2px);
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        .page-content {
+            min-height: 70vh;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .terminal-window {
+            background: #161b22;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: #21262d;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-window::after {
+            content: '● ● ●';
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        .terminal-content {
+            margin-top: 20px;
+        }
+
+        .prompt {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .command {
+            color: #58a6ff;
+        }
+
+        .output {
+            color: #f85149;
+            margin-left: 20px;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section h2 {
+            color: #7c3aed;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .project-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #58a6ff);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: #58a6ff;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .project-header h3 {
+            color: #58a6ff;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .project-type {
+            background: #21262d;
+            color: #7c3aed;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .project-card p {
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+
+        .project-details ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .project-details li {
+            color: #8b949e;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .project-details li::before {
+            content: '•';
+            color: #7c3aed;
+            position: absolute;
+            left: 0;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .tech-tag {
+            background: #21262d;
+            color: #7c3aed;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #8b949e;
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .project-link:hover {
+            color: #58a6ff;
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding: 30px 0;
+            border-top: 1px solid #21262d;
+            text-align: center;
+            color: #8b949e;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">./bat-otgonbayar</a>
+            <nav>
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="projects.html" class="nav-link active">Projects</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+        </header>
+
+        <main class="page-content">
+            <div class="section">
+                <h2>Projects</h2>
+                <div class="terminal-window">
+                    <div class="terminal-content">
+                        <div><span class="prompt">user@projects:~$</span> <span class="command">ls -la projects/</span></div>
+                        <div class="output">total 2</div>
+                        <div class="output">drwxr-xr-x 2 bat bat 4096 Jan 2025 active-directory-lab/</div>
+                        <div class="output">drwxr-xr-x 2 bat bat 4096 Jan 2025 automation-scripts/</div>
+                        <div class="output">-rw-r--r-- 1 bat bat 1024 Jan 2025 README.md</div>
+                        <div><span class="prompt">user@projects:~$</span> <span class="command">cat README.md</span></div>
+                        <div class="output">A collection of cybersecurity and IT infrastructure projects showcasing hands-on experience with enterprise technologies.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Featured Projects</h2>
+                <div class="grid">
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h3>Active Directory Secora Series</h3>
+                            <span class="project-type">Lab Environment</span>
+                        </div>
+                        <p>Comprehensive Active Directory lab environment demonstrating enterprise identity management, hybrid cloud integration, and security best practices.</p>
+                        <div class="project-details">
+                            <ul>
+                                <li>Installed and configured VMware Pro Workstation with Windows Server 2025</li>
+                                <li>Implemented linked clones and RDP for efficient resource management</li>
+                                <li>Added Windows 11 client machines to Windows Server 2025 domain</li>
+                                <li>Created and modified Active Directory template user accounts with various properties</li>
+                                <li>Configured server settings including TCP/IP, DNS, and remote desktop</li>
+                                <li>Created and linked Group Policy Objects (GPO) for centralized management</li>
+                                <li>Setup Entra ID Connect for hybrid cloud identity with seamless SSO</li>
+                                <li>Implemented password hash synchronization for secure authentication</li>
+                            </ul>
+                        </div>
+                        <div class="tech-stack">
+                            <span class="tech-tag">Windows Server 2025</span>
+                            <span class="tech-tag">Active Directory</span>
+                            <span class="tech-tag">Entra ID Connect</span>
+                            <span class="tech-tag">Group Policy</span>
+                            <span class="tech-tag">VMware Workstation</span>
+                            <span class="tech-tag">Windows 11</span>
+                            <span class="tech-tag">PowerShell</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link">
+                                <span>🔗</span>
+                                <span>Documentation</span>
+                            </a>
+                            <a href="https://github.com/botgonbayar" class="project-link">
+                                <span>🐙</span>
+                                <span>GitHub</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h3>PowerShell Automation Scripts</h3>
+                            <span class="project-type">Automation</span>
+                        </div>
+                        <p>Collection of PowerShell scripts developed for automating post-deployment configurations and security risk mitigation in enterprise environments.</p>
+                        <div class="project-details">
+                            <ul>
+                                <li>Automated post-deployment device configuration scripts</li>
+                                <li>Scareware detection and mitigation automation</li>
+                                <li>User account provisioning and deprovisioning scripts</li>
+                                <li>Security baseline configuration automation</li>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bat Otgonbayar - Cybersecurity Professional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #0d1117;
+            color: #58a6ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7c3aed;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #8b949e;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a:hover, nav a.active {
+            color: #58a6ff;
+            background: #21262d;
+            transform: translateY(-2px);
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        .page-content {
+            min-height: 70vh;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .terminal-window {
+            background: #161b22;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: #21262d;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-window::after {
+            content: '● ● ●';
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        .terminal-content {
+            margin-top: 20px;
+        }
+
+        .prompt {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .command {
+            color: #58a6ff;
+        }
+
+        .output {
+            color: #f85149;
+            margin-left: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            margin: -20px -20px 40px -20px;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #7c3aed, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(124, 58, 237, 0.5); }
+            to { text-shadow: 0 0 30px rgba(88, 166, 255, 0.8); }
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #7c3aed, #58a6ff);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section h2 {
+            color: #7c3aed;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #58a6ff);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: #58a6ff;
+        }
+
+        .card h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .tech-tag {
+            background: #21262d;
+            color: #7c3aed;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .cert-tag {
+            background: #21262d;
+            color: #58a6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b949e;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: #58a6ff;
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 80px;
+            padding: 30px 0;
+            border-top: 1px solid #21262d;
+            text-align: center;
+            color: #8b949e;
+        }
+
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid #58a6ff;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #58a6ff; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            nav {
+                gap: 15px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">./bat-otgonbayar</a>
+            <nav>
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+        </header>
+
+        <main class="page-content">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Bat Otgonbayar</h1>
+                    <p class="typing-animation">IT Systems Technician | Cybersecurity Professional | Problem Solver</p>
+                    <a href="projects.html" class="cta-button">View My Work</a>
+                </div>
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-content">
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">whoami</span></div>
+                    <div class="output">IT Systems Technician with expertise in cybersecurity and identity management</div>
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">ls -la experience/</span></div>
+                    <div class="output">Onward Energy (IT Systems Technician I) | Insight Global (Technical Support Specialist)</div>
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">cat skills.txt</span></div>
+                    <div class="output">Active Directory, Microsoft 365, PowerShell, VMware, Windows Server, Cybersecurity</div>
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">cat motto.txt</span></div>
+                    <div class="output">"Security through knowledge, efficiency through automation"</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Current Role & Experience</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>IT Systems Technician I</h3>
+                        <p><strong>Onward Energy</strong> • Nov 2024 - Mar 2025</p>
+                        <p>Providing Tier 1 support for hardware, software, and access issues. Managing identity lifecycle through Microsoft Entra ID, Active Directory, and role-based access controls.</p>
+                        <div class="tech-stack">
+                            <span class="tech-tag">Microsoft Entra ID</span>
+                            <span class="tech-tag">Active Directory</span>
+                            <span class="tech-tag">PowerShell</span>
+                            <span class="tech-tag">Windows 11</span>
+                            <span class="tech-tag">Microsoft 365</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Technical Support Specialist</h3>
+                        <p><strong>Insight Global</strong> • Oct 2024 - Nov 2024</p>
+                        <p>Deployed and maintained IT infrastructure across 18 polling sites during elections. Managed secure access with Duo MFA and GlobalProtect VPN while ensuring compliance with cybersecurity policies.</p>
+                        <div class="tech-stack">
+                            <span class="tech-tag">Duo MFA</span>
+                            <span class="tech-tag">GlobalProtect VPN</span>
+                            <span class="tech-tag">Citrix</span>
+                            <span class="tech-tag">Windows 10</span>
+                            <span class="tech-tag">Network Security</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Certifications</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>CompTIA Certified</h3>
+                        <div class="tech-stack">
+                            <span class="cert-tag">A+</span>
+                            <span class="cert-tag">Network+</span>
+                            <span class="cert-tag">Security+</span>
+                            <span class="cert-tag">CySA+</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Microsoft Certified</h3>
+                        <div class="tech-stack">
+                            <span class="cert-tag">SC-300 (Identity & Access)</span>
+                            <span class="cert-tag">AZ-900 (Azure Fundamentals)</span>
+                            <span class="cert-tag">SC-900 (Security Fundamentals)</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Okta Certified</h3>
+                        <div class="tech-stack">
+                            <span class="cert-tag">Okta Certified Professional (OCP)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Connect With Me</h2>
+                <div class="social-links">
+                    <a href="mailto:batotgonbayar@proton.me" class="social-link">
+                        <span>📧</span>
+                        <span>batotgonbayar@proton.me</span>
+                    </a>
+                    <a href="https://github.com/botgonbayar" class="social-link">
+                        <span>🐙</span>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/botgonbayar" class="social-link">
+                        <span>💼</span>
+                        <span>LinkedIn</span>
+                    </a>
+                    <a href="tel:720-427-1794" class="social-link">
+                        <span>📱</span>
+                        <span>720-427-1794</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Bat Otgonbayar. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

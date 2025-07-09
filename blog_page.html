@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Bat Otgonbayar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #0d1117;
+            color: #58a6ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7c3aed;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #8b949e;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a:hover, nav a.active {
+            color: #58a6ff;
+            background: #21262d;
+            transform: translateY(-2px);
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        .page-content {
+            min-height: 70vh;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .terminal-window {
+            background: #161b22;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: #21262d;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-window::after {
+            content: '● ● ●';
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        .terminal-content {
+            margin-top: 20px;
+        }
+
+        .prompt {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .command {
+            color: #58a6ff;
+        }
+
+        .output {
+            color: #f85149;
+            margin-left: 20px;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section h2 {
+            color: #7c3ced;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 10px;
+        }
+
+        .blog-post {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .blog-post::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #58a6ff);
+        }
+
+        .blog-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #58a6ff;
+        }
+
+        .blog-header {
+            margin-bottom: 20px;
+        }
+
+        .blog-title {
+            color: #58a6ff;
+            font-size: 24px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .blog-meta {
+            color: #8b949e;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .blog-series {
+            background: #21262d;
+            color: #7c3aed;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .blog-content {
+            color: #c9d1d9;
+            line-height: 1.7;
+        }
+
+        .blog-content h3 {
+            color: #7c3aed;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+
+        .blog-content p {
+            margin-bottom: 15px;
+        }
+
+        .blog-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .blog-content li {
+            margin-bottom: 5px;
+        }
+
+        .blog-content code {
+            background: #21262d;
+            color: #ffa7c4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .blog-content pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .blog-content pre code {
+            background: none;
+            color: #58a6ff;
+            padding: 0;
+        }
+
+        .blog-excerpt {
+            color: #8b949e;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .challenge-day {
+            background: #21262d;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-day:hover {
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+
+        .challenge-day.completed {
+            border-color: #7c3aed;
+            background: linear-gradient(135deg, #21262d, #1e1e2e);
+        }
+
+        .challenge-day.current {
+            border-color: #58a6ff;
+            background: linear-gradient(135deg, #21262d, #1e2a3a);
+        }
+
+        .day-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+
+        .day-topic {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .blog-footer {
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+            margin-top: 30px;
+        }
+
+        .blog-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .blog-tag {
+            background: #21262d;
+            color: #7c3aed;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .blog-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .blog-link {
+            color: #8b949e;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .blog-link:hover {
+            color: #58a6ff;
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 80px;
+            padding: 30px 0;
+            border-top: 1px solid #21262d;
+            text-align: center;
+            color: #8b949e;
+        }
+
+        @media (max-width: 768px) {
+            .blog-links {
+                flex-direction: column;
+            }
+            
+            .challenge-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">./bat-otgonbayar</a>
+            <nav>
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+        </header>
+
+        <main class="page-content">
+            <div class="section">
+                <h2>Blog</h2>
+                <div class="terminal-window">
+                    <div class="terminal-content">
+                        <div><span class="prompt">reader@blog:~$</span> <span class="command">ls -la posts/</span></div>
+                        <div class="output">total 1</div>
+                        <div class="output">-rw-r--r-- 1 bat bat 4096 Jan 2025 powershell-30-day-challenge.md</div>
+                        <div><span class="prompt">reader@blog:~$</span> <span class="command">cat posts/meta.txt</span></div>
+                        <div class="output">Technical blog covering cybersecurity automation, PowerShell scripting, and identity management.</div>
+                        <div><span class="prompt">reader@blog:~$</span> <span class="command">wc -l posts/powershell-30-day-challenge.md</span></div>
+                        <div class="output">Challenge in progress: 30 days of PowerShell automation for cybersecurity professionals</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="blog-post">
+                    <div class="blog-header">
+                        <span class="blog-series">PowerShell Series</span>
+                        <h2 class="blog-title">PowerShell 30-Day Challenge: Mastering Automation for Cybersecurity</h2>
+                        <div class="blog-meta">Published: January 2025 | By Bat Otgonbayar | 5 min read</div>
+                    </div>
+                    
+                    <div class="blog-content">
+                        <p class="blog-excerpt">Embarking on a 30-day journey to master PowerShell automation for cybersecurity operations. This challenge aims to build practical skills that directly apply to my work as an IT Systems Technician and future cybersecurity roles.</p>
+                        
+                        <h3>Why This Challenge?</h3>
+                        <p>As someone working in IT infrastructure and cybersecurity, I've seen firsthand how PowerShell can transform manual, time-consuming tasks into efficient, repeatable processes. Through my recent role at Onward Energy, I've already developed automation scripts for post-deployment configurations and security risk mitigation, but I want to take my skills to the next level.</p>
+                        
+                        <p>Recent industry research shows that <em>PowerShell automation is becoming increasingly critical for cybersecurity professionals</em>, with organizations using it for everything from incident response to threat hunting. This challenge will build on my existing experience with Microsoft Entra ID, Active Directory, and Windows Server management.</p>
+                        
+                        <h3>The Challenge Structure</h3>
+                        <p>Each day focuses on a specific aspect of PowerShell automation relevant to cybersecurity and IT operations:</p>
+                        
+                        <div class="challenge-grid">
+                            <div class="challenge-day completed">
+                                <div class="day-number">Day 1</div>
+                                <div class="day-topic">PowerShell Fundamentals</div>
+                            </div>
+                            <div class="challenge-day completed">
+                                <div class="day-number">Day 2</div>
+                                <div class="day-topic">File System Operations</div>
+                            </div>
+                            <div class="challenge-day completed">
+                                <div class="day-number">Day 3</div>
+                                <div class="day-topic">Registry Management</div>
+                            </div>
+                            <div class="challenge-day completed">
+                                <div class="day-number">Day 4</div>
+                                <div class="day-type">Process Monitoring</div>
+                            </div>
+                            <div class="challenge-day completed">
+                                <div class="day-number">Day 5</div>
+                                <div class="day-topic">Event Log Analysis</div>
+                            </div>
+                            <div class="challenge-day current">
+                                <div class="day-number">Day 6</div>
+                                <div class="day-topic">Active Directory Automation</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 7</div>
+                                <div class="day-topic">User Management</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 8</div>
+                                <div class="day-topic">Group Policy Scripts</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 9</div>
+                                <div class="day-topic">Exchange Online</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 10</div>
+                                <div class="day-topic">Azure AD/Entra ID</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 11</div>
+                                <div class="day-topic">Security Baselines</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 12</div>
+                                <div class="day-topic">Vulnerability Scanning</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 13</div>
+                                <div class="day-topic">Network Security</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 14</div>
+                                <div class="day-topic">Incident Response</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 15</div>
+                                <div class="day-topic">Threat Hunting</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 16</div>
+                                <div class="day-topic">Log Analysis</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 17</div>
+                                <div class="day-topic">Forensics Tools</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 18</div>
+                                <div class="day-topic">Compliance Auditing</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 19</div>
+                                <div class="day-topic">Backup Automation</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 20</div>
+                                <div class="day-topic">System Monitoring</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 21</div>
+                                <div class="day-topic">Scheduled Tasks</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 22</div>
+                                <div class="day-topic">API Integration</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 23</div>
+                                <div class="day-topic">Cloud Automation</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 24</div>
+                                <div class="day-topic">Security Orchestration</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 25</div>
+                                <div class="day-topic">Reporting & Analytics</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 26</div>
+                                <div class="day-topic">Error Handling</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 27</div>
+                                <div class="day-topic">Testing & Validation</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 28</div>
+                                <div class="day-topic">Performance Optimization</div>
+                            </div>
+                            <div class="challenge-day">
+                                <div class="day-number">Day 29</div>
+                                <div class="day-topic">Documentation</div>
+                            </div>
+                            <div class="challenge-day">
+                                <ecode class="day-number">Day 30</div>
+                                <div class="day-topic">Final Project</div>
+                            </div>
+                        </div>
+                        
+                        <h3>Real-World Application</h3>
+                        <p>Each script and concept I'm learning directly applies to my current work at Onward Energy, where I manage identity lifecycle through Microsoft Entra ID and Active Directory. The challenge builds on my existing experience with:</p>
+                        
+                        <ul>
+                            <li>Automating post-deployment configurations for new devices</li>
+                            <li>Managing user provisioning and access controls</li>
+                            <li>Implementing security baselines and compliance checks</li>
+                            <li>Streamlining service desk operations</li>
+                        </ul>
+                        
+                        <h3>Example: Day 5 - Event Log Analysis</h3>
+                        <p>Here's a sample script from the challenge that demonstrates automated security event monitoring:</p>
+                        
+                        <pre><code># PowerShell script for security event monitoring
+$EventLog = Get-WinEvent -FilterHashtable @{
+    LogName = 'Security'
+    ID = 4625  # Failed login attempts
+    StartTime = (Get-Date).AddHours(-24)
+}
+
+$FailedLogins = $EventLog | ForEach-Object {
+    $Message = $_.Message
+    $Account = ($Message -split '\n' | Select-String 'Account Name:').ToString().Split(':')[1].Trim()
+    $SourceIP = ($Message -split '\n' | Select-String 'Source Network Address:').ToString().Split(':')[1].Trim()
+    
+    [PSCustomObject]@{
+        TimeCreated = $_.TimeCreated
+        AccountName = $Account
+        SourceIP = $SourceIP
+        EventID = $_.Id
+    }
+}
+
+# Generate security report
+$Report = $FailedLogins | Group-Object AccountName | Sort-Object Count -Descending
+$Report | Export-Csv -Path "SecurityAlert_$(Get-Date -Format 'yyyyMMdd').csv" -NoTypeInformation
+
+Write-Host "Security analysis complete. Found $($FailedLogins.Count) failed login attempts."</code></pre>
+                        
+                        <p>This script demonstrates how PowerShell can automate security monitoring tasks that would otherwise require manual log analysis, directly applying to my work in cybersecurity operations.</p>
+                        
+                        <h3>Goals and Learning Outcomes</h3>
+                        <p>By the end of this 30-day challenge, I aim to:</p>
+                        
+                        <ul>
+                            <li>Master advanced PowerShell techniques for cybersecurity automation</li>
+                            <li>Build a comprehensive library of security-focused scripts</li>
+                            <li>Enhance my efficiency in service desk and system administration tasks</li>
+                            <li>Prepare for advanced cybersecurity roles requiring automation skills</li>
+                            <li>Contribute to the cybersecurity community through shared knowledge</li>
+                        </ul>
+                        
+                        <p>Follow along as I document my journey, share code examples, and explore how PowerShell can transform cybersecurity operations. Each day builds on the last, creating a comprehensive foundation for automation in security-focused IT environments.</p>
+                    </div>
+                    
+                    <div class="blog-footer">
+                        <div class="blog-tags">
+                            <span class="blog-tag">PowerShell</span>
+                            <span class="blog-tag">Cybersecurity</span>
+                            <span class="blog-tag">Automation</span>
+                            <span class="blog-tag">Active Directory</span>
+                            <span class="blog-tag">Security</span>
+                            <span class="blog-tag">IT Operations</span>
+                        </div>
+                        <div class="blog-links">
+                            <a href="https://github.com/botgonbayar" class="blog-link">
+                                <span>🐙</span>
+                                <span>View Code on GitHub</span>
+                            </a>
+                            <a href="https://linkedin.com/in/botgonbayar" class="blog-link">
+                                <span>💼</span>
+                                <span>Connect on LinkedIn</span>
+                            </a>
+                            <a href="mailto:batotgonbayar@proton.me" class="blog-link">
+                                <span>📧</span>
+                                <span>Discuss This Post</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>More Posts Coming Soon</h2>
+                <div class="coming-soon">
+                    <p>Future blog posts will cover Active Directory security hardening, cloud identity management, and advanced PowerShell techniques for cybersecurity professionals.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Bat Otgonbayar. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

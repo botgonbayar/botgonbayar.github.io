@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - Bat Otgonbayar</title>
+    <title>Bat Otgonbayar - Cybersecurity Professional</title>
     <base href="https://botgonbayar.github.io/">
     <style>
         * {
@@ -139,6 +139,85 @@
             margin-left: 20px;
         }
 
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            margin: -20px -20px 40px -20px;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #7c3aed, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(124, 58, 237, 0.5); }
+            to { text-shadow: 0 0 30px rgba(88, 166, 255, 0.8); }
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #7c3aed, #58a6ff);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
         .section {
             margin: 40px 0;
         }
@@ -153,12 +232,12 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin: 30px 0;
         }
 
-        .project-card {
+        .card {
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 12px;
@@ -168,7 +247,7 @@
             overflow: hidden;
         }
 
-        .project-card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -178,58 +257,21 @@
             background: linear-gradient(90deg, #7c3aed, #58a6ff);
         }
 
-        .project-card:hover {
+        .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             border-color: #58a6ff;
         }
 
-        .project-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .project-header h3 {
+        .card h3 {
             color: #58a6ff;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             font-size: 20px;
         }
 
-        .project-type {
-            background: #21262d;
-            color: #7c3aed;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            border: 1px solid #30363d;
-        }
-
-        .project-card p {
+        .card p {
             color: #8b949e;
             margin-bottom: 15px;
-        }
-
-        .project-details ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .project-details li {
-            color: #8b949e;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-            font-size: 14px;
-        }
-
-        .project-details li::before {
-            content: '•';
-            color: #7c3aed;
-            position: absolute;
-            left: 0;
         }
 
         .tech-stack {
@@ -248,36 +290,38 @@
             border: 1px solid #30363d;
         }
 
-        .project-links {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+        .cert-tag {
+            background: #21262d;
+            color: #58a6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #30363d;
         }
 
-        .project-link {
-            display: inline-flex;
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .social-link {
+            display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             color: #8b949e;
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 10px 20px;
             border: 1px solid #30363d;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.3s ease;
-            font-size: 14px;
         }
 
-        .project-link:hover {
+        .social-link:hover {
             color: #58a6ff;
             border-color: #58a6ff;
             transform: translateY(-2px);
-        }
-
-        .coming-soon {
-            text-align: center;
-            padding: 40px;
-            color: #8b949e;
-            font-style: italic;
         }
 
         footer {
@@ -288,15 +332,43 @@
             color: #8b949e;
         }
 
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid #58a6ff;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #58a6ff; }
+        }
+
         @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            nav {
+                gap: 15px;
+            }
+            
             .grid {
                 grid-template-columns: 1fr;
             }
             
-            .project-header {
+            .social-links {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                align-items: center;
             }
         }
     </style>
@@ -306,166 +378,114 @@
         <header>
             <a href="/" class="logo">./bɑːt/</a>
             <nav>
-                <a href="/" class="nav-link">Home</a>
-                <a href="/projects/" class="nav-link">Projects</a>
+                <a href="/" class="nav-link active">Home</a>
+                <a href="#writeups" class="nav-link">Writeups</a>
                 <a href="/about/" class="nav-link">About</a>
             </nav>
         </header>
-        
-        <div class="section">
-            <h2>Featured Projects</h2>
-            <div class="grid">
-                <div class="project-card">
-    <div class="project-header">
-        <h3>Active Directory Secora Series -- Part 2</h3>
-        <span class="project-type">Security Architecture</span>
-    </div>
-    <p>Advanced Active Directory implementation focusing on enterprise organizational structure, tiered security models, and automated user/group management using PowerShell.</p>
-    <div class="project-details">
-        <ul>
-            <li>Designed and implemented enterprise OU structure for 50-200 user organization</li>
-            <li>Built Microsoft's recommended tiered administrative security model</li>
-            <li>Created comprehensive security groups and user management framework</li>
-            <li>Automated deployment processes using PowerShell scripting</li>
-            <li>Implemented departmental separation with granular access controls</li>
-            <li>Established proper privilege delegation and least-privilege principles</li>
-            <li>Demonstrated scalable enterprise identity management practices</li>
-        </ul>
-    </div>
-    <div class="tech-stack">
-        <span class="tech-tag">Active Directory</span>
-        <span class="tech-tag">PowerShell ISE</span>
-        <span class="tech-tag">Security Architecture</span>
-        <span class="tech-tag">Enterprise Design</span>
-        <span class="tech-tag">User Management</span>
-        <span class="tech-tag">Access Controls</span>
-    </div>
-    <div class="project-links">
-        <a href="https://medium.com/@botgonbayar/building-secoras-user-base-creating-30-users-ous-and-security-groups-b4a22e2f1d73" 
-           class="project-link" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           id="part2-article-link">
-            <span>🔗</span>
-            <span>Article</span>
-        </a>
-    </div>
-</div>
-                
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3>Active Directory Secora Series -- Part 1</h3>
-                        <span class="project-type">Lab Environment</span>
-                    </div>
-                    <p>Comprehensive Active Directory lab environment demonstrating enterprise identity management, hybrid cloud integration, and security best practices.</p>
-                    <div class="project-details">
-                        <ul>
-                            <li>Installed and configured VMware Pro Workstation with Windows Server 2025</li>
-                            <li>Implemented linked clones and RDP for efficient resource management</li>
-                            <li>Added Windows 11 client machines to Windows Server 2025 domain</li>
-                            <li>Created and modified Active Directory template user accounts with various properties</li>
-                            <li>Configured server settings including TCP/IP, DNS, and remote desktop</li>
-                            <li>Created and linked Group Policy Objects (GPO) for centralized management</li>
-                            <li>Setup Entra ID Connect for hybrid cloud identity with seamless SSO</li>
-                            <li>Implemented password hash synchronization for secure authentication</li>
-                        </ul>
-                    </div>
-                    <div class="tech-stack">
-                        <span class="tech-tag">Windows Server 2025</span>
-                        <span class="tech-tag">Active Directory</span>
-                        <span class="tech-tag">Entra ID Connect</span>
-                        <span class="tech-tag">Group Policy</span>
-                        <span class="tech-tag">VMware Workstation</span>
-                        <span class="tech-tag">Windows 11</span>
-                        <span class="tech-tag">PowerShell</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://medium.com/@botgonbayar/part-1-setting-up-active-directory-c59677048c92" 
-                           class="project-link" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            <span>🔗</span>
-                            <span>Article</span>
-                        </a>
-                        <a href="https://github.com/botgonbayar/Active-Directory-Series" 
-                           class="project-link" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            <span>🐙</span>
-                            <span>GitHub</span>
-                        </a>
-                    </div>
-                </div>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3>PowerShell Scripts</h3>
-                        <span class="project-type">Automation</span>
-                    </div>
-                    <p>Collection of PowerShell scripts developed for automating post-deployment configurations and security risk mitigation in enterprise environments.</p>
-                    <div class="project-details">
-                        <ul>
-                            <li>Disable-EdgeIntrusiveAds.ps1</li>
-                            <li>Audit-ACLPermissions.ps1</li>
-                            <li>Audit-AuthenticationEvents.ps1</li>
-                            <li>Create-UsersBulk.ps1</li>
-                            <li>Disable-InactiveUsers.ps1</li>
-                            <li>Audit-SecureBackup.ps1</li>
-                            <li>Report-SystemHealth.ps1</li>
-                        </ul>
-                    </div>
-                    <div class="tech-stack">
-                        <span class="tech-tag">PowerShell</span>
-                        <span class="tech-tag">Scripting</span>
-                        <span class="tech-tag">Windows</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" 
-                           class="project-link" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            <span>🐙</span>
-                            <span>Scripts</span>
-                        </a>
-                    </div>
+        <main class="page-content">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>System Access Granted. Welcome!</h1>
+                    <p class="typing-animation">Cloud Security Practitioner · IAM Specialist · M365 Expert</p>
+                    <a href="#writeups" class="cta-button">Explore My Work</a>
                 </div>
+            </div>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3>Gmail Attachments to Google Drive Automated Flow</h3>
-                        <span class="project-type">Cloud Automation</span>
+            <div class="terminal-window">
+                <div class="terminal-content">
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">whoami</span></div>
+                    <div class="output">Hello! My name is Bat Otgonbayar and I'm a detail-oriented cybersecurity practitioner with 1.5+ years of experience in identity management, access controls, and IT infrastructure support. Passionate about leveraging automation to enhance security posture and operational efficiency.</div>
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">cat skills.txt</span></div>
+                    <div class="output">Security: Active Directory, Microsoft Entra ID, SharePoint, Exchange Online, Teams, Microsoft 365 Defender, Intune, SSO, MFA, SIEM (Microsoft Sentinel, Splunk), KQL, PowerShell, Azure, Okta</div>
+                    <div><span class="prompt">visitor@portfolio:~$</span> <span class="command">cat motto.txt</span></div>
+                    <div class="output">Knowledge-driven security, automation-powered efficiency.</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Certifications</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>CompTIA</h3>
+                        <div class="tech-stack">
+                            <a class="cert-tag" href="https://www.credly.com/badges/20b32b43-0f40-4f7f-ac28-d12f21266722/public_url" target="_blank">A+</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/86131170-d47e-4d95-add6-3dfffac7adc7/public_url" target="_blank">Network+</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/977908cd-5185-4032-b589-bc41cfc65e8e/public_url" target="_blank">Security+</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/126e9b15-d17a-44ef-b092-af702449d2c6/public_url" target="_blank">CySA+</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/8b7660f3-d4d4-46c7-a60c-73690062c2ca/public_url" target="_blank">CSAP</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/cd6d4605-a008-4e61-bf59-60c48fc5702b/public_url" target="_blank">CSIS</a>
+                            <a class="cert-tag" href="https://www.credly.com/badges/8e5feeae-1e71-4e97-bddc-acae01bba625/public_url" target="_blank">CIOS</a>
+                        </div>
                     </div>
-                    <p>Automated workflow using Microsoft Power Automate to save Gmail attachments directly to Google Drive, streamlining document management and reducing manual processes.</p>
-                    <div class="project-details">
-                        <ul>
-                            <li>Created automated trigger for new Gmail messages with attachments</li>
-                            <li>Implemented conditional logic to filter specific email types</li>
-                            <li>Configured secure authentication between Gmail and Google Drive services</li>
-                            <li>Set up automatic file organization and naming conventions</li>
-                            <li>Added error handling and notification systems</li>
-                            <li>Optimized workflow for performance and reliability</li>
-                            <li>Documented setup process and troubleshooting steps</li>
-                        </ul>
+                    <div class="card">
+                        <h3>Microsoft</h3>
+                        <div class="tech-stack">
+                            <a class="cert-tag" href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/97888B3F00375EFF?sharingId=8DD8699F73824EBC" target="_blank">SC-300 (Identity & Access)</a>
+                            <a class="cert-tag" href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/2925161AE4093D5?sharingId=8DD8699F73824EBC" target="_blank">AZ-900 (Azure Fundamentals)</a>
+                            <a class="cert-tag" href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/B6C0CB7731DF1205?sharingId=8DD8699F73824EBC" target="_blank">SC-900 (Security Fundamentals)</a>
+                        </div>
                     </div>
-                    <div class="tech-stack">
-                        <span class="tech-tag">Microsoft Power Automate</span>
-                        <span class="tech-tag">Gmail API</span>
-                        <span class="tech-tag">GoogleDrive API</span>
-                        <span class="tech-tag">Cloud Integration</span>
-                        <span class="tech-tag">Workflow Automation</span>
+                    <div class="card">
+                        <h3>Okta</h3>
+                        <div class="tech-stack">
+                            <a class="cert-tag" href="https://www.credly.com/badges/1cdc8d72-278f-4e05-9478-e0be9ed52cb9/public_url" target="_blank">Okta Certified Professional (OCP)</a>
+                        </div>
                     </div>
-                    <div class="project-links">
-                        <a href="https://medium.com/@botgonbayar/automatically-save-gmail-attachments-to-dropbox-via-power-automate-f09f9d5c9d12" 
-                           class="project-link" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            <span>🔗</span>
-                            <span>Article</span>
-                        </a>
+                    <div class="card">
+                        <h3>GIAC</h3>
+                        <div class="tech-stack">
+                            <span class="cert-tag">GFACT</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="section" id="writeups">
+
+            <div class="section">
+                <h2>Technical Writeups</h2>
+                <div class="grid">
+                    <a href="/writeups/ad-lab-part1.html" class="card" style="text-decoration: none; color: inherit;">
+                        <h3>Building an Active Directory Home Lab: Part 1</h3>
+                        <p>Learn how to set up a complete Active Directory environment using VMware Workstation Pro. This hands-on guide walks through installing Windows Server 2025, configuring networking, and deploying your first domain controller.</p>
+                        <div class="tech-stack">
+                            <span class="tech-tag">Active Directory</span>
+                            <span class="tech-tag">VMware</span>
+                            <span class="tech-tag">Windows Server</span>
+                        </div>
+                    </a>
+                    <a href="/writeups/ad-lab-part2.html" class="card" style="text-decoration: none; color: inherit;">
+                        <h3>Active Directory Structure Foundation: Part 2</h3>
+                        <p>Build out your AD infrastructure with organizational units, user accounts, security groups, and group policies. Configure realistic department structures and apply enterprise-grade security controls.</p>
+                        <div class="tech-stack">
+                            <span class="tech-tag">Active Directory</span>
+                            <span class="tech-tag">Group Policy</span>
+                            <span class="tech-tag">IAM</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Let's connect</h2>
+                <div class="social-links">
+                    <a href="mailto:batotgonbayar@proton.me" class="social-link">
+                        <span>📧</span>
+                        <span>batotgonbayar@proton.me</span>
+                    </a>
+                    <a href="https://github.com/botgonbayar" class="social-link" target="_blank" rel="noopener noreferrer">
+                        <span>🐙</span>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/botgonbayar" class="social-link" target="_blank" rel="noopener noreferrer">
+                        <span>💼</span>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </div>
+        </main>
 
         <footer>
             <p>&copy; 2025 Bat Otgonbayar. All rights reserved.</p>

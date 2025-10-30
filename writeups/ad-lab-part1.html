@@ -225,12 +225,12 @@
             z-index: 999;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.95);
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 0;
             cursor: zoom-out;
         }
 
@@ -239,8 +239,8 @@
         }
 
         .lightbox img {
-            max-width: 98%;
-            max-height: 98%;
+            max-width: 98vw;
+            max-height: 98vh;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -726,6 +726,8 @@
             img.addEventListener('click', function() {
                 lightbox.classList.add('active');
                 lightboxImg.src = this.src;
+                lightboxImg.style.maxWidth = '98vw';
+                lightboxImg.style.maxHeight = '98vh';
                 lightboxCaption.textContent = this.alt;
                 document.body.style.overflow = 'hidden';
             });
@@ -738,7 +740,7 @@
 
         // Close lightbox on background click
         lightbox.addEventListener('click', function(e) {
-            if (e.target === lightbox) {
+            if (e.target === lightbox || e.target === lightboxImg) {
                 closeLightbox();
             }
         });

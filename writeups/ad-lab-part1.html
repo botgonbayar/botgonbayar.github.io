@@ -209,6 +209,70 @@
             border-radius: 8px;
             margin: 32px 0;
             display: block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .article-content img:hover {
+            border-color: #60a5fa;
+            opacity: 0.9;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 95%;
+            max-height: 95%;
+            border: 2px solid #27272a;
+            border-radius: 8px;
+            cursor: default;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fafafa;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 1000;
+        }
+
+        .lightbox-close:hover {
+            color: #60a5fa;
+        }
+
+        .lightbox-caption {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #d4d4d8;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            max-width: 80%;
+            text-align: center;
         }
 
         .requirements-grid {
@@ -375,7 +439,6 @@
                 </div>
             </div>
 
-            <img src="/images/writeups/ad-lab-part1/1.png" alt="Anticipated Project Diagram">
             <div class="article-content">
                 <p>When I first started diving into cybersecurity, especially the world of Identity and Access Management (IAM), I figured out right away that Active Directory (AD) isn't going anywhere.</p>
 
@@ -636,7 +699,50 @@
         </footer>
     </div>
 
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="" alt="">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
+    <script>
+        hljs.highlightAll();
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const contentImages = document.querySelectorAll('.article-content img');
+
+        contentImages.forEach(img => {
+            img.addEventListener('click', function() {
+                lightbox.classList.add('active');
+                lightboxImg.src = this.src;
+                lightboxCaption.textContent = this.alt;
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close lightbox on background click
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
 </body>
 </html>

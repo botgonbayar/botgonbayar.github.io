@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building an Active Directory Home Lab - Part 1 | Bat Otgonbayar</title>
+    <base href="https://botgonbayar.github.io/">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: #0a0e17;
+            color: #d4d4d8;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            border-bottom: 1px solid #27272a;
+            padding-bottom: 32px;
+            margin-bottom: 48px;
+        }
+
+        .back-link {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #fafafa;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fafafa;
+            text-decoration: none;
+            font-family: 'Monaco', monospace;
+        }
+
+        .article-header {
+            margin-bottom: 56px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #27272a;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .article-header h1 {
+            font-size: 42px;
+            color: #fafafa;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .article-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .tag {
+            background: #18181b;
+            color: #a1a1aa;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid #27272a;
+            font-weight: 500;
+        }
+
+        .article-content {
+            font-size: 17px;
+            color: #d4d4d8;
+            font-weight: 400;
+        }
+
+        .article-content h2 {
+            font-size: 32px;
+            color: #fafafa;
+            margin: 64px 0 24px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .article-content h3 {
+            font-size: 24px;
+            color: #fafafa;
+            margin: 48px 0 20px;
+            font-weight: 600;
+        }
+
+        .article-content p {
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 24px 0;
+            padding-left: 32px;
+        }
+
+        .article-content li {
+            margin-bottom: 12px;
+            line-height: 1.8;
+            color: #d4d4d8;
+        }
+
+        .article-content a {
+            color: #60a5fa;
+            text-decoration: none;
+            border-bottom: 1px solid #3b82f620;
+            transition: all 0.2s;
+        }
+
+        .article-content a:hover {
+            border-bottom-color: #60a5fa;
+        }
+
+        .article-content strong {
+            color: #fafafa;
+            font-weight: 600;
+        }
+
+        .article-content pre {
+            background: #161b22;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 32px 0;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+
+        .article-content code {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 14px;
+        }
+
+        .article-content p code,
+        .article-content li code {
+            background: #1c1c1f;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 15px;
+            color: #86efac;
+            border: 1px solid #27272a;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #18181b;
+            border-left: 3px solid #60a5fa;
+            padding: 24px;
+            margin: 32px 0;
+            border-radius: 6px;
+            border: 1px solid #27272a;
+        }
+
+        .info-box p {
+            margin-bottom: 16px;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-box strong {
+            color: #60a5fa;
+        }
+
+        .info-box ul {
+            margin: 16px 0 0 0;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            margin: 32px 0;
+            display: block;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .req-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .req-card h4 {
+            color: #fafafa;
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .req-card ul {
+            padding-left: 24px;
+            margin: 0;
+        }
+
+        .req-card li {
+            color: #d4d4d8;
+            margin-bottom: 10px;
+        }
+
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 96px;
+            padding-top: 48px;
+            border-top: 1px solid #27272a;
+            gap: 24px;
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            color: #a1a1aa;
+            text-decoration: none;
+            transition: color 0.2s;
+            max-width: 45%;
+        }
+
+        .nav-link:hover {
+            color: #fafafa;
+        }
+
+        .nav-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: #d4d4d8;
+        }
+
+        .nav-link:hover .nav-title {
+            color: #fafafa;
+        }
+
+        footer {
+            margin-top: 96px;
+            padding-top: 32px;
+            border-top: 1px solid #27272a;
+            text-align: center;
+            color: #71717a;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 20px;
+            }
+
+            .article-header h1 {
+                font-size: 32px;
+            }
+
+            .article-content {
+                font-size: 16px;
+            }
+
+            .article-content h2 {
+                font-size: 28px;
+                margin: 48px 0 20px;
+            }
+
+            .article-content h3 {
+                font-size: 22px;
+                margin: 40px 0 16px;
+            }
+
+            .requirements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-nav {
+                flex-direction: column;
+                margin-top: 64px;
+            }
+
+            .nav-link {
+                max-width: 100%;
+            }
+        }
+
+        .hljs {
+            background: #161b22 !important;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #18181b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← Back to Home</a>
+            <a href="/" class="logo">Bat Otgonbayar</a>
+        </header>
+
+        <article>
+            <div class="article-header">
+                <div class="article-meta">
+                    <span>January 2025</span>
+                    <span>•</span>
+                    <span>12 min read</span>
+                </div>
+                <h1>Building an Active Directory Home Lab: Part 1 — Installation & Setup</h1>
+                <div class="article-tags">
+                    <span class="tag">Active Directory</span>
+                    <span class="tag">VMware</span>
+                    <span class="tag">Windows Server</span>
+                    <span class="tag">Home Lab</span>
+                </div>
+            </div>
+
+            <div class="article-content">
+                <p>When I first started diving into cybersecurity, especially the world of Identity and Access Management (IAM), I figured out right away that Active Directory (AD) isn't going anywhere.</p>
+
+                <p>Even as companies move to the cloud with tools like Entra ID and Okta, on-prem Active Directory remains the backbone of how many organizations operate. It handles user authentication, access control, group policy, file sharing… you name it. Simply put, if you want to understand how businesses manage their identities of various sorts and what they have access to and secure their systems from a centralized point of view, you need to understand AD.</p>
+
+                <p>But what is the most effective way to get experience with AD for those wanting to work in environments managed by it? For starters, you could create your own virtualized enterprise environment. By replicating real-world AD implementations in a home lab, you gain hands-on experience with the same technologies and challenges you'll encounter in production environments, bridging the gap between theoretical knowledge and practical application.</p>
+
+                <p>This guide is part one of a hands-on lab series I created to replicate what you'd find in a real company: a domain controller, Windows clients, users, groups, GPOs, shared folders, and more. I'm running everything on VMware Workstation Pro 17 on my Windows 11 machine allowing me to experiment freely and build a deeper understanding of AD and the cloud.</p>
+
+                <div class="info-box">
+                    <p><strong>Lab Scenario:</strong> To make this lab more realistic, I created a fictional company called Secora, a cybersecurity startup that's building out its internal IT infrastructure from scratch. You are the system administrator tasked with building out the AD environment for Secora.</p>
+                </div>
+
+                <h2>What You'll Need</h2>
+
+                <div class="requirements-grid">
+                    <div class="req-card">
+                        <h4>Software</h4>
+                        <ul>
+                            <li>VMware Workstation Pro 17</li>
+                            <li>Windows Server 2025 ISO</li>
+                            <li>Windows 10/11 ISO (optional, for client machines)</li>
+                        </ul>
+                    </div>
+                    <div class="req-card">
+                        <h4>Hardware Requirements</h4>
+                        <ul>
+                            <li>Windows 11 host PC</li>
+                            <li>8 GB RAM minimum (16 GB recommended)</li>
+                            <li>40 GB of free disk space</li>
+                            <li>Virtualization enabled in BIOS</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2>Step-by-Step: Install Windows Server 2025 in VMware</h2>
+
+                <h3>Step 1: Create a New Virtual Machine</h3>
+
+                <div class="info-box">
+                    <p><strong>Image placeholder:</strong> VMware "Create a New Virtual Machine" wizard screenshot</p>
+                </div>
+
+                <ol>
+                    <li>Open VMware Workstation Pro and click <strong>Create a New Virtual Machine</strong></li>
+                    <li>Select <strong>Typical (recommended)</strong> and click Next</li>
+                    <li>Choose <strong>"I will install the operating system later"</strong></li>
+                    <li>Select <strong>Microsoft Windows</strong> → <strong>Windows Server 2025</strong></li>
+                    <li>Name your VM (e.g., <code>Secora-DC01</code>) and choose a location</li>
+                    <li>Set the disk size to <strong>40 GB</strong> and store as a single file</li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>Note:</strong> 32 GB is the absolute minimum, but 40 GB provides comfortable headroom for future expansion and Windows updates.</p>
+                </div>
+
+                <h3>Step 2: Configure Hardware Settings</h3>
+
+                <p>Click <strong>Customize Hardware</strong> and configure the following:</p>
+
+                <ul>
+                    <li><strong>Memory:</strong> 2 GB (4 GB recommended)</li>
+                    <li><strong>Processors:</strong> 2 cores</li>
+                    <li><strong>CD/DVD (SATA):</strong> Choose "Use ISO image file" and locate your Windows Server 2025 ISO</li>
+                </ul>
+
+                <h3>Network Configuration</h3>
+
+                <p>For our Secora lab, we're using <strong>Host-Only</strong> networking with the following setup:</p>
+
+                <ul>
+                    <li><strong>Subnet IP:</strong> 192.168.100.0/24</li>
+                    <li><strong>Domain Controller (Secora-DC01):</strong> 192.168.100.10</li>
+                    <li><strong>Future client machines:</strong> 192.168.100.20-50</li>
+                    <li><strong>DHCP scope:</strong> 192.168.100.100-200</li>
+                </ul>
+
+                <p>Configure the virtual network:</p>
+
+                <ol>
+                    <li>Navigate to <strong>Edit</strong> → <strong>Virtual Network Editor</strong> → <strong>Change Settings</strong> → "Yes"</li>
+                    <li>Click on type <strong>"Host-Only"</strong></li>
+                    <li>Verify the subnet IP is <code>192.168.100.0</code></li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>Image placeholder:</strong> Virtual Network Editor configuration screenshot</p>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>Why Host-Only?</strong></p>
+                    <ul>
+                        <li>Complete isolation from your home network</li>
+                        <li>No interference from external DHCP servers</li>
+                        <li>Perfect for security testing scenarios</li>
+                        <li>All VMs can communicate with each other</li>
+                    </ul>
+                    <p><strong>Important:</strong> We'll add a second NAT adapter later when we need Internet access and to setup our DHCP server for domain-joined client workstations.</p>
+                </div>
+
+                <p>Click <strong>Close</strong>, then <strong>Finish</strong> to create the VM.</p>
+
+                <h3>Step 3: Install Windows Server 2025</h3>
+
+                <ol>
+                    <li>Power on the VM and press any key to boot from the ISO</li>
+                    <li>If prompted with boot options, select <strong>"Boot Normally"</strong> and press any key immediately</li>
+                    <li>In the setup wizard, choose <strong>"Install Windows Server"</strong> and click Next</li>
+                    <li>Accept the license terms</li>
+                    <li>Select these options:
+                        <ul>
+                            <li><strong>Language:</strong> English (United States)</li>
+                            <li><strong>Edition:</strong> Windows Server 2025 Standard (Desktop Experience)</li>
+                        </ul>
+                    </li>
+                    <li>Use the unallocated space and click Next on the drive window</li>
+                    <li>Click <strong>Install</strong> to begin</li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>Image placeholders needed:</strong> Windows Server setup screens, installation progress, password setup</p>
+                </div>
+
+                <p>Allow the installation to complete. When prompted, set a password for the built-in Administrator account.</p>
+
+                <div class="info-box">
+                    <p><strong>Security Note:</strong> The built-in administrator account will be disabled later. Disabling the default Administrator account adds an extra layer of protection against brute-force or lateral movement attacks, as attackers often target this account by default.</p>
+                </div>
+
+                <p>The VM will restart. Log in with the password you just created.</p>
+
+                <h2>Initial Configuration</h2>
+
+                <h3>Step 4: Set a Static IP Address</h3>
+
+                <p>To ensure Active Directory doesn't rely on DHCP, we'll set a static IP address and point the DNS server to the DC itself.</p>
+
+                <ol>
+                    <li>Go to <strong>Settings</strong> → <strong>Network & Internet</strong> → <strong>Ethernet</strong></li>
+                    <li>Click <strong>IP assignment</strong> → <strong>Edit</strong></li>
+                    <li>Configure the following:
+                        <ul>
+                            <li><strong>IP:</strong> 192.168.100.10</li>
+                            <li><strong>Subnet:</strong> 255.255.255.0</li>
+                            <li><strong>Gateway:</strong> 192.168.100.1</li>
+                            <li><strong>Preferred DNS:</strong> 127.0.0.1</li>
+                            <li><strong>Alternate DNS:</strong> 8.8.8.8</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>Why 127.0.0.1 for DNS?</strong> The DC will become the DNS server for our domain, so it needs to point to itself for DNS resolution. The alternate DNS (8.8.8.8) provides internet name resolution for updates.</p>
+                </div>
+
+                <h3>Step 5: Rename the Server</h3>
+
+                <ol>
+                    <li>Go to <strong>System</strong> → <strong>About</strong> (scroll to bottom)</li>
+                    <li>Click <strong>Rename this PC</strong></li>
+                    <li>Enter: <code>Secora-DC01</code></li>
+                    <li>Click <strong>Next</strong> → <strong>Restart</strong> when prompted</li>
+                </ol>
+
+                <h2>Installing Active Directory Domain Services</h2>
+
+                <h3>Step 6: Install the Active Directory Tools</h3>
+
+                <ol>
+                    <li>Open <strong>Server Manager</strong></li>
+                    <li>Click <strong>Manage</strong> (top right) → <strong>Add Roles and Features</strong></li>
+                    <li>Click <strong>Next</strong> on the "Before you begin" page</li>
+                    <li>Keep <strong>"Role-based or feature-based installation"</strong> checked, click Next</li>
+                    <li>Select the local server: <code>Secora-DC01</code></li>
+                    <li>Under <strong>Server Roles</strong>, check <strong>Active Directory Domain Services</strong></li>
+                    <li>Click <strong>"Add Features"</strong> when prompted</li>
+                    <li>Click Next through the wizard and click <strong>Install</strong></li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>What we're doing:</strong> We're installing the AD DS binaries and management tools, but we haven't created a domain yet. That's the next step.</p>
+                </div>
+
+                <h3>Step 7: Promote the Server to a Domain Controller</h3>
+
+                <ol>
+                    <li>When installation completes, click <strong>"Promote this server to a domain controller"</strong></li>
+                    <li>Choose <strong>"Add a new forest"</strong></li>
+                    <li>Enter root domain name: <code>secora.local</code></li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>Why .local?</strong> It's a reserved TLD that won't conflict with internet domains, making it ideal for isolated lab environments.</p>
+                </div>
+
+                <ol start="4">
+                    <li>Keep the default settings and set a <strong>DSRM password</strong> (you can use the same as your Administrator password for simplicity)</li>
+                </ol>
+
+                <div class="info-box">
+                    <p><strong>DSRM (Directory Services Restore Mode):</strong> This is used for AD recovery scenarios. Store this password securely.</p>
+                </div>
+
+                <ol start="5">
+                    <li>Click Next through DNS and NetBIOS settings</li>
+                    <li>You'll see a warning about DNS delegation — ignore it (this appears because we're creating a new forest, not joining an existing one)</li>
+                    <li>Confirm prerequisites are met and click <strong>Install</strong></li>
+                </ol>
+
+                <p>The server will restart automatically. Log in as <code>SECORA\Administrator</code>.</p>
+
+                <h2>What We've Accomplished</h2>
+
+                <ul>
+                    <li>Fully installed Windows Server 2025 VM</li>
+                    <li>Configured static IP address and hostname (Secora-DC01)</li>
+                    <li>Installed AD Domain Services</li>
+                    <li>Created domain: <code>secora.local</code></li>
+                    <li>Promoted server to Domain Controller</li>
+                </ul>
+
+                <h2>Coming in Part 2: OUs, Users, Groups & GPOs</h2>
+
+                <p>In the next part of this lab series, we'll:</p>
+
+                <ul>
+                    <li>Organize departments using Organizational Units (OUs)</li>
+                    <li>Create users and security groups</li>
+                    <li>Build and apply Group Policy Objects (GPOs)</li>
+                    <li>Join client machines to our AD domain</li>
+                </ul>
+
+                <p>We'll also begin tying everything into real-world identity and access scenarios, just like you'd see in a modern enterprise.</p>
+
+                <div class="info-box">
+                    <p><strong>Part 2 is available:</strong> <a href="/writeups/ad-lab-part2.html">Part 2 — Active Directory Structure Foundation</a></p>
+                </div>
+
+                <h2>Questions or Feedback?</h2>
+
+                <p>Feel free to connect with me on <a href="https://linkedin.com/in/botgonbayar" target="_blank">LinkedIn</a> or reach out via <a href="mailto:batotgonbayar@proton.me">email</a>. I'd love to hear about your home lab journey!</p>
+            </div>
+
+            <nav class="article-nav">
+                <a href="/" class="nav-link">
+                    <span class="nav-label">← HOME</span>
+                    <span class="nav-title">Back to Portfolio</span>
+                </a>
+                <a href="/writeups/ad-lab-part2.html" class="nav-link" style="text-align: right;">
+                    <span class="nav-label">NEXT →</span>
+                    <span class="nav-title">Part 2: AD Structure Foundation</span>
+                </a>
+            </nav>
+        </article>
+
+        <footer>
+            <p>&copy; 2025 Bat Otgonbayar. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

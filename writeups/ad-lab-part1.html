@@ -490,11 +490,19 @@
                 <ol>
                     <li>Open VMware Workstation Pro and click <strong>Create a New Virtual Machine</strong></li>
                     <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/2.png">
+                    <img src="/images/writeups/ad-lab-part1/3.png">
                     <li>Select <strong>Typical (recommended)</strong> and click Next</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/4.png">
                     <li>Choose <strong>"I will install the operating system later"</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/5.png">
                     <li>Select <strong>Microsoft Windows</strong> → <strong>Windows Server 2025</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/6.png">
                     <li>Name your VM (e.g., <code>Secora-DC01</code>) and choose a location</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/7.png">
                     <li>Set the disk size to <strong>40 GB</strong> and store as a single file</li>
                 </ol>
 
@@ -503,9 +511,11 @@
                 </div>
 
                 <h3>Step 2: Configure Hardware Settings</h3>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/8.png">
                 <p>Click <strong>Customize Hardware</strong> and configure the following:</p>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/9.png">
                 <ul>
                     <li><strong>Memory:</strong> 2 GB (4 GB recommended)</li>
                     <li><strong>Processors:</strong> 2 cores</li>
@@ -515,7 +525,8 @@
                 <h3>Network Configuration</h3>
 
                 <p>For our Secora lab, we're using <strong>Host-Only</strong> networking with the following setup:</p>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/10.png">
                 <ul>
                     <li><strong>Subnet IP:</strong> 192.168.100.0/24</li>
                     <li><strong>Domain Controller (Secora-DC01):</strong> 192.168.100.10</li>
@@ -527,13 +538,11 @@
 
                 <ol>
                     <li>Navigate to <strong>Edit</strong> → <strong>Virtual Network Editor</strong> → <strong>Change Settings</strong> → "Yes"</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/11.png">
                     <li>Click on type <strong>"Host-Only"</strong></li>
                     <li>Verify the subnet IP is <code>192.168.100.0</code></li>
                 </ol>
-
-                <div class="info-box">
-                    <p><strong>Image placeholder:</strong> Virtual Network Editor configuration screenshot</p>
-                </div>
 
                 <div class="info-box">
                     <p><strong>Why Host-Only?</strong></p>
@@ -545,48 +554,68 @@
                     </ul>
                     <p><strong>Important:</strong> We'll add a second NAT adapter later when we need Internet access and to setup our DHCP server for domain-joined client workstations.</p>
                 </div>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/12.png">
                 <p>Click <strong>Close</strong>, then <strong>Finish</strong> to create the VM.</p>
 
                 <h3>Step 3: Install Windows Server 2025</h3>
 
                 <ol>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/13.png">
                     <li>Power on the VM and press any key to boot from the ISO</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/14.png">
                     <li>If prompted with boot options, select <strong>"Boot Normally"</strong> and press any key immediately</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/15.png">
                     <li>In the setup wizard, choose <strong>"Install Windows Server"</strong> and click Next</li>
                     <li>Accept the license terms</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/16.png">
                     <li>Select these options:
                         <ul>
                             <li><strong>Language:</strong> English (United States)</li>
                             <li><strong>Edition:</strong> Windows Server 2025 Standard (Desktop Experience)</li>
                         </ul>
                     </li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/17.png">
                     <li>Use the unallocated space and click Next on the drive window</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/18.png">
                     <li>Click <strong>Install</strong> to begin</li>
                 </ol>
 
-                <div class="info-box">
-                    <p><strong>Image placeholders needed:</strong> Windows Server setup screens, installation progress, password setup</p>
-                </div>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/19.png">
                 <p>Allow the installation to complete. When prompted, set a password for the built-in Administrator account.</p>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/20.png">
                 <div class="info-box">
                     <p><strong>Security Note:</strong> The built-in administrator account will be disabled later. Disabling the default Administrator account adds an extra layer of protection against brute-force or lateral movement attacks, as attackers often target this account by default.</p>
                 </div>
 
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/21.png">
                 <p>The VM will restart. Log in with the password you just created.</p>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/22.png">
                 <h2>Initial Configuration</h2>
-
+                    
                 <h3>Step 4: Set a Static IP Address</h3>
-
+                <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/23.png">
                 <p>To ensure Active Directory doesn't rely on DHCP, we'll set a static IP address and point the DNS server to the DC itself.</p>
 
                 <ol>
                     <li>Go to <strong>Settings</strong> → <strong>Network & Internet</strong> → <strong>Ethernet</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/24.png">
                     <li>Click <strong>IP assignment</strong> → <strong>Edit</strong></li>
                     <li>Configure the following:
+                        <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/25.png">
                         <ul>
                             <li><strong>IP:</strong> 192.168.100.10</li>
                             <li><strong>Subnet:</strong> 255.255.255.0</li>
@@ -604,6 +633,8 @@
                 <h3>Step 5: Rename the Server</h3>
 
                 <ol>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/26.png">
                     <li>Go to <strong>System</strong> → <strong>About</strong> (scroll to bottom)</li>
                     <li>Click <strong>Rename this PC</strong></li>
                     <li>Enter: <code>Secora-DC01</code></li>
@@ -616,12 +647,22 @@
 
                 <ol>
                     <li>Open <strong>Server Manager</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/27.png">
                     <li>Click <strong>Manage</strong> (top right) → <strong>Add Roles and Features</strong></li>
                     <li>Click <strong>Next</strong> on the "Before you begin" page</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/28.png">
                     <li>Keep <strong>"Role-based or feature-based installation"</strong> checked, click Next</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/29.png">
                     <li>Select the local server: <code>Secora-DC01</code></li>
                     <li>Under <strong>Server Roles</strong>, check <strong>Active Directory Domain Services</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/30.png">
                     <li>Click <strong>"Add Features"</strong> when prompted</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/31.png">
                     <li>Click Next through the wizard and click <strong>Install</strong></li>
                 </ol>
 
@@ -632,7 +673,11 @@
                 <h3>Step 7: Promote the Server to a Domain Controller</h3>
 
                 <ol>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/32.png">
                     <li>When installation completes, click <strong>"Promote this server to a domain controller"</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/33.png">
                     <li>Choose <strong>"Add a new forest"</strong></li>
                     <li>Enter root domain name: <code>secora.local</code></li>
                 </ol>
@@ -642,6 +687,8 @@
                 </div>
 
                 <ol start="4">
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/34.png">
                     <li>Keep the default settings and set a <strong>DSRM password</strong> (you can use the same as your Administrator password for simplicity)</li>
                 </ol>
 
@@ -650,8 +697,12 @@
                 </div>
 
                 <ol start="5">
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/35.png">
                     <li>Click Next through DNS and NetBIOS settings</li>
                     <li>You'll see a warning about DNS delegation — ignore it (this appears because we're creating a new forest, not joining an existing one)</li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/36.png">
                     <li>Confirm prerequisites are met and click <strong>Install</strong></li>
                 </ol>
 

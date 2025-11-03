@@ -642,23 +642,23 @@
 
                 <ol>
                     <li>Open <strong>Server Manager</strong></li>
+                    <li>Click <strong>Manage</strong> (top right) → <strong>Add Roles and Features</strong></li>
                     <div class="article-content">
                     <img src="/images/writeups/ad-lab-part1/25.png">
-                    <li>Click <strong>Manage</strong> (top right) → <strong>Add Roles and Features</strong></li>
                     <li>Click <strong>Next</strong> on the "Before you begin" page</li>
-                    <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/26.png">
                     <li>Keep <strong>"Role-based or feature-based installation"</strong> checked, click Next</li>
                     <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/27.png">
+                    <img src="/images/writeups/ad-lab-part1/26.png">
                     <li>Select the local server: <code>Secora-DC01</code></li>
-                    <li>Under <strong>Server Roles</strong>, check <strong>Active Directory Domain Services</strong></li>
                     <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/28.png">
+                    <img src="/images/writeups/ad-lab-part1/27.png">
+                    <li>Under <strong>Server Roles</strong>, check <strong>Active Directory Domain Services</strong></li>
                     <li>Click <strong>"Add Features"</strong> when prompted</li>
                     <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/29.png">
+                    <img src="/images/writeups/ad-lab-part1/28.png">
                     <li>Click Next through the wizard and click <strong>Install</strong></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/29.png">
                 </ol>
 
                 <div class="info-box">
@@ -668,13 +668,13 @@
                 <h3>Step 7: Promote the Server to a Domain Controller</h3>
 
                 <ol>
-                    <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/30.png">
                     <li>When installation completes, click <strong>"Promote this server to a domain controller"</strong></li>
                     <div class="article-content">
-                    <img src="/images/writeups/ad-lab-part1/31.png">
+                    <img src="/images/writeups/ad-lab-part1/30.png">
                     <li>Choose <strong>"Add a new forest"</strong></li>
                     <li>Enter root domain name: <code>secora.local</code></li>
+                    <div class="article-content">
+                    <img src="/images/writeups/ad-lab-part1/31.png">
                 </ol>
 
                 <div class="info-box">
@@ -682,9 +682,9 @@
                 </div>
 
                 <ol start="4">
+                    <li>Keep the default settings and set a <strong>DSRM password</strong> (you can use the same as your Administrator password for simplicity)</li>
                     <div class="article-content">
                     <img src="/images/writeups/ad-lab-part1/32.png">
-                    <li>Keep the default settings and set a <strong>DSRM password</strong> (you can use the same as your Administrator password for simplicity)</li>
                 </ol>
 
                 <div class="info-box">
@@ -692,13 +692,13 @@
                 </div>
 
                 <ol start="5">
+                    <li>Click Next through DNS and NetBIOS settings</li>
                     <div class="article-content">
                     <img src="/images/writeups/ad-lab-part1/33.png">
-                    <li>Click Next through DNS and NetBIOS settings</li>
                     <li>You'll see a warning about DNS delegation — ignore it (this appears because we're creating a new forest, not joining an existing one)</li>
+                    <li>Confirm prerequisites are met and click <strong>Install</strong></li>
                     <div class="article-content">
                     <img src="/images/writeups/ad-lab-part1/34.png">
-                    <li>Confirm prerequisites are met and click <strong>Install</strong></li>
                 </ol>
 
                 <p>The server will restart automatically. Log in as <code>SECORA\Administrator</code>.</p>

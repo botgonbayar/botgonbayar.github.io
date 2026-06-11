@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer | Bat Otgonbayar</title>
+<meta name="description" content="Standing up a deliberately exposed Windows VM in Azure, wiring it to Microsoft Sentinel, sharpening the detections beyond the tutorial, and bolting an AI triage layer onto the incident pipeline.">
+<base href="https://botgonbayar.github.io/">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script>
+// set theme before paint to avoid flash
+(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();
+</script>
+<style>
+  :root{
+    --bg:#0a0e17;
+    --surface:#111118;
+    --surface-2:#161b22;
+    --code-bg:#0d1117;
+    --text:#d4d4d8;
+    --text-dim:#a1a1aa;
+    --text-faint:#71717a;
+    --heading:#fafafa;
+    --border:#27272a;
+    --border-soft:#1c1c1f;
+    --accent:#a78bfa;
+    --accent-strong:#8b5cf6;
+    --teal:#5eead4;
+    --amber:#fbbf24;
+    --red:#f87171;
+    --inline-code:#5eead4;
+    --shadow:rgba(0,0,0,.4);
+  }
+  [data-theme="light"]{
+    --bg:#fbfbfc;
+    --surface:#f4f4f5;
+    --surface-2:#ececef;
+    --code-bg:#0d1117;        /* keep code dark in both modes */
+    --text:#3f3f46;
+    --text-dim:#52525b;
+    --text-faint:#71717a;
+    --heading:#18181b;
+    --border:#e4e4e7;
+    --border-soft:#ececef;
+    --accent:#7c3aed;
+    --accent-strong:#6d28d9;
+    --teal:#0d9488;
+    --amber:#b45309;
+    --red:#dc2626;
+    --inline-code:#0f766e;
+    --shadow:rgba(0,0,0,.08);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.8;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s ease,color .25s ease;
+  }
+
+  /* ---------- top nav ---------- */
+  .topbar{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 24px;
+  }
+  .topbar a.brand{
+    font-family:'Monaco','Menlo',monospace;
+    font-weight:600;font-size:18px;color:var(--heading);text-decoration:none;
+  }
+  .topbar nav{display:flex;align-items:center;gap:8px;}
+  .topbar nav a{
+    color:var(--text-dim);text-decoration:none;font-size:15px;font-weight:500;
+    padding:6px 12px;border-radius:6px;transition:color .2s;
+  }
+  .topbar nav a:hover{color:var(--heading);}
+  .theme-toggle{
+    margin-left:8px;width:34px;height:34px;border-radius:8px;
+    border:1px solid var(--border);background:transparent;color:var(--text-dim);
+    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    transition:all .2s;
+  }
+  .theme-toggle:hover{color:var(--heading);border-color:var(--text-faint);}
+  .theme-toggle svg{width:17px;height:17px;}
+  .icon-sun{display:none;}
+  [data-theme="light"] .icon-moon{display:none;}
+  [data-theme="light"] .icon-sun{display:block;}
+
+  /* ---------- reading progress ---------- */
+  .progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+    background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .1s;}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+  .article-header{
+    text-align:center;padding:24px 0 36px;border-bottom:1px solid var(--border);
+  }
+  .pub-date{font-size:14px;color:var(--text-faint);font-weight:500;margin-bottom:18px;}
+  .article-header h1{
+    font-size:42px;line-height:1.18;font-weight:800;letter-spacing:-.02em;
+    color:var(--heading);max-width:820px;margin:0 auto;
+  }
+  .subtitle{
+    margin:20px auto 0;max-width:680px;font-size:18px;color:var(--text-dim);line-height:1.6;
+  }
+
+  /* grid: article + sidebar */
+  .grid{
+    display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:48px;
+    align-items:start;margin-top:40px;
+  }
+  .author{
+    border-bottom:1px solid var(--border);padding-bottom:28px;margin-bottom:8px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .author .avatar{
+    width:46px;height:46px;border-radius:999px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--teal));
+    display:flex;align-items:center;justify-content:center;
+    color:#0a0e17;font-weight:700;font-family:'Monaco',monospace;font-size:16px;
+  }
+  .author .who{font-size:14px;line-height:1.4;}
+  .author .who .name{color:var(--heading);font-weight:600;}
+  .author .who .role{color:var(--text-faint);}
+  .author .who a{color:var(--accent);text-decoration:none;}
+  .author .who a:hover{text-decoration:underline;}
+
+  /* ---------- sidebar TOC ---------- */
+  .toc{position:sticky;top:24px;}
+  .toc .toc-label{
+    font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--text-faint);margin-bottom:14px;
+  }
+  .toc ul{list-style:none;border-left:1px solid var(--border);}
+  .toc li a{
+    display:block;padding:5px 0 5px 16px;margin-left:-1px;
+    color:var(--text-faint);text-decoration:none;font-size:13.5px;line-height:1.4;
+    border-left:2px solid transparent;transition:color .2s,border-color .2s;
+  }
+  .toc li a:hover{color:var(--accent);}
+  .toc li a.active{color:var(--accent);border-left-color:var(--accent);}
+  .toc li.sub a{padding-left:28px;font-size:13px;}
+
+  /* ---------- prose ---------- */
+  .prose{font-size:17px;color:var(--text);max-width:760px;}
+  .prose p{margin-bottom:22px;}
+  .prose h2{
+    font-size:28px;font-weight:700;color:var(--heading);letter-spacing:-.01em;
+    margin:60px 0 18px;scroll-margin-top:24px;
+  }
+  .prose h3{
+    font-size:21px;font-weight:600;color:var(--heading);
+    margin:40px 0 14px;scroll-margin-top:24px;
+  }
+  .prose h2 a.anchor,.prose h3 a.anchor{
+    color:var(--text-faint);text-decoration:none;opacity:0;margin-left:8px;font-weight:400;
+    transition:opacity .2s;
+  }
+  .prose h2:hover a.anchor,.prose h3:hover a.anchor{opacity:1;}
+  .prose a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 25%,transparent);transition:border-color .2s;}
+  .prose a:hover{border-bottom-color:var(--accent);}
+  .prose strong{color:var(--heading);font-weight:600;}
+  .prose em{color:var(--text-dim);}
+  .prose ul,.prose ol{margin:18px 0 22px;padding-left:26px;}
+  .prose li{margin-bottom:9px;}
+  .prose ul li::marker{color:var(--text-faint);}
+  .prose ol li::marker{color:var(--text-faint);font-variant-numeric:tabular-nums;}
+
+  /* lede */
+  .lede{font-size:19px;line-height:1.7;color:var(--text-dim);}
+
+  /* inline code */
+  .prose p code,.prose li code,.prose td code{
+    background:var(--surface-2);color:var(--inline-code);
+    padding:2px 7px;border-radius:5px;font-size:14px;font-weight:500;
+    font-family:'Monaco','Menlo','Consolas',monospace;border:1px solid var(--border);
+  }
+  [data-theme="light"] .prose p code,[data-theme="light"] .prose li code,[data-theme="light"] .prose td code{
+    background:#f0f0f3;border-color:var(--border);
+  }
+
+  /* code blocks */
+  .prose pre{
+    background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+    margin:26px 0;overflow-x:auto;
+  }
+  .prose pre code{
+    display:block;padding:20px;font-size:13px;line-height:1.65;
+    font-family:'Monaco','Menlo','Consolas',monospace;background:transparent!important;
+  }
+  .hljs{background:var(--code-bg)!important;}
+  .code-cap{
+    font-size:12.5px;color:var(--text-faint);margin:-14px 0 26px;padding-left:2px;
+  }
+
+  /* callout — used sparingly, Griffyn-style restraint */
+  .note{
+    border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent);
+    padding:16px 20px;margin:26px 0;border-radius:0 6px 6px 0;font-size:16px;
+  }
+  .note.warn{border-left-color:var(--amber);background:color-mix(in srgb,var(--amber) 8%,transparent);}
+  .note p{margin-bottom:10px;}
+  .note p:last-child{margin-bottom:0;}
+  .note strong{color:var(--heading);}
+
+  /* screenshot placeholder */
+  figure.shot{margin:30px 0;}
+  .shot-ph{
+    border:1.5px dashed var(--border);border-radius:10px;background:var(--surface);
+    min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;text-align:center;padding:34px 24px;transition:border-color .2s,background .2s;
+  }
+  .shot-ph:hover{border-color:var(--accent);}
+  .shot-ph .ph-icon{
+    width:34px;height:34px;color:var(--text-faint);
+  }
+  .shot-ph .ph-label{font-size:13px;font-weight:600;color:var(--text-dim);letter-spacing:.3px;}
+  .shot-ph .ph-hint{font-size:12px;color:var(--text-faint);font-family:'Monaco',monospace;}
+  figure.shot img{
+    display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;
+  }
+  figure.shot figcaption{
+    margin-top:12px;font-size:13.5px;color:var(--text-faint);line-height:1.5;text-align:center;
+  }
+
+  /* tables */
+  .prose table{
+    width:100%;border-collapse:collapse;margin:26px 0;font-size:14.5px;display:block;overflow-x:auto;
+  }
+  .prose thead th{
+    text-align:left;padding:10px 14px;background:var(--surface-2);color:var(--text-dim);
+    font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;
+    border-bottom:1px solid var(--border);white-space:nowrap;
+  }
+  .prose tbody td{padding:11px 14px;border-bottom:1px solid var(--border-soft);vertical-align:top;}
+  .prose tbody tr:last-child td{border-bottom:none;}
+  .prose tbody td:first-child{color:var(--heading);font-weight:500;}
+
+  /* horizontal rule between major sections feel */
+  .prose hr{border:none;border-top:1px solid var(--border);margin:48px 0;}
+
+  /* footer */
+  .article-foot{
+    max-width:760px;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px;}
+  .tags a{
+    font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;
+    color:var(--accent);text-decoration:none;border:1px solid var(--border);
+    padding:5px 11px;border-radius:6px;transition:all .2s;
+  }
+  .tags a:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);}
+  .foot-nav{display:flex;justify-content:space-between;gap:20px;font-size:14px;}
+  .foot-nav a{color:var(--accent);text-decoration:none;}
+  .foot-nav a:hover{text-decoration:underline;}
+  .site-foot{
+    text-align:center;color:var(--text-faint);font-size:13px;
+    padding:40px 24px;border-top:1px solid var(--border);margin-top:60px;
+    display:flex;gap:10px;justify-content:center;
+  }
+
+  /* responsive */
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr;gap:0;}
+    .toc{display:none;}
+    .prose{max-width:none;}
+    .author{max-width:none;}
+  }
+  @media (max-width:600px){
+    .article-header h1{font-size:30px;}
+    .subtitle{font-size:16px;}
+    .prose{font-size:16px;}
+    .prose h2{font-size:24px;}
+    .prose h3{font-size:19px;}
+    .topbar{padding:20px 18px;}
+    .wrap{padding:0 18px 60px;}
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--surface);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <a href="/" class="brand">Bat Otgonbayar</a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/writeups">Writeups</a>
+    <a href="/about">About</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+      <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+    </button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <div class="article-header">
+    <div class="pub-date">June 2025 · ~18 min read · Blue Team / Cloud Security / AI</div>
+    <h1>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer</h1>
+    <p class="subtitle">
+      I put a deliberately exposed Windows box on the public internet, wired it into Microsoft Sentinel,
+      and watched real attackers show up within minutes. Then I went past the tutorial — sharper detections,
+      MITRE mapping, and an AI layer that turns raw alerts into analyst-ready summaries.
+    </p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ================= ARTICLE ================= -->
+    <article>
+      <div class="author">
+        <div class="avatar">BO</div>
+        <div class="who">
+          <div class="name">Bat Otgonbayar</div>
+          <div class="role">Systems &amp; Security · <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener">LinkedIn</a></div>
+        </div>
+      </div>
+
+      <div class="prose" id="prose">
+
+        <p class="lede">
+          A coworker once asked me whether a brute-force alert on a server was something to worry about, and I realized
+          I had never actually watched the other side of that interaction happen in real time. I knew the theory —
+          failed logon events, source IPs, the whole MITRE vocabulary — but I had never stood up a target, opened the
+          front door, and let the internet do what it does. So I did exactly that, and turned it into a small SOC pipeline.
+        </p>
+
+        <p>
+          The foundation here is the <a href="https://logos-red.com/blog/how-to-build-a-microsoft-azure-sentinel-siem-cybersecurity-lab/" target="_blank" rel="noopener">Logos Red Azure Sentinel guide</a>:
+          spin up a Windows VM, expose it, and feed its security events into Microsoft Sentinel. I followed it end to end,
+          got it working, and then kept going — because the tutorial stops at a single string-match query, and a real
+          detection environment is a different animal. This writeup is the version I wish I'd had: the base build, the
+          places I tightened it, and the AI layer I bolted onto the incident pipeline afterward.
+        </p>
+
+        <p>
+          One principle up front, the same one that keeps a honeypot a lab and not a liability. <strong>Expose the
+          throwaway, never the real thing.</strong> The whole point is to attract noise onto a machine that holds nothing,
+          lives in its own resource group, and gets deleted when I'm done. I'll flag the spot where that distinction
+          actually costs money if you ignore it.
+        </p>
+
+        <h2 id="the-build-at-a-glance">The build at a glance<a href="#the-build-at-a-glance" class="anchor">#</a></h2>
+
+        <p>
+          Five moving parts, and each one only matters because of the one after it.
+        </p>
+
+        <ol>
+          <li>A Windows VM in Azure with a Network Security Group deliberately set to allow everything inbound. This is the honeypot — the bait.</li>
+          <li>The Azure Monitor Agent on that VM, shipping Windows Security Events into a Log Analytics Workspace through a Data Collection Rule.</li>
+          <li>Microsoft Sentinel sitting on top of the workspace, running KQL analytics rules that turn raw events into alerts and incidents.</li>
+          <li>A set of detections that go past "someone logged in" — brute-force thresholds, post-brute-force success, privilege escalation, and persistence, each mapped to MITRE ATT&amp;CK.</li>
+          <li>A Logic App playbook that enriches every new incident with geo data and an AI-written triage summary before an analyst ever opens it.</li>
+        </ol>
+
+        <p>Now the detail, in the order I built it.</p>
+
+        <h2 id="standing-up-the-victim-vm">Standing up the victim VM<a href="#standing-up-the-victim-vm" class="anchor">#</a></h2>
+
+        <p>
+          Once you're signed into the Azure portal, the VM itself is the easy part — the interesting decisions are in the
+          networking. Start from <strong>Virtual machines → Create → Azure virtual machine</strong>, and give it a fresh
+          resource group of its own. Keeping the whole lab in a dedicated resource group is not cosmetic: when you're done,
+          you delete the group and everything goes with it, no orphaned disks quietly billing you.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/01-create-vm.png" alt="Azure portal — creating the virtual machine"> -->
+          <figcaption>Creating the VM and its dedicated resource group from the Azure dashboard.</figcaption>
+        </figure>
+
+        <p>
+          For the image, pick Windows 10 or 11. For size, anything cheap works, but I'd aim for roughly two vCPUs and a
+          few gigs of RAM — the Azure Monitor Agent that ships events to Sentinel has real overhead, and if you starve the
+          VM it drops events during I/O spikes, which means you miss the exact bursts of activity you built this to see.
+          Set a username and password, keep RDP enabled, and leave the disk settings at their defaults.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/02-vm-size-image.png" alt="VM image and size selection"> -->
+          <figcaption>Choosing the OS image and a small, cheap VM size.</figcaption>
+        </figure>
+
+        <p>
+          The networking step is the one that makes this a honeypot. By default Azure gives you a sensible Network
+          Security Group that only allows RDP. Delete that rule and replace it with one that allows everything: source
+          <code>*</code>, destination port range <code>*</code>, priority <code>100</code>. Lower priority numbers win in
+          Azure, so <code>100</code> guarantees this "allow all" rule is evaluated before any default deny.
+        </p>
+
+        <div class="note warn">
+          <p><strong>Lab only.</strong> An allow-all inbound rule on a public IP is exactly what you spend your career
+          preventing. It belongs on a disposable VM in an isolated resource group and nowhere near anything real. The
+          reason we open it this wide is so the box lights up with attack traffic we can study — that's the entire experiment.</p>
+        </div>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/03-nsg-allow-all.png" alt="NSG inbound rule allowing all traffic"> -->
+          <figcaption>The deliberately permissive inbound rule: source *, destination *, priority 100.</figcaption>
+        </figure>
+
+        <p>
+          Review, create, and let it deploy. While the VM spins up, we move to Sentinel.
+        </p>
+
+        <h2 id="wiring-up-sentinel">Wiring up Sentinel<a href="#wiring-up-sentinel" class="anchor">#</a></h2>
+
+        <p>
+          The thing worth internalizing here is that Sentinel doesn't actually store your logs — the Log Analytics
+          Workspace does. Sentinel is the analytics and alerting brain that sits on top of it. So the order matters:
+          search for <strong>Microsoft Sentinel</strong>, create it, and point it at a workspace in the
+          <em>same region as your VM</em>. Same region keeps you out of cross-region data-transfer charges, which is a
+          small thing until your honeypot is ingesting thousands of events an hour.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/04-create-sentinel.png" alt="Creating Microsoft Sentinel on a workspace"> -->
+          <figcaption>Creating Sentinel against a workspace in the same region as the VM.</figcaption>
+        </figure>
+
+        <p>
+          With Sentinel created, go to <strong>Content hub</strong> and install the <strong>Windows Security Events</strong>
+          solution. That pack brings in the AMA-based data connector, plus pre-built workbooks and analytics rules you'll
+          use later. Refresh the Sentinel page afterward — the connector won't appear in the list until you do, and that
+          missing refresh is the single most common reason people think their setup is broken when it isn't.
+        </p>
+
+        <p>
+          Open the <strong>Windows Security Events via AMA</strong> connector, create a new <strong>Data Collection
+          Rule</strong>, and attach your VM to it. When it asks which events to collect, choose <strong>All Security
+          Events</strong> rather than Common. "Common" drops some of the event IDs that matter for lateral-movement and
+          persistence detection, and for a lab you want the full firehose. In production you'd filter aggressively here to
+          control ingestion cost — but that's a production problem, not a lab one.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/05-data-collection-rule.png" alt="Creating a Data Collection Rule for the VM"> -->
+          <figcaption>The Data Collection Rule, set to collect all security events from the honeypot VM.</figcaption>
+        </figure>
+
+        <p>
+          Give it five to ten minutes. The agent installs as a VM extension after the DCR is created, and there's an
+          initialization window where queries return nothing. If you query immediately and panic, you'll waste an hour
+          troubleshooting a thing that just needed to finish booting.
+        </p>
+
+        <h2 id="the-first-query-and-why-its-not-enough">The first query, and why it's not enough<a href="#the-first-query-and-why-its-not-enough" class="anchor">#</a></h2>
+
+        <p>
+          Sentinel queries are written in KQL, Kusto Query Language — Microsoft's own thing, close enough to SQL that you
+          can read it on sight. The tutorial's starting query is genuinely the right first move, because it proves data is
+          flowing:
+        </p>
+
+        <pre><code class="language-sql">SecurityEvent
+| where Activity contains "success"</code></pre>
+        <p class="code-cap">The base query — fine for a first look, far too broad for an alert.</p>
+
+        <p>
+          Run that after you've RDP'd in once, and you'll see your own logon. The problem is the breadth: matching the
+          string <code>success</code> in the Activity field catches logoffs and a pile of benign events alongside the real
+          logons. It tells you data exists; it does not tell you anything an analyst would act on. So the first thing I did
+          was throw it away and write detections around <em>event IDs</em>, which are specific, stable, and fast.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/06-first-kql-results.png" alt="KQL query results in Sentinel Logs"> -->
+          <figcaption>First successful query — proof the pipeline is live before sharpening the logic.</figcaption>
+        </figure>
+
+        <h2 id="sharper-detections">Sharper detections — the part the tutorial skips<a href="#sharper-detections" class="anchor">#</a></h2>
+
+        <p>
+          Here's the first real detection: rapid failed logons from a single source, which is the signature of an RDP
+          brute-force. Event ID <code>4625</code> is a failed logon. A single one is meaningless; ten from the same IP in
+          ten minutes is a campaign. Thresholds are what separate an alert from a notification nobody reads.
+        </p>
+
+        <pre><code class="language-sql">// Brute-force signature: rapid failed logons (Event ID 4625) per source IP
+let threshold = 10;
+SecurityEvent
+| where EventID == 4625
+| where TimeGenerated > ago(1h)
+| summarize
+    FailedAttempts   = count(),
+    FirstAttempt     = min(TimeGenerated),
+    LastAttempt      = max(TimeGenerated),
+    AccountsTargeted = dcount(TargetAccount)
+    by IpAddress, Computer
+| where FailedAttempts >= threshold
+| extend DurationMin = datetime_diff('minute', LastAttempt, FirstAttempt)
+| project IpAddress, Computer, FailedAttempts, AccountsTargeted,
+          FirstAttempt, LastAttempt, DurationMin
+| sort by FailedAttempts desc</code></pre>
+        <p class="code-cap">Counting failures per IP and only surfacing the ones past a threshold.</p>
+
+        <p>
+          The higher-fidelity detection is the one that actually means trouble: a <em>successful</em> logon
+          (<code>4624</code>) from an IP that was just throwing failures at you. That's a brute-force that worked. Joining
+          the two event streams turns a noisy signal into a precise one, and I annotate the MITRE technique right in the
+          query so the mapping travels with the alert into the incident.
+        </p>
+
+        <pre><code class="language-sql">// Brute-force SUCCESS: a 4624 logon from an IP that was just failing (4625)
+let lookback = 1h;
+let failThreshold = 5;
+let bruteForceIPs =
+    SecurityEvent
+    | where TimeGenerated > ago(lookback)
+    | where EventID == 4625
+    | summarize FailCount = count() by IpAddress
+    | where FailCount >= failThreshold
+    | project IpAddress;
+SecurityEvent
+| where TimeGenerated > ago(lookback)
+| where EventID == 4624
+| where LogonType == 10          // 10 = RemoteInteractive (RDP)
+| join kind=inner bruteForceIPs on IpAddress
+| project TimeGenerated, Computer, IpAddress, TargetAccount, AuthenticationPackageName
+| extend MitreTactic    = "Initial Access",
+         MitreTechnique = "T1110.001 - Brute Force: Password Guessing"
+| sort by TimeGenerated desc</code></pre>
+        <p class="code-cap">The success-after-failure pattern — low volume, high meaning.</p>
+
+        <p>
+          Filtering on <code>LogonType == 10</code> is the detail that keeps this honest: it scopes the match to RDP
+          sessions specifically, so you're not alerting on a local console logon that happens to follow some unrelated
+          failures. Small filter, large difference in false-positive rate.
+        </p>
+
+        <p>
+          Beyond the login story, three more event IDs are worth watching because they describe an attacker who is
+          <em>already in</em> and trying to stay there or cover their tracks. In a honeypot those are gold, because
+          reaching them means the brute-force succeeded and someone is now operating on the box.
+        </p>
+
+        <pre><code class="language-sql">// 4732 — account added to a privileged local group (privilege escalation)
+SecurityEvent
+| where EventID == 4732
+| where TargetAccount contains "Administrators"
+| project TimeGenerated, Computer, SubjectAccount, MemberName, TargetAccount
+| extend MitreTactic = "Privilege Escalation", MitreTechnique = "T1078 - Valid Accounts"
+
+// 4719 — audit policy changed (defense evasion / log tampering)
+SecurityEvent
+| where EventID == 4719
+| project TimeGenerated, Computer, SubjectAccount, AuditPolicyChanges
+| extend MitreTactic = "Defense Evasion", MitreTechnique = "T1562.002 - Disable Windows Event Logging"
+
+// 4698 — scheduled task created (persistence)
+SecurityEvent
+| where EventID == 4698
+| project TimeGenerated, Computer, SubjectAccount, TaskName
+| extend MitreTactic = "Persistence", MitreTechnique = "T1053.005 - Scheduled Task"</code></pre>
+        <p class="code-cap">Three post-compromise detections the base tutorial never reaches for.</p>
+
+        <p>
+          With the queries written, turning one into an alert is a couple of clicks: <strong>New alert rule → Create
+          Microsoft Sentinel rule</strong>. Name it, set a severity, and — the genuinely nice part — tag it with its MITRE
+          tactic right in the rule UI. For the brute-force success rule that's <em>Initial Access</em>; for the scheduled-task
+          rule it's <em>Persistence</em>. Set how often it runs (anywhere from five minutes to fourteen days) and save.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/07-analytics-rule-mitre.png" alt="Creating an analytics rule with MITRE mapping"> -->
+          <figcaption>Building the analytics rule and categorizing it by MITRE ATT&amp;CK tactic.</figcaption>
+        </figure>
+
+        <h2 id="where-i-tightened-it">Where I tightened it<a href="#where-i-tightened-it" class="anchor">#</a></h2>
+
+        <p>
+          It's worth laying out plainly what changed between the tutorial's setup and the one I ended up running, because
+          most of it is the difference between a demo and something that resembles a working detection environment.
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>Area</th><th>Base tutorial</th><th>What I ran instead</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Detection logic</td><td>String match on "success"</td><td>Event-ID based (4624 / 4625 / 4719 / 4732 / 4698) with thresholds</td></tr>
+            <tr><td>Severity</td><td>One level for everything</td><td>Tiered: brute-force Medium, post-brute success High, policy change Critical</td></tr>
+            <tr><td>MITRE mapping</td><td>Single tactic in the UI</td><td>Tactic + technique embedded in the KQL so it rides into the incident</td></tr>
+            <tr><td>Lookback window</td><td>5-min run, 5-min lookback</td><td>5-min run, 1-hour lookback — catches slow campaigns under the per-window bar</td></tr>
+            <tr><td>Entity mapping</td><td>Not configured</td><td>IP and Account mapped as entities — enables the investigation graph and UEBA</td></tr>
+            <tr><td>Incident grouping</td><td>Default (one per alert)</td><td>Grouped by IP + 1-hour window — no alert storm from a single attacker</td></tr>
+            <tr><td>Automation</td><td>None</td><td>Logic App playbook: geo + AI enrichment on incident creation</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          The incident-grouping change is the one that saved my sanity. A single determined IP can trip a brute-force rule
+          hundreds of times in an hour. Grouped by source IP and a time window, that becomes one incident with a count,
+          instead of a screen full of identical noise that buries anything real.
+        </p>
+
+        <h2 id="the-ai-layer">The AI layer<a href="#the-ai-layer" class="anchor">#</a></h2>
+
+        <p>
+          This is where the project stops being a lab build and starts being something I'd actually want at a SOC desk.
+          The most tedious part of Tier-1 work is reading raw event data and reconstructing, in your head, the story of
+          what happened. That reconstruction is exactly the kind of thing a language model is good at — so I put one in
+          the pipeline.
+        </p>
+
+        <p>
+          When Sentinel creates an incident, a Logic App fires immediately. It pulls the alert entities — IP, account,
+          timestamps, event IDs — enriches the IP with geolocation, and hands the whole bundle to a model with a tight,
+          structured prompt. The result gets posted back as an incident comment <em>before an analyst opens it</em>. The
+          payload the Logic App sends looks like this:
+        </p>
+
+        <pre><code class="language-json">{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a SOC analyst assistant. Given a Microsoft Sentinel incident, produce a triage summary in three sections: 1) What happened (2-3 sentences), 2) MITRE ATT&CK mapping with technique IDs, 3) Recommended immediate actions. Write for a Tier 2 analyst."
+    },
+    {
+      "role": "user",
+      "content": "Incident: @{triggerBody()?['object']?['properties']?['title']}\n\nEntities:\n@{variables('EntitySummary')}\n\nGeo:\n@{variables('GeoEnrichment')}"
+    }
+  ],
+  "max_tokens": 500,
+  "temperature": 0.1
+}</code></pre>
+        <p class="code-cap">The Logic App's HTTP action body. Low temperature keeps the output factual and consistent.</p>
+
+        <p>
+          For testing the prompt outside Logic Apps — which I'd recommend before you wire it into a playbook — the same
+          call in Python against Azure OpenAI is straightforward:
+        </p>
+
+        <pre><code class="language-python">import os
+from openai import AzureOpenAI
+
+client = AzureOpenAI(
+    api_key=os.environ["AZURE_OPENAI_KEY"],
+    api_version="2024-02-01",
+    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+)
+
+def triage(incident_title: str, entities: dict) -> str:
+    """Generate an analyst-ready triage summary for a Sentinel incident."""
+    summary = "\n".join([
+        f"- IP: {entities.get('ip', 'N/A')}",
+        f"- Account: {entities.get('account', 'N/A')}",
+        f"- Host: {entities.get('host', 'N/A')}",
+        f"- Country: {entities.get('country', 'N/A')} ({entities.get('asn', 'N/A')})",
+        f"- Failed attempts: {entities.get('failed', 0)}",
+    ])
+
+    resp = client.chat.completions.create(
+        model="gpt-4o",                       # your Azure deployment name
+        messages=[
+            {"role": "system", "content": (
+                "You are a SOC analyst assistant. Produce a triage summary with "
+                "three sections: What happened (2-3 sentences), MITRE ATT&CK mapping "
+                "(tactic + technique ID), and three recommended actions. Be technical "
+                "and precise; assume a Tier 2 audience."
+            )},
+            {"role": "user", "content": f"Incident: {incident_title}\n\nEntities:\n{summary}"},
+        ],
+        max_tokens=500,
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+
+if __name__ == "__main__":
+    print(triage(
+        "Brute Force Success — RDP (T1110.001)",
+        {"ip": "185.220.101.47", "account": "Administrator", "host": "honeypot-vm-01",
+         "country": "Netherlands", "asn": "Tor exit node", "failed": 347},
+    ))</code></pre>
+        <p class="code-cap">The same triage call as a standalone script, useful for iterating on the prompt.</p>
+
+        <p>
+          What comes back is the thing an analyst would otherwise spend four to six minutes assembling by hand: a plain
+          statement of what happened, the technique IDs, and the next moves. For the example above the model produced a
+          summary that read, in essence, that a Tor-exit IP in the Netherlands had run 347 failed logons against the
+          Administrator account before a successful authentication, mapped it to T1110.001, and recommended isolating the
+          host, rotating the credential, and checking for the persistence event IDs I wired up earlier. That last part is
+          the payoff — the AI's advice loops back to the exact detections in this lab.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/08-ai-incident-comment.png" alt="AI-generated triage comment on a Sentinel incident"> -->
+          <figcaption>The AI triage summary posted as a comment on the incident, ready before anyone opens it.</figcaption>
+        </figure>
+
+        <p>
+          The second AI touch is enrichment. A raw IP is almost useless to an analyst, so before the triage call I run the
+          IP through a geo/ASN lookup and a Tor/VPN/datacenter classification, then let the model interpret what that
+          combination implies about the actor. A residential IP in one country reads very differently from a datacenter
+          range or a known Tor exit, and surfacing that distinction up front changes how you triage.
+        </p>
+
+        <pre><code class="language-python">import requests
+
+def enrich_ip(ip: str, client) -> dict:
+    """Geo + ASN lookup, then an AI read on what the combination suggests."""
+    geo = requests.get(
+        f"http://ip-api.com/json/{ip}"
+        "?fields=country,regionName,isp,org,as,proxy,hosting",
+        timeout=5,
+    ).json()
+
+    context = (
+        f"IP: {ip}\nCountry: {geo.get('country')}\n"
+        f"Org: {geo.get('org', geo.get('isp'))}\nASN: {geo.get('as')}\n"
+        f"Proxy/VPN: {geo.get('proxy')}\nHosting/DC: {geo.get('hosting')}"
+    )
+
+    read = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": (
+                "You are a threat-intel analyst. In 2-3 sentences, assess likely "
+                "actor type (opportunistic scanner, targeted, botnet node), "
+                "infrastructure type, and OPSEC posture. Be concise."
+            )},
+            {"role": "user", "content": context},
+        ],
+        max_tokens=200, temperature=0.2,
+    )
+    return {"geo": geo, "assessment": read.choices[0].message.content}</code></pre>
+        <p class="code-cap">IP enrichment feeding an AI actor-context read, which then feeds the triage prompt.</p>
+
+        <p>
+          The third piece, which I kept deliberately conservative, is response. The Logic App can ask the model which
+          containment action fits — isolate the host, block the IP at the NSG, watchlist it, or do nothing — and then it
+          sends that recommendation to me for approval before anything executes. The model advises; a human still pulls
+          the trigger. For a lab that's slightly theatrical, but it's the right shape for the real thing, and it means the
+          automation never takes an irreversible action on its own.
+        </p>
+
+        <h2 id="what-actually-showed-up">What actually showed up<a href="#what-actually-showed-up" class="anchor">#</a></h2>
+
+        <p>
+          Then I turned it on and waited, which did not take long. The first brute-force attempt against the box landed
+          inside fifteen minutes of it going public — internet-wide scanners find a fresh public IP almost immediately,
+          and there is something genuinely sobering about watching the first failed-logon events roll in before you've
+          finished your coffee.
+        </p>
+
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot</span>
+            <span class="ph-hint">set src on the &lt;img&gt; below, or replace this box</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/09-first-alert.png" alt="First brute-force alert in Sentinel"> -->
+          <figcaption>The first alert firing — minutes after the VM went public.</figcaption>
+        </figure>
+
+        <p>
+          Over the next day the failed-logon traffic came from dozens of countries, with the usual suspects dominating the
+          volume: hosting ranges, Tor exits, and a long tail of clearly compromised residential hosts being used as
+          relays. The targeted usernames were exactly the boring, predictable set — Administrator, admin, user, test,
+          guest — because automated tools cycle through the obvious ones first, every time. Volume peaked overnight in my
+          timezone, which lines up with automated campaigns running during business hours elsewhere in the world.
+        </p>
+
+        <p>
+          The two things I'll keep from running this: event-ID detections produced zero false positives from the benign
+          logoff events that the tutorial's string-match would have flagged, and the AI triage comment turned each
+          incident from a four-to-six-minute manual read into something I could grasp in well under a minute, because the
+          narrative was already sitting there when I opened it. Neither of those is a dramatic result on its own. Together
+          they're the difference between a lab and a workflow.
+        </p>
+
+        <div class="note">
+          <p><strong>The cost footnote I promised.</strong> Sentinel bills on data ingestion, and a wide-open VM
+          generating thousands of events an hour with "All Security Events" selected adds up faster than you'd guess. I
+          ran a smaller VM than recommended to throttle event volume, kept it deallocated whenever I wasn't actively
+          collecting, and deleted the whole resource group when I was done. Total cost across about three days of
+          collection: a few dollars. Leave it running and forget it, and that number stops being funny.</p>
+        </div>
+
+        <h2 id="where-this-goes-next">Where this goes next<a href="#where-this-goes-next" class="anchor">#</a></h2>
+
+        <p>
+          This is the first piece of a longer cloud-security thread I'm working through. The geo data I'm already
+          collecting wants to become a live attack map in a Sentinel Workbook — watching the failed logons light up a
+          world map in real time is the obvious next move, and the enrichment is half-built for it already. After that I
+          want to wire MISP into Sentinel so attacker IPs get cross-referenced against known threat-actor infrastructure
+          automatically, and layer Defender for Cloud on top to capture what actually happens on the box <em>after</em> a
+          brute-force succeeds, rather than inferring it from event IDs.
+        </p>
+
+        <p>
+          The thing this lab drove home, though, is smaller and more durable than any of that. You can read about RDP
+          brute-force for years and it stays abstract. Open one real port to the internet, watch the attempts arrive
+          inside fifteen minutes, and it stops being abstract permanently. Build the detection around what you watched,
+          not around what the tutorial told you to match, and the queries get sharper because you've seen the thing they're
+          meant to catch.
+        </p>
+
+        <hr>
+
+        <p style="font-size:15px;color:var(--text-faint);">
+          Built on the <a href="https://logos-red.com/blog/how-to-build-a-microsoft-azure-sentinel-siem-cybersecurity-lab/" target="_blank" rel="noopener">Logos Red Azure Sentinel lab</a>.
+          Reference docs:
+          <a href="https://learn.microsoft.com/en-us/azure/sentinel/" target="_blank" rel="noopener">Microsoft Sentinel</a>,
+          <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-query-overview" target="_blank" rel="noopener">KQL</a>,
+          <a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK</a>,
+          <a href="https://learn.microsoft.com/en-us/azure/logic-apps/" target="_blank" rel="noopener">Azure Logic Apps</a>.
+        </p>
+
+      </div><!-- /prose -->
+
+      <div class="article-foot">
+        <div class="tags">
+          <a href="/tags/cloud-security">cloud-security</a>
+          <a href="/tags/microsoft-sentinel">microsoft-sentinel</a>
+          <a href="/tags/siem">siem</a>
+          <a href="/tags/blue-team">blue-team</a>
+          <a href="/tags/kql">kql</a>
+          <a href="/tags/ai">ai</a>
+          <a href="/tags/honeypot">honeypot</a>
+          <a href="/tags/mitre-attack">mitre-attack</a>
+        </div>
+        <div class="foot-nav">
+          <a href="/writeups">← All writeups</a>
+          <a href="/writeups/ad-lab-part1.html">Active Directory Home Lab: Part 1 →</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= SIDEBAR TOC ================= -->
+    <aside class="toc" id="toc">
+      <div class="toc-label">On this page</div>
+      <ul id="toc-list">
+        <li><a href="#the-build-at-a-glance">The build at a glance</a></li>
+        <li><a href="#standing-up-the-victim-vm">Standing up the victim VM</a></li>
+        <li><a href="#wiring-up-sentinel">Wiring up Sentinel</a></li>
+        <li><a href="#the-first-query-and-why-its-not-enough">The first query</a></li>
+        <li><a href="#sharper-detections">Sharper detections</a></li>
+        <li><a href="#where-i-tightened-it">Where I tightened it</a></li>
+        <li><a href="#the-ai-layer">The AI layer</a></li>
+        <li><a href="#what-actually-showed-up">What actually showed up</a></li>
+        <li><a href="#where-this-goes-next">Where this goes next</a></li>
+      </ul>
+    </aside>
+
+  </div><!-- /grid -->
+</div><!-- /wrap -->
+
+<footer class="site-foot">
+  <span>Bat Otgonbayar</span><span>·</span><span>© 2025</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  // syntax highlighting
+  hljs.highlightAll();
+
+  // theme toggle
+  (function(){
+    var btn = document.getElementById('themeToggle');
+    btn.addEventListener('click', function(){
+      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if(isLight){
+        document.documentElement.removeAttribute('data-theme');
+        try{ localStorage.setItem('theme','dark'); }catch(e){}
+      } else {
+        document.documentElement.setAttribute('data-theme','light');
+        try{ localStorage.setItem('theme','light'); }catch(e){}
+      }
+    });
+  })();
+
+  // reading progress
+  var bar = document.getElementById('progress');
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  });
+
+  // active TOC highlight
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc-list a'));
+  var heads = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var id = e.target.getAttribute('id');
+        links.forEach(function(a){
+          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-12% 0px -78% 0px' });
+  heads.forEach(function(h){ obs.observe(h); });
+
+  // auto-hide a screenshot placeholder once its sibling <img> has a real src
+  document.querySelectorAll('figure.shot').forEach(function(fig){
+    var img = fig.querySelector('img');
+    var ph  = fig.querySelector('.shot-ph');
+    if(img && ph && img.getAttribute('src')){ ph.style.display = 'none'; }
+  });
+</script>
+</body>
+</html>

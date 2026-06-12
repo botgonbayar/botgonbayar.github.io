@@ -549,6 +549,12 @@
           </div>
           <img src="/images/writeups/sentinel/02-vm-basics.png" alt="Azure portal Create VM Basics tab with new resource group" loading="lazy" decoding="async">
         </figure>
+          
+          <div class="note">
+          <p><strong>Why a dedicated resource group?</strong> When the lab is over, you delete the group and everything inside
+          it goes with it: VM, disk, NIC, public IP. No orphaned resources quietly billing you.</p>
+        </div>
+          
           <li>Name the VM (I used <code>Secora-CORP-0241</code>) because if you know me from my <a href="https://botgonbayar.github.io/writeups/ad-lab-part1.html" target="_blank" rel="noopener">Active Directory lab writeup</a>, Secora is the fictional company I based the lab off of, so to make the VM sound more enticing to the public, I formatted the name to resemble a legitimate company asset, and then pick a region close to you. Remember which one; the workspace must match it later</li>
           <figure class="shot">
           <div class="shot-ph">
@@ -559,11 +565,6 @@
           <img src="/images/writeups/sentinel/03-vm-basics.png" alt="Azure portal Create VM Basics tab with new resource group" loading="lazy" decoding="async">
         </figure>
         </ol>
-
-        <div class="note">
-          <p><strong>Why a dedicated resource group?</strong> When the lab is over, you delete the group and everything inside
-          it goes with it: VM, disk, NIC, public IP. No orphaned resources quietly billing you.</p>
-        </div>
 
         <ol start="4">
           <li>For Image, make sure you choose <strong>Windows 10 Enterprise, version 22H2</strong>, since you will get this error if you try to proceed with for example, Windows 11 images: "This virtual machine requires a subscription without any spending limit or temporary payment method set. Use a different subscription or update your subscription (requires account administrator privileges) at [Account Center](https://account.windowsazure.com) to continue." </li>

@@ -549,7 +549,7 @@
           </div>
           <img src="/images/writeups/sentinel/02-vm-basics.png" alt="Azure portal Create VM Basics tab with new resource group" loading="lazy" decoding="async">
         </figure>
-          <li>Name the VM (I used <code>Secora-CORP-0241</code>) because if you know me from my Active Directory lab writeup, that is my fictional company so I'll continue with that for now and pick a region close to you. Remember which one; the workspace must match it later</li>
+          <li>Name the VM (I used <code>Secora-CORP-0241</code>) because if you know me from my Active Directory lab writeup, Secora is the fictional company I based the lab off of, so to make the VM sound more enticing to the public, I formatted the name to resemble a legitimate company asset, and then pick a region close to you. Remember which one; the workspace must match it later</li>
           <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
@@ -566,7 +566,16 @@
         </div>
 
         <ol start="4">
-          <li>For Image, select <strong>Windows 10</strong> or <strong>Windows 11</strong></li>
+          <li>For Image, make sure you choose <strong>Windows 10 Enterprise, version 22H2</strong>, since you will get this error if you try to proceed with for example, Windows 11 images: "This virtual machine requires a subscription without any spending limit or temporary payment method set. Use a different subscription or update your subscription (requires account administrator privileges) at [Account Center](https://account.windowsazure.com) to continue." </li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 4</span>
+            <span class="ph-hint">/images/writeups/sentinel/04-vm-image.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/04-vm-image-size.png" alt="VM image and size selection" loading="lazy" decoding="async"> -->
+          <figcaption>Choosing the OS image and a small, cheap VM size.</figcaption>
+        </figure>
           <li>For Size, pick something small but not tiny, around 2 vCPUs and 4 GB RAM (e.g. <code>B2s</code>)</li>
           <li>Set a username and password. Write them down; you'll RDP in later to generate test events</li>
           <li>Under Inbound port rules, leave <strong>RDP (3389)</strong> selected</li>

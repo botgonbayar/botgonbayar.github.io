@@ -477,7 +477,7 @@
           <!-- OPTION C: static image fallback -->
           <!-- <img src="/images/writeups/sentinel/00-hero.png" alt="Honeypot SOC dashboard artwork: a bee inside a hexagonal targeting reticle with live capture telemetry" loading="eager" decoding="async" fetchpriority="high"> -->
 
-          <figcaption>The lab in one picture: bait that looks sweet, instrumentation watching everything that touches it.</figcaption>
+          <figcaption>made with Claude Design.</figcaption>
         </figure>
 
         <p class="lede">
@@ -647,8 +647,26 @@
         <p>This is the step that makes it a honeypot. By default Azure gives you a sensible Network Security Group that only allows RDP. We're going to replace it with a rule that allows everything, from everyone, on every port. There are entire compliance frameworks devoted to preventing what you're about to do on purpose. Do it anyway. The point is to make this box impossible for a scanner to ignore.</p>
 
         <ol>
-          <li>Open your VM and go to <strong>Networking</strong> → <strong>Network settings</strong></li>
+          <li>Open your VM and go to <strong>Networking</strong> → <strong>Network settings, then navigate into your NSG config page. Yours will be named differently, mine is <code>Secora-CORP-0241-nsg</code></strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 11</span>
+            <span class="ph-hint">/images/writeups/sentinel/11-vm-nsg.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/11-vm-nsg.png" alt="VM" loading="lazy" decoding="async">
+          <figcaption>A network security group essentially acts as your "firewall" for your virtual network that houses our VM. It contains rules that allow or deny inbound network traffic to, or outbound traffic from, the virtual machine.</figcaption>
+        </figure>
           <li>Delete the default <code>RDP</code> inbound rule</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 12</span>
+            <span class="ph-hint">/images/writeups/sentinel/12-vm-rdp.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/12-vm-rdp.png" alt="VM rdp delete" loading="lazy" decoding="async">
+          <figcaption>VM deployment successful - nice!</figcaption>
+        </figure>
           <li>Click <strong>Create port rule</strong> → <strong>Inbound port rule</strong> and set:
             <ul>
               <li><strong>Source:</strong> Any</li>

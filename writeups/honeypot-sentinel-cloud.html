@@ -260,6 +260,13 @@
   figure.shot.hero{margin:8px 0 34px;}
   figure.shot.hero .shot-ph{min-height:260px;}
   figure.shot.hero img{box-shadow:0 8px 32px var(--shadow);}
+  .hero-embed{
+    display:block;width:100%;aspect-ratio:16/9;border:1px solid var(--border);
+    border-radius:10px;background:#0a0e17;box-shadow:0 8px 32px var(--shadow);
+    pointer-events:none;
+  }
+  iframe.hero-embed{overflow:hidden;}
+  video.hero-embed{object-fit:cover;}
 
   /* tables */
   .prose table{
@@ -431,10 +438,19 @@
         <figure class="shot hero">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Hero Image</span>
-            <span class="ph-hint">/images/writeups/sentinel/00-hero.png</span>
+            <span class="ph-label">Hero (animated)</span>
+            <span class="ph-hint">uncomment ONE option below</span>
           </div>
-          <img src="/images/writeups/sentinel/00-hero.png" alt="Honeypot SOC dashboard artwork: a bee inside a hexagonal targeting reticle with live capture telemetry" loading="eager" decoding="async" fetchpriority="high">
+
+          <!-- OPTION A (best): the Claude Design HTML loop, saved to /images/writeups/sentinel/hero-sting.html -->
+          <iframe class="hero-embed" src="/images/writeups/sentinel/hero-sting.html" title="Animated honeypot intro: intrusion packets stream in, target lock, trap armed" loading="eager" scrolling="no"></iframe>
+
+          <!-- OPTION B: a screen recording of the loop as mp4 -->
+          <!-- <video class="hero-embed" src="/images/writeups/sentinel/hero-sting.mp4" autoplay muted loop playsinline disablepictureinpicture aria-label="Animated honeypot intro loop"></video> -->
+
+          <!-- OPTION C: static image fallback -->
+          <!-- <img src="/images/writeups/sentinel/00-hero.png" alt="Honeypot SOC dashboard artwork: a bee inside a hexagonal targeting reticle with live capture telemetry" loading="eager" decoding="async" fetchpriority="high"> -->
+
           <figcaption>The lab in one picture: bait that looks sweet, instrumentation watching everything that touches it.</figcaption>
         </figure>
 
@@ -1217,12 +1233,18 @@ def enrich_ip(ip: str, client) -> dict:
   }, { rootMargin: '-12% 0px -78% 0px' });
   heads.forEach(function(h){ obs.observe(h); });
 
-  // auto-hide a screenshot placeholder once its sibling <img> has a real src
+  // auto-hide a placeholder once its figure contains real media (img, video, or iframe)
   document.querySelectorAll('figure.shot').forEach(function(fig){
-    var img = fig.querySelector('img');
-    var ph  = fig.querySelector('.shot-ph');
-    if(img && ph && img.getAttribute('src')){ ph.style.display = 'none'; }
+    var media = fig.querySelector('img, video, iframe');
+    var ph    = fig.querySelector('.shot-ph');
+    if(media && ph && media.getAttribute('src')){ ph.style.display = 'none'; }
   });
+
+  // respect reduced motion: stop the hero loop, leave a still frame
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var heroVid = document.querySelector('video.hero-embed');
+    if (heroVid) { heroVid.removeAttribute('autoplay'); heroVid.pause(); }
+  }
 </script>
 </body>
 </html>

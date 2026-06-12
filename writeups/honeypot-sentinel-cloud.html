@@ -594,6 +594,13 @@
           </div>
           <img src="/images/writeups/sentinel/06-vm-size.png" alt="VM size" loading="lazy" decoding="async">
         </figure>
+
+          <div class="note">
+          <p><strong>Why not the smallest size?</strong> The Azure Monitor Agent that ships events to Sentinel has real overhead.
+          Starve the VM and it drops events during I/O spikes, which means you miss the exact bursts of attack activity you
+          built this lab to see.</p>
+        </div>
+          
           <li>Set a username and password. Write them down; you'll RDP in later to generate test events</li>
           <figure class="shot">
           <div class="shot-ph">
@@ -632,12 +639,6 @@
           <img src="/images/writeups/sentinel/10-vm-complete.png" alt="VM image and size selection" loading="lazy" decoding="async">
           <figcaption>VM deployment successful - nice!</figcaption>
         </figure>
-
-        <div class="note">
-          <p><strong>Why not the smallest size?</strong> The Azure Monitor Agent that ships events to Sentinel has real overhead.
-          Starve the VM and it drops events during I/O spikes, which means you miss the exact bursts of attack activity you
-          built this lab to see.</p>
-        </div>
 
         <h2 id="step-2-open-it-to-the-internet">Step 2: Open It to the Internet<a href="#step-2-open-it-to-the-internet" class="anchor">#</a></h2>
 

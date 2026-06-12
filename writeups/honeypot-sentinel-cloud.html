@@ -601,7 +601,8 @@
           built this lab to see.</p>
         </div>
           
-          <li>Set a username and password. Write them down; you'll RDP in later to generate test events</li>
+          <li>Set a username and password. Write them down; you'll RDP in later to generate test events. Oh, and yes... the
+          attackers will be trying <code>Password123</code> within the hour, so feel free to not use that one</li>
           <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
@@ -644,8 +645,7 @@
         <h2 id="step-2-open-it-to-the-internet">Step 2: Open It to the Internet<a href="#step-2-open-it-to-the-internet" class="anchor">#</a></h2>
 
         <p>
-          This is the step that makes it a honeypot. By default Azure gives you a sensible Network Security Group that only
-          allows RDP. We're going to replace it with a rule that allows everything.
+          We're going to replace it with a rule that allows absolutely everything. In any other context this configuration is a resume-generating event; here it's the entire business plan. We want this box loud, obvious, and irresistible, because the goal is for it to light up with attack traffic we can map later.
         </p>
 
         <ol>

@@ -361,6 +361,32 @@
   }
   .toc-mobile li a:hover{color:var(--accent);}
 
+  /* image lightbox */
+  .prose figure.shot img{cursor:zoom-in;}
+  .lightbox{
+    border:none;padding:0;background:transparent;max-width:none;max-height:none;
+    width:100vw;height:100vh;display:none;align-items:center;justify-content:center;
+    flex-direction:column;gap:14px;outline:none;
+  }
+  .lightbox[open]{display:flex;}
+  .lightbox::backdrop{
+    background:rgba(8,10,18,.82);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .lightbox img{
+    max-width:min(1400px,92vw);max-height:84vh;border-radius:10px;
+    box-shadow:0 24px 80px rgba(0,0,0,.55);cursor:zoom-out;
+    animation:lb-in .22s cubic-bezier(.2,.8,.25,1);
+  }
+  .lightbox .lb-caption{
+    color:#c8cede;font-size:14.5px;text-align:center;max-width:70ch;line-height:1.5;
+    padding:0 16px;
+  }
+  .lightbox .lb-hint{
+    color:#7e879c;font-size:12.5px;letter-spacing:.4px;
+  }
+  @keyframes lb-in{from{transform:scale(.94);opacity:0;}to{transform:scale(1);opacity:1;}}
+
   /* reduced motion */
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto;}
@@ -481,7 +507,7 @@
 
         <h3>Accounts &amp; Software</h3>
         <ul>
-          <li>An <a href="https://azure.microsoft.com/free/" target="_blank" rel="noopener">Azure account</a> (the free tier with $200 in credits is plenty)</li>
+          <li>An <a href="https://azure.microsoft.com/free/" target="_blank" rel="noopener">Azure account - which means a credit card is needed as well</a> (the free tier with $200 in credits is plenty)</li>
           <li>A web browser. Everything in this lab happens in the Azure portal</li>
           <li>Remote Desktop client (built into Windows, free on macOS) to test logons</li>
           <li>Optional, for Step 8: access to Azure OpenAI or an OpenAI API key for the AI triage layer</li>
@@ -1165,6 +1191,12 @@ def enrich_ip(ip: str, client) -> dict:
   <span>Bat Otgonbayar</span><span>·</span><span>© 2026</span>
 </footer>
 
+<dialog class="lightbox" id="lightbox" aria-label="Expanded screenshot">
+  <img id="lightbox-img" src="" alt="">
+  <div class="lb-caption" id="lightbox-cap"></div>
+  <div class="lb-hint">Click anywhere or press Esc to close</div>
+</dialog>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
 <script>
   // syntax highlighting (after deferred script loads)
@@ -1238,6 +1270,32 @@ def enrich_ip(ip: str, client) -> dict:
     var ph    = fig.querySelector('.shot-ph');
     if(media && ph && media.getAttribute('src')){ ph.style.display = 'none'; }
   });
+
+  // lightbox: click a screenshot to expand, click/Esc to close
+  (function(){
+    var box = document.getElementById('lightbox');
+    var boxImg = document.getElementById('lightbox-img');
+    var boxCap = document.getElementById('lightbox-cap');
+    if (!box || !box.showModal) return; // dialog unsupported: images stay inline
+
+    document.querySelectorAll('.prose figure.shot img').forEach(function(img){
+      img.addEventListener('click', function(){
+        boxImg.src = img.currentSrc || img.src;
+        boxImg.alt = img.alt || '';
+        var fig = img.closest('figure');
+        var cap = fig ? fig.querySelector('figcaption') : null;
+        boxCap.textContent = cap ? cap.textContent : '';
+        box.showModal();
+        document.documentElement.style.overflow = 'hidden';
+      });
+    });
+
+    box.addEventListener('click', function(){ box.close(); });
+    box.addEventListener('close', function(){
+      document.documentElement.style.overflow = '';
+      boxImg.src = '';
+    });
+  })();
 
   // respect reduced motion: stop the hero loop, leave a still frame
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

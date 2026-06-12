@@ -573,10 +573,26 @@
             <span class="ph-label">Screenshot 4</span>
             <span class="ph-hint">/images/writeups/sentinel/04-vm-image.png</span>
           </div>
-          <img src="/images/writeups/sentinel/04-vm-image-size.png" alt="VM image and size selection" loading="lazy" decoding="async"> -->
-          <figcaption>Choosing the OS image and a small, cheap VM size.</figcaption>
+          <img src="/images/writeups/sentinel/04-vm-image.png" alt="VM image and size selection" loading="lazy" decoding="async"> -->
         </figure>
-          <li>For Size, pick something small but not tiny, around 2 vCPUs and 4 GB RAM (e.g. <code>B2s</code>)</li>
+          <li>For Availibility options, make sure you pick <strong>No infrastructure redudancy required</strong> because choosing avalibility zones for our VMs will restrict certain sizes</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 5</span>
+            <span class="ph-hint">/images/writeups/sentinel/05-vm-availibility.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/05-vm-availibility.png" alt="VM availibility" loading="lazy" decoding="async"> -->
+        </figure>
+          <li>For Size, pick something small but not tiny, around 2 vCPUs and 8 GB RAM is perfect in my opinion (e.g. <code>B2s</code>)</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 6</span>
+            <span class="ph-hint">/images/writeups/sentinel/06-vm-size.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/06-vm-size.png" alt="VM size" loading="lazy" decoding="async"> -->
+        </figure>
           <li>Set a username and password. Write them down; you'll RDP in later to generate test events</li>
           <li>Under Inbound port rules, leave <strong>RDP (3389)</strong> selected</li>
           <li>Click <strong>Review + create</strong>, then <strong>Create</strong>, and let it deploy</li>

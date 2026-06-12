@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer | Bat Otgonbayar</title>
 <meta name="description" content="Standing up a deliberately exposed Windows VM in Azure, wiring it to Microsoft Sentinel, sharpening the detections beyond the tutorial, and bolting an AI triage layer onto the incident pipeline.">
-<base href="https://botgonbayar.github.io/">
 <link rel="canonical" href="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html">
 <meta name="author" content="Bat Otgonbayar">
 <meta name="color-scheme" content="dark light">
@@ -257,6 +256,11 @@
     margin-top:12px;font-size:13.5px;color:var(--text-faint);line-height:1.5;text-align:center;
   }
 
+  /* hero figure */
+  figure.shot.hero{margin:8px 0 34px;}
+  figure.shot.hero .shot-ph{min-height:260px;}
+  figure.shot.hero img{box-shadow:0 8px 32px var(--shadow);}
+
   /* tables */
   .prose table{
     width:100%;border-collapse:collapse;margin:26px 0;font-size:14.5px;display:block;overflow-x:auto;
@@ -423,6 +427,16 @@
       </details>
 
       <div class="prose" id="prose">
+
+        <figure class="shot hero">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Hero Image</span>
+            <span class="ph-hint">/images/writeups/sentinel/00-hero.png</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/00-hero.png" alt="Honeypot SOC dashboard artwork: a bee inside a hexagonal targeting reticle with live capture telemetry" loading="eager" decoding="async" fetchpriority="high"> -->
+          <figcaption>The lab in one picture: bait that looks sweet, instrumentation watching everything that touches it.</figcaption>
+        </figure>
 
         <p class="lede">
           A coworker once asked me whether a brute-force alert on a server was something to worry about, and I realized

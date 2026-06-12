@@ -644,9 +644,7 @@
 
         <h2 id="step-2-open-it-to-the-internet">Step 2: Open It to the Internet<a href="#step-2-open-it-to-the-internet" class="anchor">#</a></h2>
 
-        <p>
-          We're going to replace it with a rule that allows absolutely everything. In any other context this configuration is a resume-generating event; here it's the entire business plan. We want this box loud, obvious, and irresistible, because the goal is for it to light up with attack traffic we can map later.
-        </p>
+        <p>This is the step that makes it a honeypot. By default Azure gives you a sensible Network Security Group that only allows RDP. We're going to replace it with a rule that allows everything, from everyone, on every port. There are entire compliance frameworks devoted to preventing what you're about to do on purpose. Do it anyway. The point is to make this box impossible for a scanner to ignore.</p>
 
         <ol>
           <li>Open your VM and go to <strong>Networking</strong> → <strong>Network settings</strong></li>

@@ -506,11 +506,7 @@
 
         <ol>
           <li>Sign in to the <a href="https://portal.azure.com" target="_blank" rel="noopener">Azure portal</a> and go to <strong>Virtual machines</strong> → <strong>Create</strong> → <strong>Azure virtual machine</strong></li>
-          <li>Under Resource group, click <strong>Create new</strong> and name it something obvious, e.g. <code>rg-honeypot-lab</code></li>
-          <li>Name the VM (I used <code>honeypot-vm-01</code>) and pick a region close to you. Remember which one; the workspace must match it later</li>
-        </ol>
-
-        <figure class="shot">
+          <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
             <span class="ph-label">Screenshot 1</span>
@@ -519,6 +515,9 @@
           <img src="/images/writeups/sentinel/01-create-vm-basics.png" alt="Azure portal Create VM Basics tab with new resource group" loading="lazy" decoding="async">
           <figcaption>The Basics tab: a fresh resource group and a region you'll reuse for the workspace.</figcaption>
         </figure>
+          <li>Under Resource group, click <strong>Create new</strong> and name it something obvious, e.g. <code>rg-honeypot-lab</code></li>
+          <li>Name the VM (I used <code>honeypot-vm-01</code>) and pick a region close to you. Remember which one; the workspace must match it later</li>
+        </ol>
 
         <div class="note">
           <p><strong>Why a dedicated resource group?</strong> When the lab is over, you delete the group and everything inside

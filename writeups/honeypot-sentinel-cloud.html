@@ -712,15 +712,32 @@
         <h2 id="step-3-deploy-sentinel">Step 3: Deploy Microsoft Sentinel<a href="#step-3-deploy-sentinel" class="anchor">#</a></h2>
 
         <p>
-          The thing worth internalizing here is that Sentinel doesn't actually store your logs; the Log Analytics Workspace
+          One thing to keep in mind here is that Sentinel doesn't actually store your logs; the Log Analytics Workspace
           does. Sentinel is the analytics and alerting brain that sits on top of it. So we create the workspace first, then
           enable Sentinel on it.
         </p>
 
         <ol>
           <li>In the portal search bar, search for <strong>Log Analytics workspaces</strong> → <strong>Create</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 15</span>
+            <span class="ph-hint">/images/writeups/sentinel/15-vm-law.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/15-vm-law.png" alt="Creating a Log Analytics Workspace" loading="lazy" decoding="async"> -->
+        </figure>
           <li>Put it in the same resource group as the VM, name it (e.g. <code>law-honeypot</code>), and pick the <em>same region as your VM</em></li>
-          <li>Click <strong>Review + create</strong> → <strong>Create</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 16</span>
+            <span class="ph-hint">/images/writeups/sentinel/16-law.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/16-law.png" alt="Creating a Log Analytics Workspace" loading="lazy" decoding="async"> -->
+          <figcaption>Creating the Log Analytics Workspace in the same region and resource group as the VM.</figcaption>
+        </figure>
+          <li>Click <strong>Review + create</strong> → <strong>Create</strong> after validation has passed</li>
         </ol>
 
         <figure class="shot">

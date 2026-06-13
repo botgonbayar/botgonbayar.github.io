@@ -781,7 +781,7 @@
           <img src="/images/writeups/sentinel/20-sentinel3.png" alt="Adding Microsoft Sentinel to the workspace" loading="lazy" decoding="async">
           <figcaption>This is required to connect our Log Analytics Workspace (honeypot-law) to Sentinel in Defender.</figcaption>
         </figure>
-          <li>If this is your first time provisioning a LAW in Sentinel, it might take a couple minutes for Settings under Sentinel to appear. Go to <strong>Settings</strong> → <strong>Microsoft Sentinel</strong> → <strong>Workspaces</strong>, verify yours is listed, and click <strong>Connect</strong></li>
+          <li>If this is your first time provisioning a LAW in Sentinel, it might take a couple minutes for Settings under Sentinel to appear. Go to <strong>Settings</strong> → <strong>Microsoft Sentinel</strong> → <strong>Workspaces</strong>, verify yours is listed, select it and click <strong>Connect workspace</strong></li>
           <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
@@ -789,18 +789,26 @@
             <span class="ph-hint">/images/writeups/sentinel/21-sentinel.png</span>
           </div>
           <img src="/images/writeups/sentinel/21-sentinel.png" alt="Adding Microsoft Sentinel to the workspace" loading="lazy" decoding="async">
-          <figcaption>Enabling Sentinel on the new workspace.</figcaption>
+        </figure>
+          <li>Then set the workspace as <strong>Primary</strong>, and click <strong>Connect</strong> on the Review and Finish page.</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 22</span>
+            <span class="ph-hint">/images/writeups/sentinel/22-sentinel.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/22-sentinel.png" alt="Adding Microsoft Sentinel to the workspace" loading="lazy" decoding="async"> -->
         </figure>
         </ol>
 
         <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 5</span>
-            <span class="ph-hint">/images/writeups/sentinel/05-enable-sentinel.png</span>
+            <span class="ph-label">Screenshot 23</span>
+            <span class="ph-hint">/images/writeups/sentinel/23-sentinel.png</span>
           </div>
-          <!-- <img src="/images/writeups/sentinel/05-enable-sentinel.png" alt="Adding Microsoft Sentinel to the workspace" loading="lazy" decoding="async"> -->
-          <figcaption>Enabling Sentinel on the new workspace.</figcaption>
+          <img src="/images/writeups/sentinel/23-sentinel.png" alt="Adding Microsoft Sentinel to the workspace" loading="lazy" decoding="async">
+          <figcaption>The LAW we just created is officially the primary workspace for our Sentinel instance. Woohoo!</figcaption>
         </figure>
 
         <h2 id="step-4-connect-the-vm">Step 4: Connect the VM to Sentinel<a href="#step-4-connect-the-vm" class="anchor">#</a></h2>

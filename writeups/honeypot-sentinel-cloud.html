@@ -644,7 +644,7 @@
 
         <h2 id="step-2-open-it-to-the-internet">Step 2: Open It to the Internet<a href="#step-2-open-it-to-the-internet" class="anchor">#</a></h2>
 
-        <p>This is the step that makes it a honeypot. By default Azure gives you a sensible Network Security Group that only allows RDP. We're going to replace it with a rule that allows everything, from everyone, on every port. There are entire compliance frameworks devoted to preventing what you're about to do on purpose. Do it anyway. The point is to make this box impossible for a scanner to ignore.</p>
+        <p>This is the step that makes it a honeypot. By default Azure gives you a sensible <strong>Network Security Group</strong> that only allows RDP. We're going to replace it with a rule that allows everything, from everyone, on every port. There are entire compliance frameworks devoted to preventing what you're about to do on purpose. Do it anyway. The point is to make this box impossible for a scanner to ignore.</p>
 
         <ol>
           <li>Open your VM and go to <strong>Networking</strong> → <strong>Network settings</strong>, then navigate into your NSG config page. Yours will be named differently, mine is <code>Secora-CORP-0241-nsg</code></li>
@@ -712,9 +712,7 @@
         <h2 id="step-3-deploy-sentinel">Step 3: Deploy Microsoft Sentinel<a href="#step-3-deploy-sentinel" class="anchor">#</a></h2>
 
         <p>
-          One thing to keep in mind here is that Sentinel doesn't actually store your logs; the Log Analytics Workspace
-          does. Sentinel is the analytics and alerting brain that sits on top of it. So we create the workspace first, then
-          enable Sentinel on it.
+          Here's the part that trips people up. Sentinel doesn't store your logs at all. The Log Analytics Workspace does that, and Sentinel is the analytics and alerting layer sitting on top of it, reading what the workspace holds. That dependency is why we build in this order: the workspace first, then Sentinel enabled on top of it.
         </p>
 
         <ol>
@@ -725,7 +723,7 @@
             <span class="ph-label">Screenshot 15</span>
             <span class="ph-hint">/images/writeups/sentinel/15-vm-law.png</span>
           </div>
-          <img src="/images/writeups/sentinel/15-vm-law.png" alt="Creating a Log Analytics Workspace" loading="lazy" decoding="async"> -->
+          <img src="/images/writeups/sentinel/15-vm-law.png" alt="Creating a Log Analytics Workspace" loading="lazy" decoding="async">
         </figure>
           <li>Put it in the same resource group as the VM, name it (e.g. <code>law-honeypot</code>), and pick the <em>same region as your VM</em></li>
           <figure class="shot">

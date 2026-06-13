@@ -873,6 +873,13 @@
           </div>
           <img src="/images/writeups/sentinel/31-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
         </figure>
+
+          <div class="note">
+          <p><strong>Why All Security Events instead of Common?</strong> "Common" drops some of the event IDs that matter for
+          lateral-movement and persistence detection, and for a lab you want the full firehose. In production you'd filter
+          aggressively here to control ingestion cost, but that's a production problem, not a lab one.</p>
+        </div>
+          
           <li>Click <strong>Review + create</strong> → <strong>Create</strong></li>
           <figure class="shot">
           <div class="shot-ph">
@@ -893,12 +900,6 @@
           <img src="/images/writeups/sentinel/30-connector.png" alt="Creating a Data Collection Rule for the VM" loading="lazy" decoding="async">
           <figcaption>The Data Collection Rule, set to collect all security events from the honeypot VM is now in "Connected" status</figcaption>
         </figure>
-
-        <div class="note">
-          <p><strong>Why All Security Events instead of Common?</strong> "Common" drops some of the event IDs that matter for
-          lateral-movement and persistence detection, and for a lab you want the full firehose. In production you'd filter
-          aggressively here to control ingestion cost, but that's a production problem, not a lab one.</p>
-        </div>
 
         <p>
           Give it five to ten minutes. The agent installs as a VM extension after the rule is created, and there's an

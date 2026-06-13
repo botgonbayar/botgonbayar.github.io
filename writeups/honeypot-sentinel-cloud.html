@@ -834,7 +834,7 @@
           </div>
           <img src="/images/writeups/sentinel/25-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
         </figure>
-          <li>Go back to Sentinel, refresh Data connectors pane and select <strong>Windows Security Events via AMA</strong>, and click on <strong>Open connector page</strong></li>
+          <li>Go back to Sentinel, refresh, and go to <strong>Configuration</strong> → <strong>Data connectors</strong>, open <strong>Windows Security Events via AMA</strong>, and click <strong>Open connector page</strong></li>
           <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
@@ -846,21 +846,44 @@
         </ol>
 
         <ol start="4">
-          <li>Go to <strong>Configuration</strong> → <strong>Data connectors</strong>, open <strong>Windows Security Events via AMA</strong>, and click <strong>Open connector page</strong></li>
-          <li>Click <strong>Create data collection rule</strong></li>
-          <li>Name it, then on the Resources tab check your honeypot VM</li>
+          <li>Click <strong>Create data collection rule</strong> and name it. e.g. <code>SecurityEvents-Honeypot-Sentinel</code></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 27</span>
+            <span class="ph-hint">/images/writeups/sentinel/27-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/27-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
+          <li>Then on the Resources tab, check your honeypot VM </li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 28</span>
+            <span class="ph-hint">/images/writeups/sentinel/28-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/28-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
           <li>On the Collect tab, choose <strong>All Security Events</strong></li>
           <li>Click <strong>Review + create</strong> → <strong>Create</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 29</span>
+            <span class="ph-hint">/images/writeups/sentinel/29-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/29-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
         </ol>
 
         <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
             <span class="ph-label">Screenshot 7</span>
-            <span class="ph-hint">/images/writeups/sentinel/07-data-collection-rule.png</span>
+            <span class="ph-hint">/images/writeups/sentinel/30-connector.png</span>
           </div>
-          <!-- <img src="/images/writeups/sentinel/07-data-collection-rule.png" alt="Creating a Data Collection Rule for the VM" loading="lazy" decoding="async"> -->
-          <figcaption>The Data Collection Rule, set to collect all security events from the honeypot VM.</figcaption>
+          <img src="/images/writeups/sentinel/30-connector.png" alt="Creating a Data Collection Rule for the VM" loading="lazy" decoding="async"> -->
+          <figcaption>The Data Collection Rule, set to collect all security events from the honeypot VM is now in "Connected" status</figcaption>
         </figure>
 
         <div class="note">

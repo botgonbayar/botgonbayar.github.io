@@ -816,8 +816,33 @@
         <p>Sentinel can only work with events that actually reach it, and right now nothing does. Two major components play a role here: a data connector, which tells Sentinel what kind of logs to expect, and a Data Collection Rule, which defines exactly which events get shipped from the VM and where they land.</p>
 
         <ol>
-          <li>In Sentinel, go to <strong>Content hub</strong>, search for <strong>Windows Security Events</strong>, and click <strong>Install</strong></li>
-          <li>Refresh the Sentinel page after the install finishes</li>
+          <li>In Sentinel from Azure portal, go to <strong>Data connectors</strong> under Configuration, and go to <strong>Content hub</strong></li> 
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 24</span>
+            <span class="ph-hint">/images/writeups/sentinel/24-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/24-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
+          <li>search for <strong>Windows Security Events</strong>, and click <strong>Install</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 25</span>
+            <span class="ph-hint">/images/writeups/sentinel/25-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/25-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
+          <li>Go back to Sentinel, refresh Data connectors pane and select <strong>Windows Security Events via AMA</strong>, and click on <strong>Open connector page</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 26</span>
+            <span class="ph-hint">/images/writeups/sentinel/26-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/26-connector.png" alt="Content hub Windows Security Events solution" loading="lazy" decoding="async">
+        </figure>
         </ol>
 
         <figure class="shot">

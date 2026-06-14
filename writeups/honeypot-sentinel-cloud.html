@@ -928,22 +928,40 @@
         </p>
 
         <ol>
-          <li>RDP into the VM once using its public IP, so there's at least one logon event to find</li>
+          <li>RDP into the VM once using its public IP, so there's at least one logon event to find. Easiest way to do this is by going to your virtual machine, under <<strong>Connect</strong>, click on <strong>Download RDP file</strong> and open up that <code>.rdp file</code></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 33</span>
+            <span class="ph-hint">/images/writeups/sentinel/33-rdp.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/33-rdp.png" alt="RDP into VM" loading="lazy" decoding="async">
+          <figcaption>or you can use the default Remote Desktop Connection app to connect using public IP of the VM. your choice!</figcaption>
+        </figure>
+          <li>Sign in using the admin credentials you created earlier</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 34</span>
+            <span class="ph-hint">/images/writeups/sentinel/34-rdp.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/34-rdp.png" alt="RDP into VM" loading="lazy" decoding="async">
+        </figure>
           <li>In Sentinel, go to <strong>Logs</strong>, close the query gallery, and run:</li>
         </ol>
 
         <pre><code class="language-sql">SecurityEvent
-| where EventID == "4625"</code></pre>
-        <p class="code-cap">Windows EventID 4625 means a an attempted logon has failed. Which is a common indicator for brute-force or password spraying attacks.</p>
+| where EventID == 4625</code></pre>
+        <p class="code-cap">Windows EventID 4625 means an attempted logon has failed. Which is a common indicator for brute-force or password spraying attacks.</p>
 
         <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 8</span>
-            <span class="ph-hint">/images/writeups/sentinel/08-first-kql-results.png</span>
+            <span class="ph-label">Screenshot 35</span>
+            <span class="ph-hint">/images/writeups/sentinel/35-kql.png</span>
           </div>
-          <!-- <img src="/images/writeups/sentinel/08-first-kql-results.png" alt="KQL query results in Sentinel Logs" loading="lazy" decoding="async"> -->
-          <figcaption>First successful query, proof that the pipeline is live before sharpening the logic.</figcaption>
+          <img src="/images/writeups/sentinel/35-kql.png" alt="KQL query results in Sentinel Logs" loading="lazy" decoding="async">
+          <figcaption>And just like that, we have our first query. The results in mine indicate we already have attracted some visitors to our sweet honeypot.</figcaption>
         </figure>
 
         <p>

@@ -450,6 +450,7 @@
           <li><a href="#step-3-deploy-sentinel">Step 3: Deploy Sentinel</a></li>
           <li><a href="#step-4-connect-the-vm">Step 4: Connect the VM</a></li>
           <li><a href="#step-5-first-kql-query">Step 5: First KQL Query</a></li>
+          <li><a href="#generating-the-telemetry">Generating the Telemetry</a></li>
           <li><a href="#step-6-sharper-detections">Step 6: Sharper Detections</a></li>
           <li><a href="#step-7-analytics-rules">Step 7: Alert Rules</a></li>
           <li><a href="#step-8-ai-triage">Step 8: AI Triage Layer</a></li>
@@ -952,6 +953,192 @@
           we keep going.
         </p>
 
+        <h2 id="generating-the-telemetry">Generating the Telemetry: A Self-Inflicted Attack Chain<a href="#generating-the-telemetry" class="anchor">#</a></h2>
+ 
+        <p>
+          Before we write detections, it helps to have something to detect. The internet will happily supply a flood of
+          failed logons, but the more interesting events, the ones that describe an attacker who already got in and is
+          escalating, only show up if someone actually does those things on the box. So I did them myself, in attacker
+          order, and watched each action land in the logs. Reading individual event IDs is table stakes. What actually
+          shows fluency is correlating them, tying one action to the exact events it produces and explaining why the
+          sequence matters.
+        </p>
+ 
+        <p>
+          The whole point is the chain. Run these in order and the logs read like a real intrusion walking from initial
+          access through persistence to evasion. Everything below is harmless, but each step has the same shape as the
+          malicious version it stands in for.
+        </p>
+ 
+        <div class="note warn">
+          <p><strong>Do this on the honeypot only.</strong> You're creating accounts, granting admin, and weakening audit
+          policy on purpose. That's fine on a disposable VM that gets deleted at the end, and nowhere else.</p>
+        </div>
+ 
+        <h3>1. Authentication: the 4625 to 4624 pivot</h3>
+ 
+        <p>
+          Start at the front door. Mistype the password at the RDP prompt a few times, then log in correctly. The failures
+          write <code>4625</code>, the success writes <code>4624</code>, and the field that proves you understand them is
+          the <strong>Logon Type</strong>. Type 2 is someone sitting at the keyboard, Type 3 is a network logon over SMB,
+          and Type 10 is RDP. A Type 10 success from an IP you don't recognize is the exact thing you build an alert
+          around. The moment you log in as an admin, you'll also see <code>4672</code> fire alongside your <code>4624</code>,
+          because that event marks the special privileges handed to an elevated session.
+        </p>
+ 
+        <pre><code class="language-sql">// Tie a successful logon to the privileges granted to that same session
+SecurityEvent
+| where EventID in (4624, 4672)
+| where TimeGenerated > ago(1h)
+| summarize Events = make_set(EventID), Account = any(Account) by TargetLogonId
+| where set_has_element(Events, 4624) and set_has_element(Events, 4672)</code></pre>
+        <p class="code-cap">Correlating 4624 and 4672 on a shared Logon ID, the hex value that stitches one session together.</p>
+ 
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 25</span>
+            <span class="ph-hint">/images/writeups/sentinel/25-logon-correlation.png</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/25-logon-correlation.png" alt="KQL correlating 4624 and 4672 events on a shared Logon ID" loading="lazy" decoding="async"> -->
+          <figcaption>The 4624 and 4672 pair sharing one Logon ID, which is how you confirm an elevated session.</figcaption>
+        </figure>
+ 
+        <div class="note">
+          <p><strong>Not every 4624 is a person.</strong> The first time you query for successful logons, most of what
+          comes back won't be you. Windows logs a constant stream of <code>4624</code>s from service accounts: the Desktop
+          Window Manager (<code>DWM-1</code>), font drivers (<code>UMFD</code>), and the machine account itself
+          (<code>COMPUTERNAME$</code>). The tell is in the fields. Those events carry <code>LogonType 2</code> with an empty
+          <code>IpAddress</code> and a target like <code>Window Manager\DWM-1</code>, while your actual RDP session shows
+          <code>LogonType 10</code>, a real source IP, and the account you logged in with. That gap is the whole reason the
+          detections filter on <code>LogonType == 10</code> instead of trusting the event ID alone. Reading logs well is
+          mostly knowing which events to ignore.</p>
+        </div>
+ 
+        <h3>2. Persistence: create an account and promote it</h3>
+ 
+        <p>
+          Attackers who get in want to stay in, and the classic way is to create their own account and quietly add it to
+          the local Administrators group. Open an elevated PowerShell on the VM and do exactly that:
+        </p>
+ 
+        <pre><code class="language-powershell">net user soc_test P@ssw0rd!23 /add        # writes 4720 (account created)
+net localgroup Administrators soc_test /add  # writes 4732 (added to admin group)
+net user soc_test /active:no              # writes 4725 (account disabled)</code></pre>
+        <p class="code-cap">A full account lifecycle in three commands, each one a distinct security event.</p>
+ 
+        <p>
+          The detection story is the timing. A <code>4720</code> followed seconds later by a <code>4732</code> adding that
+          brand-new account to Administrators is textbook privilege escalation. This is also the exact event the
+          <code>4732</code> rule in the next step is built to catch, so running it now means you have a real hit to point
+          at instead of waiting on an attacker to oblige.
+        </p>
+ 
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 26</span>
+            <span class="ph-hint">/images/writeups/sentinel/26-account-creation.png</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/26-account-creation.png" alt="4720 account creation followed by 4732 admin group addition in the logs" loading="lazy" decoding="async"> -->
+          <figcaption>4720 then 4732, an account created and promoted to admin within seconds.</figcaption>
+        </figure>
+ 
+        <h3>3. Lateral movement: explicit credentials</h3>
+ 
+        <p>
+          When an attacker has stolen creds and wants to use them somewhere new, they often run a process as a different
+          user. That writes <code>4648</code>, a logon using explicit credentials, the same event <code>runas</code> and
+          tools like PsExec produce. A harmless <code>runas</code> against the account you just made is enough to generate
+          it:
+        </p>
+ 
+        <pre><code class="language-powershell">runas /user:soc_test cmd    # writes 4648 (explicit-credential logon)</code></pre>
+        <p class="code-cap">4648 is a quiet but reliable signal of credentials being reused across a session boundary.</p>
+ 
+        <h3>4. Execution: a 4688 that looks like trouble</h3>
+ 
+        <p>
+          Process creation is one of the most useful events in any SOC, but Windows doesn't capture command lines in
+          <code>4688</code> by default, so turn that on first. Then run something benign that has the exact silhouette of
+          malicious tooling:
+        </p>
+ 
+        <pre><code class="language-powershell">// Capture command lines in 4688 events
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" `
+  /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f
+ 
+// Generate a 4688 with an encoded command (this just decodes to "test")
+powershell.exe -nop -w hidden -enc dGVzdA==</code></pre>
+        <p class="code-cap">The payload is nothing, but the shape (hidden window, encoded command) is what real malware looks like.</p>
+ 
+        <p>
+          That second command decodes to the harmless string <code>test</code>, yet it carries every hallmark analysts
+          hunt for: a hidden window and a base64-encoded command. The standard detection matches <code>4688</code> events
+          whose command line carries those markers:
+        </p>
+ 
+        <pre><code class="language-sql">SecurityEvent
+| where EventID == 4688
+| where CommandLine has_any ("-enc", "-encodedcommand", "FromBase64String")
+| project TimeGenerated, Computer, Account, NewProcessName, CommandLine</code></pre>
+        <p class="code-cap">Catching encoded PowerShell by its command line, one of the highest-value process detections you can write.</p>
+ 
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 27</span>
+            <span class="ph-hint">/images/writeups/sentinel/27-encoded-powershell.png</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/27-encoded-powershell.png" alt="4688 event showing an encoded PowerShell command line caught by KQL" loading="lazy" decoding="async"> -->
+          <figcaption>The 4688 event with its encoded command line surfaced by the detection.</figcaption>
+        </figure>
+ 
+        <h3>5. Defense evasion: going dark</h3>
+ 
+        <p>
+          The last move in the chain is the attacker covering their tracks. Weakening the audit policy writes
+          <code>4719</code>, and clearing the Security log outright writes <code>1102</code>. Both say the same thing: someone
+          is trying to stop you from seeing what happens next.
+        </p>
+ 
+        <pre><code class="language-powershell">auditpol /set /category:"Logon/Logoff" /success:disable   # writes 4719</code></pre>
+        <p class="code-cap">Tampering with logging is high-severity by itself; defenders rarely have a benign reason to do it.</p>
+ 
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 28</span>
+            <span class="ph-hint">/images/writeups/sentinel/28-audit-tampering.png</span>
+          </div>
+          <!-- <img src="/images/writeups/sentinel/28-audit-tampering.png" alt="4719 audit policy change event in the Sentinel logs" loading="lazy" decoding="async"> -->
+          <figcaption>The 4719 audit-policy change, an attacker reaching for the light switch.</figcaption>
+        </figure>
+ 
+        <p>
+          Laid end to end, that's a complete intrusion narrative: a brute-force burst, a successful elevated logon, a new
+          account promoted to admin, those credentials reused, an encoded payload executed, and the logs tampered with to
+          hide it. Here's the whole chain in one place, which doubles as a reference for the IDs worth knowing cold.
+        </p>
+ 
+        <table>
+          <thead>
+            <tr><th>Event ID</th><th>What it means</th><th>How to generate it</th><th>ATT&amp;CK stage</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>4625</td><td>Failed logon</td><td>Wrong password at RDP (or just wait)</td><td>Initial Access</td></tr>
+            <tr><td>4624</td><td>Successful logon</td><td>Log in correctly</td><td>Initial Access</td></tr>
+            <tr><td>4672</td><td>Special privileges assigned</td><td>Log in as an admin</td><td>Privilege Escalation</td></tr>
+            <tr><td>4720</td><td>Account created</td><td><code>net user /add</code></td><td>Persistence</td></tr>
+            <tr><td>4732</td><td>Added to local admin group</td><td><code>net localgroup Administrators /add</code></td><td>Privilege Escalation</td></tr>
+            <tr><td>4725</td><td>Account disabled</td><td><code>net user /active:no</code></td><td>Persistence cleanup</td></tr>
+            <tr><td>4648</td><td>Explicit-credential logon</td><td><code>runas</code></td><td>Lateral Movement</td></tr>
+            <tr><td>4688</td><td>Process created</td><td>Run any command (with cmdline auditing on)</td><td>Execution</td></tr>
+            <tr><td>4719</td><td>Audit policy changed</td><td><code>auditpol /set</code></td><td>Defense Evasion</td></tr>
+            <tr><td>1102</td><td>Security log cleared</td><td>Clear the log in Event Viewer</td><td>Defense Evasion</td></tr>
+          </tbody>
+        </table>
+        
         <h2 id="step-6-sharper-detections">Step 6: Write Sharper Detections<a href="#step-6-sharper-detections" class="anchor">#</a></h2>
 
         <p>

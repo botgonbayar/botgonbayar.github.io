@@ -1643,20 +1643,32 @@ def enrich_ip(ip: str, client) -> dict:
     });
   }, { passive: true });
 
-  // active TOC highlight
+  // active TOC highlight (scroll-spy: highlight the last heading scrolled past)
   var links = Array.prototype.slice.call(document.querySelectorAll('#toc-list a'));
-  var heads = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
-  var obs = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        var id = e.target.getAttribute('id');
-        links.forEach(function(a){
-          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-        });
-      }
+  var heads = links
+    .map(function(a){ return document.querySelector(a.getAttribute('href')); })
+    .filter(Boolean);
+
+  function syncToc(){
+    var marker = window.scrollY + 120;           // 120px below the top edge
+    var currentId = heads.length ? heads[0].id : null;
+    for (var i = 0; i < heads.length; i++){
+      if (heads[i].offsetTop <= marker) currentId = heads[i].id;
+      else break;
+    }
+    links.forEach(function(a){
+      a.classList.toggle('active', a.getAttribute('href') === '#' + currentId);
     });
-  }, { rootMargin: '-12% 0px -78% 0px' });
-  heads.forEach(function(h){ obs.observe(h); });
+  }
+
+  var tocTicking = false;
+  window.addEventListener('scroll', function(){
+    if (tocTicking) return;
+    tocTicking = true;
+    requestAnimationFrame(function(){ syncToc(); tocTicking = false; });
+  }, { passive: true });
+  window.addEventListener('resize', syncToc, { passive: true });
+  syncToc();
 
   // auto-hide a placeholder once its figure contains real media (img, video, or iframe)
   document.querySelectorAll('figure.shot').forEach(function(fig){

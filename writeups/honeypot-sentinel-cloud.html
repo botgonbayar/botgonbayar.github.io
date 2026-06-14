@@ -689,8 +689,8 @@
         </ol>
 
         <p>
-          Congratulations: you now operate the least secure VM in your Azure region. This is the only context in which
-          that sentence is a milestone rather than a confession.
+          Congratulations: you now operate the least secure VM in your Azure region. (this is the only context in which
+          that sentence is a milestone rather than a confession)
         </p>
 
         <figure class="shot">
@@ -712,7 +712,7 @@
         <h2 id="step-3-deploy-sentinel">Step 3: Deploy Microsoft Sentinel<a href="#step-3-deploy-sentinel" class="anchor">#</a></h2>
 
         <p>
-          Here's the part that trips people up. Sentinel doesn't store your logs at all. The Log Analytics Workspace does that, and Sentinel is the analytics and alerting layer sitting on top of it, reading what the workspace holds. That dependency is why we build in this order: the workspace first, then Sentinel enabled on top of it.
+          Here's the part most tend to forget or get confused about: Sentinel doesn't store your logs at all. The Log Analytics Workspace does that, and Sentinel is the analytics and alerting layer sitting on top of it, reading what the workspace holds. That dependency is why we build in this order: the workspace first, then Sentinel enabled on top of it.
         </p>
 
         <ol>
@@ -906,11 +906,21 @@
           initialization window where queries return nothing. If you query immediately and panic, you'll waste an hour
           troubleshooting a thing that just needed to finish booting.
         </p>
-
+        
+        <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 32</span>
+            <span class="ph-hint">/images/writeups/sentinel/32-connector.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/32-connector.png" alt="VM extensions vs apps" loading="lazy" decoding="async">
+          <figcaption>VM extensions are small applications that provide post-deployment configuration and automation on Azure VMs. They are used for tasks like installing antivirus, configuring monitoring agents, or running scripts.</figcaption>
+        </figure>
+        
         <h2 id="step-5-first-kql-query">Step 5: Run Your First KQL Query<a href="#step-5-first-kql-query" class="anchor">#</a></h2>
 
         <p>
-          Sentinel queries are written in KQL, Kusto Query Language. It's Microsoft's own thing, close enough to SQL that you
+          Sentinel queries are written in KQL, <strong>Kusto Query Language</strong>. It's Microsoft's own thing, close enough to SQL that you
           can read it on sight. Let's prove data is flowing.
         </p>
 

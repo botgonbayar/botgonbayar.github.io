@@ -923,7 +923,7 @@
           Sentinel queries are written in KQL, <strong>Kusto Query Language</strong>. It's Microsoft's own powerful query language used primarily for retrieving and processing data in Azure services like Azure Data Explorer and Azure Monitor. Which means <strong>Querying logs is a non-negotiable skill in security operations.</strong> Depending on where you
           land you'll be working in SQL, KQL, or SPL, but they're close enough cousins that learning one makes the
           others easy to pick up. Microsoft and Sentinel run on KQL, which you can practice for free at
-          <a href="https://kc7cyber.com/" target="_blank" rel="noopener">KC7</a>.
+          <a href="https://kc7cyber.com/" target="_blank" rel="noopener">KC7</a> Now let's prove data is flowing by running our first query.
         </p>
 
         <ol>
@@ -932,8 +932,8 @@
         </ol>
 
         <pre><code class="language-sql">SecurityEvent
-| where Activity contains "success"</code></pre>
-        <p class="code-cap">The base query: fine for a first look, far too broad for an alert.</p>
+| where EventId == "4625"</code></pre>
+        <p class="code-cap">Windows EventId 4625 means a an attempted logon has failed. Which is a common indicator for brute-force or password spraying attacks.</p>
 
         <figure class="shot">
           <div class="shot-ph">

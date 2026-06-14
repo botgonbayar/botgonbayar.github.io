@@ -933,8 +933,8 @@
         </ol>
 
         <pre><code class="language-sql">SecurityEvent
-| where EventId == "4625"</code></pre>
-        <p class="code-cap">Windows EventId 4625 means a an attempted logon has failed. Which is a common indicator for brute-force or password spraying attacks.</p>
+| where EventID == "4625"</code></pre>
+        <p class="code-cap">Windows EventID 4625 means a an attempted logon has failed. Which is a common indicator for brute-force or password spraying attacks.</p>
 
         <figure class="shot">
           <div class="shot-ph">
@@ -947,10 +947,9 @@
         </figure>
 
         <p>
-          You should see your own logon in the results. The problem is the breadth: matching the string <code>success</code>
-          in the Activity field catches logoffs and a pile of benign events alongside the real logons. It tells you data
-          exists; it does not tell you anything an analyst would act on. This is where the original tutorial stops, and where
-          we keep going.
+          You should see failed-logon events in the results, each one a 4625. A raw count of them confirms the pipeline is
+          live, but it doesn't yet separate a real campaign from background noise. It tells you data
+          exists; it does not tell you anything an analyst would act on. This is where I took it a step further from the original tutorial and explore what I can do with it. Let's keep going.
         </p>
 
         <h2 id="generating-the-telemetry">Generating the Telemetry: A Self-Inflicted Attack Chain<a href="#generating-the-telemetry" class="anchor">#</a></h2>

@@ -480,8 +480,7 @@
 
         <p>
           This guide walks through the entire build step by step: a deliberately exposed Windows VM in Azure, Microsoft Sentinel
-          ingesting its security events, custom KQL detections mapped to MITRE ATT&amp;CK, and an AI triage layer that summarizes
-          every incident before an analyst opens it. The foundation is
+          ingesting its security events, custom KQL detections mapped to MITRE ATT&amp;CK, and Alert Rules that incorporates automated responses transforming SIEM functionality into a SOAR that automatically performs actions depending on the rule. The foundation is
           <a href="https://www.youtube.com/watch?v=g5JL2RIbThM&t=1596s" target="_blank" rel="noopener">Josh Madakor's tutorial here</a>.
           I followed it end to end, then kept going, because the tutorial stops at a single string-match query and a real
           detection environment is a different animal. Steps 1 through 5 are the base build; Steps 6 through 7 is when it

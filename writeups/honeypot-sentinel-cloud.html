@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer | Bat Otgonbayar</title>
+<title>Building a Cloud SIEM Honeypot: Microsoft Sentinel, Live Attack Telemetry, and an AI Triage Layer | Bat Otgonbayar</title>
 <meta name="description" content="Standing up a deliberately exposed Windows VM in Azure, wiring it to Microsoft Sentinel, sharpening the detections beyond the tutorial, and bolting an AI triage layer onto the incident pipeline.">
 <link rel="canonical" href="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html">
 <meta name="author" content="Bat Otgonbayar">
@@ -26,7 +26,7 @@
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
-  "headline": "Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer",
+  "headline": "Building a Cloud SIEM Honeypot: Microsoft Sentinel, Live Attack Telemetry, and an AI Triage Layer",
   "author": {"@type": "Person", "name": "Bat Otgonbayar", "url": "https://botgonbayar.github.io/"},
   "datePublished": "2026-06-11",
   "url": "https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html",
@@ -421,7 +421,7 @@
 
   <div class="article-header">
     <div class="pub-date">June 2026 · ~20 min read · Blue Team / Cloud Security / AI</div>
-    <h1>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and integrating Alert Rules</h1>
+    <h1>Building a Cloud SIEM Honeypot: Microsoft Sentinel, Live Attack Telemetry, and integrating Alert Rules</h1>
     <p class="subtitle">
       I put a deliberately exposed Windows box on the public internet, wired it into Microsoft Sentinel, and fifteen minutes later, the first failed RDP attempts had already started arriving. By the next morning, the VM had attracted thousands of authentication attempts from dozens of countries targeting the same predictable usernames: Administrator, admin, guest, test. That's when the project stopped feeling like a tutorial. I wanted to understand exactly what those attacks looked like in the telemetry, how to build detections around them, and where the gap was between "logs exist" and "an analyst can actually act on this." This is how I built the pipeline that captured it.
     </p>

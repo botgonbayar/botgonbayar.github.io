@@ -1093,15 +1093,6 @@ powershell.exe -nop -w hidden -enc dGVzdA==</code></pre>
 | project TimeGenerated, Computer, Account, NewProcessName, CommandLine</code></pre>
         <p class="code-cap">Catching encoded PowerShell by its command line, one of the highest-value process detections you can write.</p>
  
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 27</span>
-            <span class="ph-hint">/images/writeups/sentinel/27-encoded-powershell.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/27-encoded-powershell.png" alt="4688 event showing an encoded PowerShell command line caught by KQL" loading="lazy" decoding="async"> -->
-          <figcaption>The 4688 event with its encoded command line surfaced by the detection.</figcaption>
-        </figure>
  
         <h3>5. Defense evasion: going dark</h3>
  
@@ -1113,16 +1104,6 @@ powershell.exe -nop -w hidden -enc dGVzdA==</code></pre>
  
         <pre><code class="language-powershell">auditpol /set /category:"Logon/Logoff" /success:disable   # writes 4719</code></pre>
         <p class="code-cap">Tampering with logging is high-severity by itself; defenders rarely have a benign reason to do it.</p>
- 
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 28</span>
-            <span class="ph-hint">/images/writeups/sentinel/28-audit-tampering.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/28-audit-tampering.png" alt="4719 audit policy change event in the Sentinel logs" loading="lazy" decoding="async"> -->
-          <figcaption>The 4719 audit-policy change, an attacker reaching for the light switch.</figcaption>
-        </figure>
  
         <p>
           Laid end to end, that's a complete intrusion narrative: a brute-force burst, a successful elevated logon, a new
@@ -1245,33 +1226,43 @@ SecurityEvent
 
         <ol>
           <li>In <strong>Logs</strong>, with your query open, click <strong>New alert rule</strong> → <strong>Create Microsoft Sentinel alert</strong></li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 39</span>
+            <span class="ph-hint">/images/writeups/sentinel/39-rule.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/39-rule.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async">
+        </figure>
           <li>Name the rule and set a severity (see the tiering below)</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 40</span>
+            <span class="ph-hint">/images/writeups/sentinel/40-rule.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/40-rule.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async">
+        </figure>
           <li>Under MITRE ATT&amp;CK, tag the matching tactic: <em>Initial Access</em> for the brute-force success rule, <em>Persistence</em> for the scheduled-task rule, and so on</li>
           <li>On the rule logic tab, set <strong>Run query every</strong> 5 minutes with <strong>Lookup data from the last</strong> 1 hour</li>
-          <li>Under <strong>Entity mapping</strong>, map <code>IpAddress</code> to an IP entity and <code>TargetAccount</code> to an Account entity</li>
-          <li>Under <strong>Incident settings</strong>, enable grouping: group alerts by IP entity within a 1-hour window</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 41</span>
+            <span class="ph-hint">/images/writeups/sentinel/41-rule.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/41-rule.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async">
+        </figure>
           <li>Save, then repeat for each detection from Step 6</li>
+          <figure class="shot">
+          <div class="shot-ph">
+            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+            <span class="ph-label">Screenshot 42</span>
+            <span class="ph-hint">/images/writeups/sentinel/42-rule.png</span>
+          </div>
+          <img src="/images/writeups/sentinel/42-rule.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async">
+        </figure>
         </ol>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 9</span>
-            <span class="ph-hint">/images/writeups/sentinel/09-analytics-rule-mitre.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/09-analytics-rule-mitre.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async"> -->
-          <figcaption>Building the analytics rule and tagging it with its MITRE ATT&CK tactic.</figcaption>
-        </figure>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 10</span>
-            <span class="ph-hint">/images/writeups/sentinel/10-incident-grouping.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/10-incident-grouping.png" alt="Incident grouping settings in the analytics rule" loading="lazy" decoding="async"> -->
-          <figcaption>Alert grouping by source IP, which turns hundreds of identical alerts into one incident with a count.</figcaption>
-        </figure>
 
         <div class="note">
           <p><strong>The grouping setting is the sanity-saver.</strong> A single determined IP can trip a brute-force rule
@@ -1303,15 +1294,6 @@ SecurityEvent
           and there is something genuinely sobering about watching the first failed-logon events roll in before you've
           finished your coffee.
         </p>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 38</span>
-            <span class="ph-hint">/images/writeups/sentinel/38-results.png</span>
-          </div>
-          <img src="/images/writeups/sentinel/38-results.png" alt="First brute-force alert in Sentinel" loading="lazy" decoding="async">
-        </figure>
 
         <p>
           Over the next day the failed-logon traffic came from dozens of countries, with the usual suspects dominating the

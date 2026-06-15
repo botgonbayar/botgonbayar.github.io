@@ -424,8 +424,7 @@
     <h1>Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer</h1>
     <p class="subtitle">
       I put a deliberately exposed Windows box on the public internet, wired it into Microsoft Sentinel,
-      and watched real attackers show up within minutes. Then I went past the tutorial: sharper detections,
-      MITRE mapping, and an AI layer that turns raw alerts into analyst-ready summaries.
+      and watched real attackers show up within minutes. Fifteen minutes later, the first failed RDP attempts started arriving. By the next morning, the VM had attracted thousands of authentication attempts from dozens of countries targeting the same predictable usernames: Administrator, admin, guest, test. That's when the project stopped feeling like a tutorial. I wanted to understand exactly what those attacks looked like in the telemetry, how to build detections around them, and where the gap was between "logs exist" and "an analyst can actually act on this." This is how I built the pipeline that captured it.
     </p>
   </div>
 
@@ -453,7 +452,6 @@
           <li><a href="#generating-the-telemetry">Generating the Telemetry</a></li>
           <li><a href="#step-6-sharper-detections">Step 6: Sharper Detections</a></li>
           <li><a href="#step-7-analytics-rules">Step 7: Alert Rules</a></li>
-          <li><a href="#step-8-ai-triage">Step 8: AI Triage Layer</a></li>
           <li><a href="#what-actually-showed-up">What Actually Showed Up</a></li>
           <li><a href="#what-weve-accomplished">What We've Accomplished</a></li>
           <li><a href="#whats-next">What's Next</a></li>
@@ -494,8 +492,8 @@
           every incident before an analyst opens it. The foundation is the
           <a href="https://logos-red.com/blog/how-to-build-a-microsoft-azure-sentinel-siem-cybersecurity-lab/" target="_blank" rel="noopener">Logos Red Azure Sentinel lab</a>.
           I followed it end to end, then kept going, because the tutorial stops at a single string-match query and a real
-          detection environment is a different animal. Steps 1 through 5 are the base build; Steps 6 through 8 are where it
-          becomes something closer to a working SOC workflow.
+          detection environment is a different animal. Steps 1 through 5 are the base build; Steps 6 through 7 is when it
+          becomes something closer to a working SOC workflow, and part 2 of this series will incorporate an AI layer that turns raw alerts into analyst-ready summaries. Stay tuned for that. But for now let's establish our foundation first.
         </p>
 
         <div class="note warn">
@@ -1303,172 +1301,8 @@ SecurityEvent
             <tr><td>Lookback window</td><td>5-min run, 5-min lookback</td><td>5-min run, 1-hour lookback, which catches slow campaigns under the per-window bar</td></tr>
             <tr><td>Entity mapping</td><td>Not configured</td><td>IP and Account mapped as entities, enabling the investigation graph and UEBA</td></tr>
             <tr><td>Incident grouping</td><td>Default (one per alert)</td><td>Grouped by IP + 1-hour window, so one attacker can't cause an alert storm</td></tr>
-            <tr><td>Automation</td><td>None</td><td>Logic App playbook: geo + AI enrichment on incident creation (Step 8)</td></tr>
           </tbody>
         </table>
-
-        <h2 id="step-8-ai-triage">Step 8: Add the AI Triage Layer<a href="#step-8-ai-triage" class="anchor">#</a></h2>
-
-        <p>
-          This is where the project stops being a lab build and starts being something I'd actually want at a SOC desk. The
-          most tedious part of Tier-1 work is reading raw event data and reconstructing, in your head, the story of what
-          happened. That reconstruction is exactly the kind of thing a language model is good at, so we put one in the pipeline.
-        </p>
-
-        <h3>8.1: Create the playbook</h3>
-
-        <ol>
-          <li>In Sentinel, go to <strong>Automation</strong> → <strong>Create</strong> → <strong>Playbook with incident trigger</strong></li>
-          <li>Name it (e.g. <code>pb-ai-triage</code>) and open it in the Logic Apps designer</li>
-          <li>Add steps in this order:
-            <ul>
-              <li><strong>Entities - Get IPs</strong> and <strong>Entities - Get Accounts</strong> (Sentinel connector)</li>
-              <li>An <strong>HTTP</strong> action calling a geo/ASN lookup for the attacker IP</li>
-              <li>An <strong>HTTP</strong> action calling the AI model with the payload below</li>
-              <li><strong>Add comment to incident</strong>, posting the model's response</li>
-            </ul>
-          </li>
-        </ol>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 11</span>
-            <span class="ph-hint">/images/writeups/sentinel/11-logic-app-designer.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/11-logic-app-designer.png" alt="Logic App playbook in the designer" loading="lazy" decoding="async"> -->
-          <figcaption>The playbook in the Logic Apps designer: entities in, enrichment, AI call, comment out.</figcaption>
-        </figure>
-
-        <p>The body of the AI call looks like this:</p>
-
-        <pre><code class="language-json">{
-  "model": "gpt-4o",
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are a SOC analyst assistant. Given a Microsoft Sentinel incident, produce a triage summary in three sections: 1) What happened (2-3 sentences), 2) MITRE ATT&amp;CK mapping with technique IDs, 3) Recommended immediate actions. Write for a Tier 2 analyst."
-    },
-    {
-      "role": "user",
-      "content": "Incident: @{triggerBody()?['object']?['properties']?['title']}\n\nEntities:\n@{variables('EntitySummary')}\n\nGeo:\n@{variables('GeoEnrichment')}"
-    }
-  ],
-  "max_tokens": 500,
-  "temperature": 0.1
-}</code></pre>
-        <p class="code-cap">The Logic App's HTTP action body. Low temperature keeps the output factual and consistent.</p>
-
-        <ol start="4">
-          <li>Back in <strong>Automation</strong>, create an <strong>Automation rule</strong>: when an incident is created, run <code>pb-ai-triage</code></li>
-        </ol>
-
-        <h3>8.2: Test the prompt before wiring it in</h3>
-
-        <p>
-          I'd recommend iterating on the prompt outside Logic Apps first. The same call as a standalone Python script
-          against Azure OpenAI:
-        </p>
-
-        <pre><code class="language-python">import os
-from openai import AzureOpenAI
-
-client = AzureOpenAI(
-    api_key=os.environ["AZURE_OPENAI_KEY"],
-    api_version="2024-02-01",
-    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
-)
-
-def triage(incident_title: str, entities: dict) -> str:
-    """Generate an analyst-ready triage summary for a Sentinel incident."""
-    summary = "\n".join([
-        f"- IP: {entities.get('ip', 'N/A')}",
-        f"- Account: {entities.get('account', 'N/A')}",
-        f"- Host: {entities.get('host', 'N/A')}",
-        f"- Country: {entities.get('country', 'N/A')} ({entities.get('asn', 'N/A')})",
-        f"- Failed attempts: {entities.get('failed', 0)}",
-    ])
-
-    resp = client.chat.completions.create(
-        model="gpt-4o",                       # your Azure deployment name
-        messages=[
-            {"role": "system", "content": (
-                "You are a SOC analyst assistant. Produce a triage summary with "
-                "three sections: What happened (2-3 sentences), MITRE ATT&amp;CK mapping "
-                "(tactic + technique ID), and three recommended actions. Be technical "
-                "and precise; assume a Tier 2 audience."
-            )},
-            {"role": "user", "content": f"Incident: {incident_title}\n\nEntities:\n{summary}"},
-        ],
-        max_tokens=500,
-        temperature=0.1,
-    )
-    return resp.choices[0].message.content
-
-
-if __name__ == "__main__":
-    print(triage(
-        "Brute Force Success: RDP (T1110.001)",
-        {"ip": "185.220.101.47", "account": "Administrator", "host": "honeypot-vm-01",
-         "country": "Netherlands", "asn": "Tor exit node", "failed": 347},
-    ))</code></pre>
-        <p class="code-cap">The same triage call as a standalone script, useful for iterating on the prompt.</p>
-
-        <h3>8.3: Enrich the IP before the model sees it</h3>
-
-        <p>
-          A raw IP is almost useless to an analyst, so before the triage call I run the IP through a geo/ASN lookup and a
-          Tor/VPN/datacenter classification, then let the model interpret what that combination implies about the actor. A
-          residential IP in one country reads very differently from a datacenter range or a known Tor exit.
-        </p>
-
-        <pre><code class="language-python">import requests
-
-def enrich_ip(ip: str, client) -> dict:
-    """Geo + ASN lookup, then an AI read on what the combination suggests."""
-    geo = requests.get(
-        f"http://ip-api.com/json/{ip}"
-        "?fields=country,regionName,isp,org,as,proxy,hosting",
-        timeout=5,
-    ).json()
-
-    context = (
-        f"IP: {ip}\nCountry: {geo.get('country')}\n"
-        f"Org: {geo.get('org', geo.get('isp'))}\nASN: {geo.get('as')}\n"
-        f"Proxy/VPN: {geo.get('proxy')}\nHosting/DC: {geo.get('hosting')}"
-    )
-
-    read = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": (
-                "You are a threat-intel analyst. In 2-3 sentences, assess likely "
-                "actor type (opportunistic scanner, targeted, botnet node), "
-                "infrastructure type, and OPSEC posture. Be concise."
-            )},
-            {"role": "user", "content": context},
-        ],
-        max_tokens=200, temperature=0.2,
-    )
-    return {"geo": geo, "assessment": read.choices[0].message.content}</code></pre>
-        <p class="code-cap">IP enrichment feeding an AI actor-context read, which then feeds the triage prompt.</p>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 12</span>
-            <span class="ph-hint">/images/writeups/sentinel/12-ai-incident-comment.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/12-ai-incident-comment.png" alt="AI-generated triage comment on a Sentinel incident" loading="lazy" decoding="async"> -->
-          <figcaption>The AI triage summary posted as a comment on the incident, ready before anyone opens it.</figcaption>
-        </figure>
-
-        <div class="note">
-          <p><strong>The model advises; a human pulls the trigger.</strong> The playbook can also ask the model which
-          containment action fits (isolate the host, block the IP at the NSG, watchlist it, or do nothing) and send that
-          recommendation for approval before anything executes. For a lab that's slightly theatrical, but it's the right
-          shape for the real thing: the automation never takes an irreversible action on its own.</p>
-        </div>
 
         <h2 id="what-actually-showed-up">What Actually Showed Up<a href="#what-actually-showed-up" class="anchor">#</a></h2>
 
@@ -1482,11 +1316,10 @@ def enrich_ip(ip: str, client) -> dict:
         <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 13</span>
-            <span class="ph-hint">/images/writeups/sentinel/13-first-alert.png</span>
+            <span class="ph-label">Screenshot 38</span>
+            <span class="ph-hint">/images/writeups/sentinel/38-results.png</span>
           </div>
-          <!-- <img src="/images/writeups/sentinel/13-first-alert.png" alt="First brute-force alert in Sentinel" loading="lazy" decoding="async"> -->
-          <figcaption>The first alert firing, minutes after the VM went public.</figcaption>
+          <img src="/images/writeups/sentinel/38-results.png" alt="First brute-force alert in Sentinel" loading="lazy" decoding="async">
         </figure>
 
         <p>
@@ -1592,7 +1425,6 @@ def enrich_ip(ip: str, client) -> dict:
         <li><a href="#generating-the-telemetry">Generating the Telemetry</a></li>
         <li><a href="#step-6-sharper-detections">Step 6: Sharper Detections</a></li>
         <li><a href="#step-7-analytics-rules">Step 7: Alert Rules</a></li>
-        <li><a href="#step-8-ai-triage">Step 8: AI Triage Layer</a></li>
         <li><a href="#what-actually-showed-up">What Actually Showed Up</a></li>
         <li><a href="#what-weve-accomplished">What We've Accomplished</a></li>
         <li><a href="#whats-next">What's Next</a></li>

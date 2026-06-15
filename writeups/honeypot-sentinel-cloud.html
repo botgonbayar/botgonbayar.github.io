@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+chul<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
@@ -992,44 +992,48 @@
         </div>
  
         <h3>1. Authentication: the 4625 to 4624 pivot</h3>
- 
-        <p>
-          Start at the front door. Mistype the password at the RDP prompt a few times, then log in correctly. The failures
-          write <code>4625</code>, the success writes <code>4624</code>, and the field that proves you understand them is
-          the <strong>Logon Type</strong>. Type 2 is someone sitting at the keyboard, Type 3 is a network logon over SMB,
-          and Type 10 is RDP. A Type 10 success from an IP you don't recognize is the exact thing you build an alert
-          around. The moment you log in as an admin, you'll also see <code>4672</code> fire alongside your <code>4624</code>,
-          because that event marks the special privileges handed to an elevated session.
-        </p>
- 
-        <pre><code class="language-sql">// Tie a successful logon to the privileges granted to that same session
+
+<p>
+  Start at the front door. Mistype the password at the RDP prompt a few times, then log in correctly. The failures
+  write <code>4625</code>, the success writes <code>4624</code>, and the field that proves you understand them is
+  the <strong>Logon Type</strong>. Type 2 is someone sitting at the keyboard, Type 3 is a network logon over SMB,
+  and Type 10 is RDP. A Type 10 success from an IP you don't recognize is the exact thing you build an alert
+  around. The moment you log in as an admin, you'll also see <code>4672</code> fire alongside your <code>4624</code>,
+  because that event marks the special privileges handed to an elevated session.
+</p>
+
+<pre><code class="language-sql">// Tie a successful logon to the privileges granted to that same session.
+// 4624 stores the session in TargetLogonId, 4672 in SubjectLogonId, so normalize to one key.
 SecurityEvent
 | where EventID in (4624, 4672)
-| where TimeGenerated > ago(1h)
-| summarize Events = make_set(EventID), Account = any(Account) by TargetLogonId
+| where TimeGenerated > ago(24h)
+| extend SessionId = iff(EventID == 4672, SubjectLogonId, TargetLogonId)
+| summarize Events = make_set(EventID), Account = any(Account) by SessionId
 | where set_has_element(Events, 4624) and set_has_element(Events, 4672)</code></pre>
-        <p class="code-cap">Correlating 4624 and 4672 on a shared Logon ID, the hex value that stitches one session together.</p>
- 
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 25</span>
-            <span class="ph-hint">/images/writeups/sentinel/25-logon-correlation.png</span>
-          </div>
-          <!-- <img src="/images/writeups/sentinel/25-logon-correlation.png" alt="KQL correlating 4624 and 4672 events on a shared Logon ID" loading="lazy" decoding="async"> -->
-          <figcaption>The 4624 and 4672 pair sharing one Logon ID, which is how you confirm an elevated session.</figcaption>
-        </figure>
- 
-        <div class="note">
-          <p><strong>Not every 4624 is a person.</strong> The first time you query for successful logons, most of what
-          comes back won't be you. Windows logs a constant stream of <code>4624</code>s from service accounts: the Desktop
-          Window Manager (<code>DWM-1</code>), font drivers (<code>UMFD</code>), and the machine account itself
-          (<code>COMPUTERNAME$</code>). The tell is in the fields. Those events carry <code>LogonType 2</code> with an empty
-          <code>IpAddress</code> and a target like <code>Window Manager\DWM-1</code>, while your actual RDP session shows
-          <code>LogonType 10</code>, a real source IP, and the account you logged in with. That gap is the whole reason the
-          detections filter on <code>LogonType == 10</code> instead of trusting the event ID alone. Reading logs well is
-          mostly knowing which events to ignore.</p>
-        </div>
+<p class="code-cap">Correlating 4624 and 4672 on a shared Logon ID, the hex value that stitches one session together.</p>
+
+<figure class="shot">
+  <div class="shot-ph">
+    <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
+    <span class="ph-label">Screenshot 36</span>
+    <span class="ph-hint">/images/writeups/sentinel/36-authentication.png</span>
+  </div>
+  <img src="/images/writeups/sentinel/36-authentication.png" alt="KQL correlating 4624 and 4672 events on a shared Logon ID" loading="lazy" decoding="async">
+  <figcaption>Each row is one session; the Account column is what separates the benign service logons from the real bo-admin RDP session.</figcaption>
+</figure>
+
+<div class="note">
+  <p><strong>Not every 4624 is a person.</strong> The first time you query for successful logons, most of what
+  comes back won't be you. Windows logs a steady stream of them from non-human accounts, and they split by logon
+  type: <code>SYSTEM</code>, <code>LOCAL SERVICE</code>, and <code>NETWORK SERVICE</code> come in as
+  <code>LogonType 5</code> (Service), while the Desktop Window Manager (<code>DWM-N</code>) and font driver host
+  (<code>UMFD-N</code>) virtual accounts log on as <code>LogonType 2</code> (Interactive). None of them carry a
+  remote source IP. Your actual RDP session, by contrast, is <code>LogonType 10</code> with a real source IP and
+  the account you logged in with. Here's the trap: Type 2 covers both a human at the console and the DWM virtual
+  account, so logon type alone is never enough. You confirm a real session by combining type, account, and source
+  IP, which is why the detections key on <code>LogonType == 10</code> and a real user instead of trusting the
+  event ID alone. Reading logs well is mostly knowing which events to ignore.</p>
+</div>
  
         <h3>2. Persistence: create an account and promote it</h3>
  
@@ -1053,10 +1057,10 @@ net user soc_test /active:no              # writes 4725 (account disabled)</code
         <figure class="shot">
           <div class="shot-ph">
             <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 26</span>
-            <span class="ph-hint">/images/writeups/sentinel/26-account-creation.png</span>
+            <span class="ph-label">Screenshot 37</span>
+            <span class="ph-hint">/images/writeups/sentinel/37-persistence.png</span>
           </div>
-          <!-- <img src="/images/writeups/sentinel/26-account-creation.png" alt="4720 account creation followed by 4732 admin group addition in the logs" loading="lazy" decoding="async"> -->
+          <img src="/images/writeups/sentinel/37-persistence.png" alt="4720 account creation followed by 4732 admin group addition in the logs" loading="lazy" decoding="async">
           <figcaption>4720 then 4732, an account created and promoted to admin within seconds.</figcaption>
         </figure>
  

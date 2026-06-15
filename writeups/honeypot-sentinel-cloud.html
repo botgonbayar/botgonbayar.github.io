@@ -478,18 +478,11 @@
           <figcaption>made with Claude Design.</figcaption>
         </figure>
 
-        <p class="lede">
-          A coworker once asked me whether a brute-force alert on a server was something to worry about, and I realized
-          I had never actually watched the other side of that interaction happen in real time. I knew the theory: failed logon events,
-          source IPs, the whole MITRE vocabulary. But I had never stood up a target, opened the
-          front door, and let the internet do what it does. So I did exactly that, and turned it into a small SOC pipeline.
-        </p>
-
         <p>
           This guide walks through the entire build step by step: a deliberately exposed Windows VM in Azure, Microsoft Sentinel
           ingesting its security events, custom KQL detections mapped to MITRE ATT&amp;CK, and an AI triage layer that summarizes
-          every incident before an analyst opens it. The foundation is the
-          <a href="https://logos-red.com/blog/how-to-build-a-microsoft-azure-sentinel-siem-cybersecurity-lab/" target="_blank" rel="noopener">Logos Red Azure Sentinel lab</a>.
+          every incident before an analyst opens it. The foundation is
+          <a href="https://www.youtube.com/watch?v=g5JL2RIbThM&t=1596s" target="_blank" rel="noopener">Josh Madakor's tutorial here</a>.
           I followed it end to end, then kept going, because the tutorial stops at a single string-match query and a real
           detection environment is a different animal. Steps 1 through 5 are the base build; Steps 6 through 7 is when it
           becomes something closer to a working SOC workflow, and part 2 of this series will incorporate an AI layer that turns raw alerts into analyst-ready summaries. Stay tuned for that. But for now let's establish our foundation first.

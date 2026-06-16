@@ -1377,70 +1377,166 @@ SecurityEvent
         </table>
 
         <h2 id="what-actually-showed-up">What Actually Showed Up<a href="#what-actually-showed-up" class="anchor">#</a></h2>
-
+ 
         <p>
-          Then I turned it on and waited, which did not take long. The first brute-force attempt against the box landed
-          inside fifteen minutes of it going public. Internet-wide scanners find a fresh public IP almost immediately,
-          and there is something genuinely sobering about watching the first failed-logon events roll in before you've
-          finished your coffee.
+          Then I turned it on and waited, which did not take long. Internet-wide scanners find a fresh public IP almost
+          immediately, and there is something genuinely sobering about watching the first failed-logon events roll in
+          before you've finished your coffee. What the box recorded over the following day was less a trickle than a
+          steady drumbeat.
         </p>
-
-        <figure class="shot">
-          <div class="shot-ph">
-            <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path></svg>
-            <span class="ph-label">Screenshot 38</span>
-            <span class="ph-hint">/images/writeups/sentinel/38-results.png</span>
-          </div>
-          <img src="/images/writeups/sentinel/38-results.png" alt="Creating an analytics rule with MITRE mapping" loading="lazy" decoding="async">
-        </figure>
-        
+ 
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Failed logons (4625)</td><td>26,066</td></tr>
+            <tr><td>Unique source IPs</td><td>253</td></tr>
+            <tr><td>Top source IP</td><td>194.180.49.141 (19,735 attempts, ~76%)</td></tr>
+            <tr><td>Most-targeted username</td><td>ADMINISTRATOR (4,164)</td></tr>
+            <tr><td>Logon Type 3 (network)</td><td>26,016 of 26,066</td></tr>
+            <tr><td>Successful external logons</td><td>0</td></tr>
+          </tbody>
+        </table>
+ 
+ 
+        <h3>One address did most of the work</h3>
+ 
         <p>
-          Over the next day the failed-logon traffic came from dozens of countries, with the usual suspects dominating the
-          volume: hosting ranges, Tor exits, and a long tail of clearly compromised residential hosts being used as
-          relays. The targeted usernames were exactly the boring, predictable set of Administrator, admin, user, test,
-          and guest, because automated tools cycle through the obvious ones first, every time. Volume peaked overnight in my
-          timezone, which lines up with automated campaigns running during business hours elsewhere in the world.
+          The volume was lopsided in a way I did not expect. Of the 26,066 failures, <strong>19,735 came from a single
+          IP, 194.180.49.141</strong>, roughly 76% of everything. That kind of concentration is worth a closer look, so I
+          ran the address through the same enrichment a SOC analyst would: WHOIS first, then reputation and scanning feeds.
         </p>
-
+ 
+        <ul>
+          <li><strong>WHOIS:</strong> registered to a dedicated-server / hosting allocation, not a residential ISP</li>
+          <li><strong>VirusTotal:</strong> 5 of 91 vendors flagged it, including Fortinet, Criminal IP, and GreyNoise</li>
+          <li><strong>GreyNoise:</strong> classified as malicious</li>
+          <li><strong>Community reporting:</strong> prior RDP (3389) reconnaissance against multiple targets, mapped to MITRE ATT&amp;CK <code>T1595</code> (Active Scanning)</li>
+        </ul>
+ 
         <p>
-          The two things I'll keep from running this: event-ID detections produced zero false positives from the benign
-          logoff events that the tutorial's string-match would have flagged, and the AI triage comment turned each
-          incident from a four-to-six-minute manual read into something I could grasp in well under a minute, because the
-          narrative was already sitting there when I opened it. Neither of those is a dramatic result on its own. Together
-          they're the difference between a lab and a workflow.
+          Read together, those signals all point the same direction: this looks like scanning infrastructure, not ordinary
+          consumer traffic. But I want to be careful about how far that goes. Five of ninety-one vendors is a minority,
+          community reports are not ground truth, and the registries did not even fully agree with each other (one placed
+          the block in Germany, another tied the ASN to a provider in Bulgaria). WHOIS and reputation describe an address,
+          not the person at the keyboard, and a rented server can be leased legitimately, compromised, or reused by
+          different operators over time. So the honest read is a confidence boost, not a verdict: the activity was most
+          likely part of broader scanning or credential-access operations, and the operator is unknown. The point was never
+          attribution. It was concentration. Hundreds of sources touched the box, but three quarters of the noise came from
+          one rented server methodically working a username list.
         </p>
-
+ 
+        <div class="note">
+          <p><strong>A note on attribution.</strong> External intelligence adds context, not certainty. It can tell you an
+          address has a poor reputation; it cannot tell you who controlled it at the moment of the activity. The job of
+          enrichment is to raise or lower confidence, never to name a culprit.</p>
+        </div>
+ 
+        <h3>The usernames were a recycled dictionary</h3>
+ 
+        <p>
+          The targeted accounts were exactly the boring, predictable set, with <code>ADMINISTRATOR</code> alone drawing
+          4,164 attempts:
+        </p>
+ 
+        <table>
+          <thead>
+            <tr><th>Username</th><th>Attempts</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ADMINISTRATOR</td><td>4,164</td></tr>
+            <tr><td>Administrator</td><td>2,174</td></tr>
+            <tr><td>USER</td><td>1,354</td></tr>
+            <tr><td>ADMIN</td><td>1,354</td></tr>
+            <tr><td>USER2</td><td>1,235</td></tr>
+            <tr><td>ADMINISTRADOR</td><td>1,235</td></tr>
+            <tr><td>OPERATOR</td><td>1,235</td></tr>
+            <tr><td>ADMIN1</td><td>1,234</td></tr>
+            <tr><td>SERVER1</td><td>1,234</td></tr>
+            <tr><td>MANAGER</td><td>1,234</td></tr>
+          </tbody>
+        </table>
+ 
+        <p>
+          The appearance of <code>ADMINISTRADOR</code>, the Spanish and Portuguese spelling, right next to the English
+          <code>ADMINISTRATOR</code> is a small tell that these came from multilingual, recycled credential lists rather
+          than anything aimed at me specifically. Automated tools cycle the obvious names first, every time.
+        </p>
+ 
+        <h3>The surprise: almost everything was Logon Type 3</h3>
+ 
+        <p>
+          Here's the detail I didn't expect, and the one that taught me the most. Almost every failure came in as
+          <strong>Logon Type 3 (network)</strong>, 26,016 of the 26,066, with essentially none as Type 10
+          (RemoteInteractive), even though RDP was the obvious door I had left open.
+        </p>
+ 
+        <p>
+          That looks contradictory until you remember how Windows logs remote authentication. With Network Level
+          Authentication on, which is the default, a failed RDP credential check is rejected during the network-level
+          handshake, before any interactive session is ever established, so Windows records it as a Type 3 network logon.
+          Type 10 only appears once an interactive RDP session actually succeeds. SMB and other remote authentication
+          against the wide-open box land as Type 3 as well. So Type 3 dominating is not evidence that this wasn't RDP. The
+          top source was flagged for RDP reconnaissance specifically. It is evidence that nobody ever completed an
+          interactive session. The absence of Type 10 from any external address is the finding.
+        </p>
+ 
+        <div class="note">
+          <p><strong>This is the part I'd want a hiring manager to read.</strong> I went in assuming I'd be looking at RDP
+          interactive logons (Type 10). The data said network logons (Type 3), and instead of forcing my assumption onto
+          it, I worked out why the logs were correct and I was wrong. That's the difference between confirming what you
+          already believe and actually reading the telemetry.</p>
+        </div>
+ 
+        <h3>Nobody got in</h3>
+ 
+        <p>
+          The success side of the ledger is short. Every successful logon in the dataset traced back to one of two
+          benign places: the local system and service accounts the OS generates on its own, and my own connection when I
+          logged in to set the box up. Despite 26,066 failed attempts from 253 distinct addresses, <strong>not one
+          external source ever authenticated successfully</strong>. The wide-open door drew a constant crowd, and the
+          crowd never made it through.
+        </p>
+ 
+        <p>
+          The other thing I'll keep from running this: the event-ID detections produced zero false positives from the
+          benign logoff events that the tutorial's string-match would have flagged. That isn't a dramatic result on its
+          own. Combined with telemetry I generated myself and findings I could actually defend, it's the difference
+          between a lab and a workflow.
+        </p>
+ 
         <h2 id="what-weve-accomplished">What We've Accomplished<a href="#what-weve-accomplished" class="anchor">#</a></h2>
-
+ 
         <ul>
           <li>Deployed an internet-exposed Windows honeypot VM in an isolated Azure resource group</li>
           <li>Built the full telemetry pipeline: AMA agent → Data Collection Rule → Log Analytics → Sentinel</li>
+          <li>Generated a full self-inflicted attack chain to produce the persistence, lateral-movement, execution, and evasion events the internet alone won't hand you</li>
           <li>Wrote event-ID-based KQL detections for brute force, brute-force success, privilege escalation, log tampering, and persistence</li>
           <li>Promoted them to analytics rules with MITRE ATT&amp;CK mapping, entity mapping, tiered severity, and incident grouping</li>
-          <li>Collected and analyzed real attack traffic from the open internet</li>
+          <li>Collected and analyzed real attack traffic: 26,066 failed logons, 253 source IPs, and a clear read on what was scanning versus what (nothing) actually got in</li>
         </ul>
-
+ 
         <div class="note warn">
           <p><strong>Tear it down.</strong> When you're done collecting, go to <strong>Resource groups</strong>, open
           <code>rg-honeypot-lab</code>, and click <strong>Delete resource group</strong>. The honeypot's job is to exist
           briefly, teach you something, and disappear.</p>
         </div>
-
-        <h2 id="whats-next">What's Next<a href="#whats-next" class="anchor">#</a></h2>
-
+ 
+        <h2 id="coming-in-part-2">Coming in Part 2<a href="#coming-in-part-2" class="anchor">#</a></h2>
+ 
         <p>
-          This is the first piece of a longer cloud-security thread I'm working through. The geo data this lab already
-          collects wants to become a live attack map in a Sentinel Workbook. Watching the failed logons light up a
-          world map in real time is the obvious next move, and the enrichment is half-built for it already. After that I
-          want to wire MISP into Sentinel so attacker IPs get cross-referenced against known threat-actor infrastructure
-          automatically, and layer Defender for Cloud on top to capture what actually happens on the box <em>after</em> a
-          brute-force succeeds, rather than inferring it from event IDs.
+          The pipeline so far stops at the incident. An analyst still has to open each one and reconstruct, from raw event
+          data, the story of what happened. That reconstruction is exactly the kind of work a language model is good at,
+          so <strong>Part 2</strong> bolts an AI triage layer onto the pipeline: a Logic App playbook that enriches each
+          new incident with geo and ASN context, then has a model write an analyst-ready summary, MITRE mapping, and
+          recommended actions as a comment before anyone opens it. The model advises; a human still pulls the trigger.
         </p>
-
+ 
         <p>
-          The thing this lab drove home, though, is smaller and more durable than any of that. You can read about RDP
-          brute-force for years and it stays abstract. Open one real port to the internet, watch the attempts arrive
-          inside fifteen minutes, and it stops being abstract permanently. Build the detection around what you watched,
+          The findings this first half drove home, though, is smaller and more durable than any automation. You can read
+          about RDP brute-force for years and it stays abstract. Open one real port to the internet, watch the attempts
+          arrive within the hour, and it stops being abstract permanently. Build the detection around what you watched,
           not around what the tutorial told you to match, and the queries get sharper because you've seen the thing they're
           meant to catch.
         </p>

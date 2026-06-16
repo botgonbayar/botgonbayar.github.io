@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Writeups | Bat Otgonbayar</title>
-  <meta name="description" content="Cybersecurity writeups, notes, labs, and case studies by Bat Otgonbayar." />
+  <title>About | Bat Otgonbayar</title>
+  <meta name="description" content="About Bat Otgonbayar, cybersecurity practitioner focused on identity, endpoint security, infrastructure support, Microsoft Sentinel, and automation." />
   <style>
-    :root {
+:root {
       --bg: #0b0f17;
       --bg-2: #101624;
       --text: #f4f4f5;
@@ -396,6 +396,179 @@
       .post { padding: 26px 0; }
     }
 
+
+/* ---------- about page additions using the exact Writeups shell/background ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 64px;
+  padding: 54px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-copy {
+  max-width: 720px;
+}
+
+.about-copy p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.profile-card {
+  position: sticky;
+  top: 24px;
+  border-left: 1px solid var(--border);
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.profile-image {
+  width: 148px;
+  height: 148px;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+.profile-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+.profile-card h2,
+.profile-card h3 {
+  margin: 0 0 10px;
+  color: var(--text);
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.profile-card p {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.timeline {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.role {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 30px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.role-meta {
+  color: var(--faint);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.role h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(22px, 2.5vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.role-company {
+  margin-top: 5px;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.role p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.skill-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.skill {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.skill h3 {
+  margin: 0 0 10px;
+  color: var(--text);
+  font-size: 18px;
+  letter-spacing: -0.025em;
+}
+
+.skill p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.contact-block {
+  padding: 54px 0 90px;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.contact-links a {
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.contact-links a:hover {
+  color: var(--link);
+  border-bottom-color: var(--link);
+}
+
+@media (max-width: 820px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .profile-card {
+    position: static;
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+
+  .role {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .skill-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+  
+
 /* ==========================================================
    Shared soft-faceted background — NO honeycomb / NO hexes
    Paste this at the VERY BOTTOM of the <style> block.
@@ -479,7 +652,7 @@ body.bg-faceted::after {
 .article-header,
 .grid,
 .site-header,
-site-footer,
+.site-footer,
 header,
 main,
 footer,
@@ -500,11 +673,10 @@ article,
     animation: none !important;
   }
 }
-
-  </style>
+</style>
 </head>
 
-<body class="bg-faceted">
+<body class="bg-honeycomb">
   <div class="shell">
     <header class="site-header">
       <a class="brand" href="/"><code>./bɑːt</code><span>Bat Otgonbayar</span></a>

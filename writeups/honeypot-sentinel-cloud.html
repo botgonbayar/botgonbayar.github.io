@@ -3,37 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Building a Cloud SIEM Honeypot: Microsoft Sentinel, Live Attack Telemetry, and an AI Triage Layer | Bat Otgonbayar</title>
-<meta name="description" content="Standing up a deliberately exposed Windows VM in Azure, wiring it to Microsoft Sentinel, sharpening the detections beyond the tutorial, and bolting an AI triage layer onto the incident pipeline.">
+<title>Building a Cloud SIEM Honeypot, Part 1: Azure Sentinel and Live Attack Telemetry | Bat Otgonbayar</title>
+<meta name="description" content="I exposed a Windows VM on the public internet, wired it to Microsoft Sentinel, and recorded what the internet actually did to it. Part 1 covers the build, self-generated telemetry, event-ID detections, and what 26,000 real authentication attempts looked like.">
 <link rel="canonical" href="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html">
 <meta name="author" content="Bat Otgonbayar">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0a0e17">
-
+ 
 <!-- social cards: how the link renders on LinkedIn, Discord, Slack, etc. -->
 <meta property="og:type" content="article">
-<meta property="og:title" content="Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer">
-<meta property="og:description" content="A deliberately exposed Windows VM in Azure, wired to Microsoft Sentinel, with sharpened detections and an AI triage layer on the incident pipeline.">
+<meta property="og:title" content="Building a Cloud SIEM Honeypot, Part 1: Azure Sentinel and Live Attack Telemetry">
+<meta property="og:description" content="A deliberately exposed Windows VM in Azure, wired to Microsoft Sentinel, and what 26,000 real authentication attempts from 253 IPs actually looked like.">
 <meta property="og:url" content="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html">
 <meta property="og:site_name" content="Bat Otgonbayar">
 <meta property="og:image" content="https://botgonbayar.github.io/images/writeups/sentinel/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Building a Cloud SIEM Honeypot: Azure Sentinel, Live Attack Telemetry, and an AI Triage Layer">
-<meta name="twitter:description" content="A deliberately exposed Windows VM in Azure, wired to Microsoft Sentinel, with sharpened detections and an AI triage layer on the incident pipeline.">
+<meta name="twitter:title" content="Building a Cloud SIEM Honeypot, Part 1: Azure Sentinel and Live Attack Telemetry">
+<meta name="twitter:description" content="A deliberately exposed Windows VM in Azure, wired to Microsoft Sentinel, and what 26,000 real authentication attempts from 253 IPs actually looked like.">
 <meta name="twitter:image" content="https://botgonbayar.github.io/images/writeups/sentinel/og-card.png">
-
+ 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
-  "headline": "Building a Cloud SIEM Honeypot: Microsoft Sentinel, Live Attack Telemetry, and an AI Triage Layer",
+  "headline": "Building a Cloud SIEM Honeypot, Part 1: Azure Sentinel and Live Attack Telemetry",
   "author": {"@type": "Person", "name": "Bat Otgonbayar", "url": "https://botgonbayar.github.io/"},
   "datePublished": "2026-06-11",
   "url": "https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html",
   "keywords": "Microsoft Sentinel, SIEM, honeypot, KQL, MITRE ATT&CK, Azure, blue team"
 }
 </script>
-
+ 
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script>
@@ -79,7 +79,7 @@
     --inline-code:#0f766e;
     --shadow:rgba(0,0,0,.08);
   }
-
+ 
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -90,7 +90,7 @@
     -webkit-font-smoothing:antialiased;
     transition:background .25s ease,color .25s ease;
   }
-
+ 
   /* ---------- top nav ---------- */
   .topbar{
     max-width:1100px;margin:0 auto;
@@ -118,11 +118,11 @@
   .icon-sun{display:none;}
   [data-theme="light"] .icon-moon{display:none;}
   [data-theme="light"] .icon-sun{display:block;}
-
+ 
   /* ---------- reading progress ---------- */
   .progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
     background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .1s;}
-
+ 
   /* ---------- layout ---------- */
   .wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
   .article-header{
@@ -136,7 +136,7 @@
   .subtitle{
     margin:20px auto 0;max-width:680px;font-size:18px;color:var(--text-dim);line-height:1.6;
   }
-
+ 
   /* grid: article + sidebar */
   .grid{
     display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:48px;
@@ -157,7 +157,7 @@
   .author .who .role{color:var(--text-faint);}
   .author .who a{color:var(--accent);text-decoration:none;}
   .author .who a:hover{text-decoration:underline;}
-
+ 
   /* ---------- sidebar TOC ---------- */
   .toc{position:sticky;top:24px;}
   .toc .toc-label{
@@ -173,7 +173,7 @@
   .toc li a:hover{color:var(--accent);}
   .toc li a.active{color:var(--accent);border-left-color:var(--accent);}
   .toc li.sub a{padding-left:28px;font-size:13px;}
-
+ 
   /* ---------- prose ---------- */
   .prose{font-size:17px;color:var(--text);max-width:760px;}
   .prose p{margin-bottom:22px;}
@@ -198,10 +198,10 @@
   .prose li{margin-bottom:9px;}
   .prose ul li::marker{color:var(--text-faint);}
   .prose ol li::marker{color:var(--text-faint);font-variant-numeric:tabular-nums;}
-
+ 
   /* lede */
   .lede{font-size:19px;line-height:1.7;color:var(--text-dim);}
-
+ 
   /* inline code */
   .prose p code,.prose li code,.prose td code{
     background:var(--surface-2);color:var(--inline-code);
@@ -211,7 +211,7 @@
   [data-theme="light"] .prose p code,[data-theme="light"] .prose li code,[data-theme="light"] .prose td code{
     background:#f0f0f3;border-color:var(--border);
   }
-
+ 
   /* code blocks */
   .prose pre{
     background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
@@ -220,12 +220,13 @@
   .prose pre code{
     display:block;padding:20px;font-size:13px;line-height:1.65;
     font-family:'Monaco','Menlo','Consolas',monospace;background:transparent!important;
+    color:#e6edf3;
   }
   .hljs{background:var(--code-bg)!important;}
   .code-cap{
     font-size:12.5px;color:var(--text-faint);margin:-14px 0 26px;padding-left:2px;
   }
-
+ 
   /* callout, used sparingly */
   .note{
     border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent);
@@ -235,7 +236,18 @@
   .note p{margin-bottom:10px;}
   .note p:last-child{margin-bottom:0;}
   .note strong{color:var(--heading);}
-
+ 
+  /* stat callout for results at a glance */
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:26px 0;
+  }
+  .stat-card{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    padding:18px 16px;
+  }
+  .stat-card .num{font-size:30px;font-weight:800;color:var(--heading);line-height:1.1;letter-spacing:-.02em;}
+  .stat-card .lbl{font-size:13px;color:var(--text-dim);margin-top:6px;line-height:1.4;}
+ 
   /* screenshot placeholder */
   figure.shot{margin:30px 0;}
   .shot-ph{
@@ -255,7 +267,14 @@
   figure.shot figcaption{
     margin-top:12px;font-size:13.5px;color:var(--text-faint);line-height:1.5;text-align:center;
   }
-
+ 
+  /* architecture diagram */
+  figure.diagram{margin:30px 0;}
+  figure.diagram svg{
+    display:block;width:100%;height:auto;border:1px solid var(--border);
+    border-radius:10px;background:var(--surface);
+  }
+ 
   /* hero figure */
   figure.shot.hero{margin:8px 0 34px;}
   figure.shot.hero .shot-ph{min-height:260px;}
@@ -267,7 +286,7 @@
   }
   iframe.hero-embed{overflow:hidden;}
   video.hero-embed{object-fit:cover;}
-
+ 
   /* tables */
   .prose table{
     width:100%;border-collapse:collapse;margin:26px 0;font-size:14.5px;display:block;overflow-x:auto;
@@ -280,10 +299,10 @@
   .prose tbody td{padding:11px 14px;border-bottom:1px solid var(--border-soft);vertical-align:top;}
   .prose tbody tr:last-child td{border-bottom:none;}
   .prose tbody td:first-child{color:var(--heading);font-weight:500;}
-
+ 
   /* horizontal rule between major sections feel */
   .prose hr{border:none;border-top:1px solid var(--border);margin:48px 0;}
-
+ 
   /* footer */
   .article-foot{
     max-width:760px;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);
@@ -303,7 +322,7 @@
     padding:40px 24px;border-top:1px solid var(--border);margin-top:60px;
     display:flex;gap:10px;justify-content:center;
   }
-
+ 
   /* responsive */
   @media (max-width:980px){
     .grid{grid-template-columns:1fr;gap:0;}
@@ -321,7 +340,7 @@
     .topbar{padding:20px 18px;}
     .wrap{padding:0 18px 60px;}
   }
-
+ 
   /* skip link */
   .skip-link{
     position:absolute;left:-9999px;top:0;z-index:100;
@@ -329,12 +348,12 @@
     font-size:14px;font-weight:600;text-decoration:none;
   }
   .skip-link:focus{left:0;}
-
+ 
   /* visible keyboard focus */
   a:focus-visible,button:focus-visible,summary:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;
   }
-
+ 
   /* copy button on code blocks */
   .prose pre{position:relative;}
   .copy-btn{
@@ -345,7 +364,7 @@
   }
   .prose pre:hover .copy-btn,.copy-btn:focus-visible{opacity:1;}
   .copy-btn:hover{color:var(--heading);}
-
+ 
   /* collapsible TOC for mobile */
   .toc-mobile{display:none;margin:24px 0 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);}
   .toc-mobile summary{
@@ -360,7 +379,7 @@
     display:block;padding:7px 0;color:var(--text-dim);text-decoration:none;font-size:14.5px;
   }
   .toc-mobile li a:hover{color:var(--accent);}
-
+ 
   /* image lightbox */
   .prose figure.shot img{cursor:zoom-in;}
   .lightbox{
@@ -386,13 +405,13 @@
     color:#7e879c;font-size:12.5px;letter-spacing:.4px;
   }
   @keyframes lb-in{from{transform:scale(.94);opacity:0;}to{transform:scale(1);opacity:1;}}
-
+ 
   /* reduced motion */
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto;}
     *,*::before,*::after{transition:none!important;animation:none!important;}
   }
-
+ 
   /* scrollbar */
   ::-webkit-scrollbar{width:9px;height:9px;}
   ::-webkit-scrollbar-track{background:var(--surface);}
@@ -565,10 +584,7 @@
           Leave it running and forget it, and that number stops being funny.</p>
         </div>
 
-        <iframe src="/images/writeups/sentinel/lab-diagram.html"
-        title="Cloud HoneyPot Sentinel — Detection Pipeline"
-        style="width:100%;border:0;display:block" scrolling="no"
-        onload="this.__h=e=>{if(e.data&&e.data.type==='hpsd-embed-height')this.style.height=e.data.height+'px'};addEventListener('message',this.__h)"></iframe>
+        <iframe class="hero-embed" src="/images/writeups/sentinel/lab-diagram.html" title="The entire lab at a quick glance. Part 2 included in the next article" loading="eager" scrolling="no"></iframe>
         
         <h2 id="step-1-create-the-vm">Step 1: Create the Honeypot VM<a href="#step-1-create-the-vm" class="anchor">#</a></h2>
 

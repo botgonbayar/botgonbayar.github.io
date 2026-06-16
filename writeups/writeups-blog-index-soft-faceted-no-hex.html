@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writeups | Bat Otgonbayar</title>
+  <meta name="description" content="Cybersecurity writeups, notes, labs, and case studies by Bat Otgonbayar." />
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --bg-2: #101624;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --faint: #71717a;
+      --border: rgba(148, 163, 184, 0.18);
+      --border-strong: rgba(148, 163, 184, 0.28);
+      --surface: rgba(15, 23, 42, 0.52);
+      --surface-2: rgba(15, 23, 42, 0.78);
+      --accent: #a78bfa;
+      --accent-2: #5eead4;
+      --link: #d8b4fe;
+      --shadow: rgba(0, 0, 0, 0.35);
+      --max: 980px;
+    }
+
+    [data-theme="light"] {
+      --bg: #fafafa;
+      --bg-2: #f4f4f5;
+      --text: #18181b;
+      --muted: #52525b;
+      --faint: #71717a;
+      --border: rgba(24, 24, 27, 0.12);
+      --border-strong: rgba(24, 24, 27, 0.2);
+      --surface: rgba(255, 255, 255, 0.58);
+      --surface-2: rgba(255, 255, 255, 0.86);
+      --accent: #7c3aed;
+      --accent-2: #0f766e;
+      --link: #6d28d9;
+      --shadow: rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(124, 58, 237, 0.18), transparent 34rem),
+        radial-gradient(circle at 90% 12%, rgba(20, 184, 166, 0.16), transparent 30rem),
+        linear-gradient(180deg, var(--bg), var(--bg) 55%, var(--bg-2));
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body.bg-honeycomb::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(30deg, rgba(167, 139, 250, 0.105) 12%, transparent 12.5%, transparent 87%, rgba(167, 139, 250, 0.105) 87.5%, rgba(167, 139, 250, 0.105)),
+        linear-gradient(150deg, rgba(94, 234, 212, 0.075) 12%, transparent 12.5%, transparent 87%, rgba(94, 234, 212, 0.075) 87.5%, rgba(94, 234, 212, 0.075)),
+        linear-gradient(30deg, rgba(167, 139, 250, 0.095) 12%, transparent 12.5%, transparent 87%, rgba(167, 139, 250, 0.095) 87.5%, rgba(167, 139, 250, 0.095)),
+        linear-gradient(150deg, rgba(94, 234, 212, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(94, 234, 212, 0.06) 87.5%, rgba(94, 234, 212, 0.06));
+      background-size: 96px 168px;
+      background-position: 0 0, 0 0, 48px 84px, 48px 84px;
+      opacity: 0.38;
+      mask-image: linear-gradient(to bottom, black 0%, black 38%, rgba(0,0,0,.42) 60%, transparent 88%);
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 38%, rgba(0,0,0,.42) 60%, transparent 88%);
+      animation: honey-drift 48s linear infinite;
+    }
+
+    [data-theme="light"] body.bg-honeycomb::before,
+    [data-theme="light"] .bg-honeycomb::before {
+      background-image:
+        linear-gradient(30deg, rgba(24, 24, 27, 0.09) 12%, transparent 12.5%, transparent 87%, rgba(24, 24, 27, 0.09) 87.5%, rgba(24, 24, 27, 0.09)),
+        linear-gradient(150deg, rgba(15, 118, 110, 0.055) 12%, transparent 12.5%, transparent 87%, rgba(15, 118, 110, 0.055) 87.5%, rgba(15, 118, 110, 0.055)),
+        linear-gradient(30deg, rgba(124, 58, 237, 0.055) 12%, transparent 12.5%, transparent 87%, rgba(124, 58, 237, 0.055) 87.5%, rgba(124, 58, 237, 0.055)),
+        linear-gradient(150deg, rgba(24, 24, 27, 0.065) 12%, transparent 12.5%, transparent 87%, rgba(24, 24, 27, 0.065) 87.5%, rgba(24, 24, 27, 0.065));
+      opacity: 0.30;
+    }
+
+    body.bg-honeycomb::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%),
+        linear-gradient(180deg, transparent 0%, var(--bg) 76%);
+    }
+
+    @keyframes honey-drift {
+      from { background-position: 0 0, 0 0, 48px 84px, 48px 84px; }
+      to { background-position: 96px 168px, 96px 168px, 144px 252px, 144px 252px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    a { color: inherit; }
+    .shell {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand code {
+      color: var(--accent);
+      font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .site-nav a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(12px);
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .intro {
+      padding: 80px 0 46px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(46px, 8vw, 86px);
+      line-height: 0.98;
+      letter-spacing: -0.075em;
+      font-weight: 900;
+    }
+
+    .intro p {
+      max-width: 690px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 30px;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 13px;
+      backdrop-filter: blur(12px);
+    }
+
+    .tab.active {
+      color: var(--text);
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 64px;
+      padding: 54px 0 90px;
+    }
+
+    .section-title {
+      margin: 0 0 22px;
+      color: var(--faint);
+      font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .post-list {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .post {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 30px;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .post:hover .post-title {
+      color: var(--link);
+    }
+
+    .post-meta {
+      color: var(--faint);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .post-title {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(22px, 2.5vw, 30px);
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      transition: color 0.18s ease;
+    }
+
+    .post-excerpt {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 650px;
+      font-size: 16px;
+    }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .post-tag {
+      color: var(--faint);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      line-height: 1.4;
+      background: color-mix(in srgb, var(--surface) 70%, transparent);
+    }
+
+    .post.featured {
+      padding: 34px 0;
+    }
+
+    .post.featured .post-title {
+      font-size: clamp(28px, 4vw, 42px);
+    }
+
+    .sidebar {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .side-card {
+      position: sticky;
+      top: 24px;
+      border-left: 1px solid var(--border);
+      padding-left: 22px;
+    }
+
+    .side-card h2 {
+      margin: 0 0 12px;
+      color: var(--text);
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .side-card p {
+      margin: 0 0 18px;
+    }
+
+    .side-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .side-links a {
+      color: var(--muted);
+      text-decoration: none;
+      width: fit-content;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .side-links a:hover {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 34px 0 50px;
+      color: var(--faint);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .site-footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 820px) {
+      .site-header, .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+        gap: 42px;
+      }
+
+      .side-card {
+        position: static;
+        border-left: 0;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+      }
+
+      .post {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .intro {
+        padding-top: 58px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(var(--max), calc(100% - 28px)); }
+      .site-nav { gap: 12px; font-size: 14px; }
+      .post { padding: 26px 0; }
+    }
+
+/* ==========================================================
+   Shared soft-faceted background — NO honeycomb / NO hexes
+   Paste this at the VERY BOTTOM of the <style> block.
+   It intentionally overrides older bg-honeycomb CSS.
+
+   Existing body class can stay:
+     <body class="bg-honeycomb">
+   Recommended rename:
+     <body class="bg-faceted">
+   ========================================================== */
+
+body.bg-honeycomb,
+body.bg-faceted {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.16), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(20, 184, 166, 0.13), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+/* Replace the old hex/honeycomb layer with a softer faceted/low-poly texture. */
+body.bg-honeycomb::before,
+body.bg-faceted::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(167, 139, 250, 0.035) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(94, 234, 212, 0.026) 42%, transparent 74%);
+
+  background-size: 360px 220px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  opacity: 0.58;
+
+  mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+
+  animation: faceted-drift 90s linear infinite;
+}
+
+/* Strong fade layer so the pattern sits behind content instead of becoming content. */
+body.bg-honeycomb::after,
+body.bg-faceted::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
+}
+
+[data-theme="light"] body.bg-honeycomb,
+[data-theme="light"] body.bg-faceted {
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.10), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(15, 118, 110, 0.08), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+[data-theme="light"] body.bg-honeycomb::before,
+[data-theme="light"] body.bg-faceted::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(124, 58, 237, 0.025) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(15, 118, 110, 0.020) 42%, transparent 74%);
+  opacity: 0.46;
+}
+
+.site,
+.shell,
+.container,
+.wrap,
+.topbar,
+.article-header,
+.grid,
+.site-header,
+site-footer,
+header,
+main,
+footer,
+article,
+.toc {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes faceted-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 360px 220px, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-honeycomb::before,
+  body.bg-faceted::before {
+    animation: none !important;
+  }
+}
+
+  </style>
+</head>
+
+<body class="bg-faceted">
+  <div class="shell">
+    <header class="site-header">
+      <a class="brand" href="/"><code>./bɑːt</code><span>Bat Otgonbayar</span></a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="/">Home</a>
+        <a class="active" href="/writeups/">Writeups</a>
+        <a href="/about/">About</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme">☼</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow">Blog · Labs · Case Studies</div>
+        <h1>Writeups from hands-on security work.</h1>
+        <p>
+          Technical notes, lab builds, investigations, and lessons learned from identity, cloud security,
+          Microsoft Sentinel, PowerShell automation, and blue-team projects.
+        </p>
+
+        <div class="tabs" aria-label="Topic filters">
+          <span class="tab active">All</span>
+          <span class="tab">Cloud Security</span>
+          <span class="tab">Identity</span>
+          <span class="tab">Detection Engineering</span>
+          <span class="tab">Automation</span>
+        </div>
+      </section>
+
+      <div class="content">
+        <section aria-labelledby="latest-posts">
+          <h2 class="section-title" id="latest-posts">Latest</h2>
+
+          <div class="post-list">
+            <a class="post featured" href="/writeups/honeypot-sentinel-cloud.html">
+              <div class="post-meta">
+                June 2026<br />
+                ~12 min read<br />
+                Case Study
+              </div>
+              <div>
+                <h3 class="post-title">Building a Cloud SIEM Honeypot, Part 1: Watching the Internet Find a Windows VM</h3>
+                <p class="post-excerpt">
+                  I exposed a Windows VM to the public internet, wired it into Microsoft Sentinel, and analyzed
+                  26,066 failed logons from 253 source IPs. This writeup focuses on telemetry, detections,
+                  attacker behavior, and the assumptions the data challenged.
+                </p>
+                <div class="post-tags">
+                  <span class="post-tag">Microsoft Sentinel</span>
+                  <span class="post-tag">Azure</span>
+                  <span class="post-tag">KQL</span>
+                  <span class="post-tag">Honeypot</span>
+                  <span class="post-tag">Blue Team</span>
+                </div>
+              </div>
+            </a>
+
+            <a class="post" href="/writeups/ad-lab-part1.html">
+              <div class="post-meta">
+                Lab Series<br />
+                Part 1<br />
+                Identity
+              </div>
+              <div>
+                <h3 class="post-title">Building an Active Directory Home Lab: Part 1</h3>
+                <p class="post-excerpt">
+                  Setting up a complete Active Directory environment using VMware Workstation Pro, Windows Server,
+                  networking configuration, and a first domain controller.
+                </p>
+                <div class="post-tags">
+                  <span class="post-tag">Active Directory</span>
+                  <span class="post-tag">VMware</span>
+                  <span class="post-tag">Windows Server</span>
+                  <span class="post-tag">Identity</span>
+                </div>
+              </div>
+            </a>
+
+            <article class="post" aria-label="Coming soon writeup">
+              <div class="post-meta">
+                Coming soon<br />
+                Part 2<br />
+                Automation
+              </div>
+              <div>
+                <h3 class="post-title">Turning Microsoft Sentinel Alerts into Analyst-Ready Incidents with AI</h3>
+                <p class="post-excerpt">
+                  Planned follow-up covering Logic Apps, Sentinel incidents, alert enrichment, MITRE mapping,
+                  and automated triage summaries.
+                </p>
+                <div class="post-tags">
+                  <span class="post-tag">Sentinel</span>
+                  <span class="post-tag">Logic Apps</span>
+                  <span class="post-tag">AI Triage</span>
+                  <span class="post-tag">SOAR</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <aside class="sidebar" aria-label="About the blog">
+          <div class="side-card">
+            <h2>About these writeups</h2>
+            <p>
+              I use this space to document practical security labs and investigations in a way that is useful
+              after the lab is over: what I built, what broke, what the logs showed, and what I would improve.
+            </p>
+
+            <h2>Topics</h2>
+            <div class="side-links">
+              <a href="/writeups/">Cloud Security</a>
+              <a href="/writeups/">Identity & Access</a>
+              <a href="/writeups/">Detection Engineering</a>
+              <a href="/writeups/">PowerShell Automation</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2026 Bat Otgonbayar</span>
+      <span><a href="https://github.com/botgonbayar" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener">LinkedIn</a></span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          root.setAttribute('data-theme', saved);
+        }
+      } catch (e) {}
+
+      function syncLabel() {
+        btn.textContent = root.getAttribute('data-theme') === 'light' ? '☾' : '☼';
+      }
+
+      syncLabel();
+
+      btn.addEventListener('click', function () {
+        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        syncLabel();
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -390,100 +390,109 @@
       .two-col { grid-template-columns: 1fr; gap: 32px; }
     }
 /* ==========================================================
-   Balanced ghost honeycomb background — homepage version
-   Use this instead of the "visible" version if the pattern is too loud.
-   Paste near the bottom of your homepage <style> block.
-   Use: <body class="bg-honeycomb">
+   Shared soft-faceted background — NO honeycomb / NO hexes
+   Paste this at the VERY BOTTOM of the <style> block.
+   It intentionally overrides older bg-honeycomb CSS.
+
+   Existing body class can stay:
+     <body class="bg-honeycomb">
+   Recommended rename:
+     <body class="bg-faceted">
    ========================================================== */
 
-body.bg-honeycomb {
-  min-height: 100vh;
+body.bg-honeycomb,
+body.bg-faceted {
   position: relative;
-  isolation: isolate;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 16% 4%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 30rem),
-    radial-gradient(circle at 88% 5%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 32rem),
-    var(--bg);
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.16), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(20, 184, 166, 0.13), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
 }
 
+/* Replace the old hex/honeycomb layer with a softer faceted/low-poly texture. */
 body.bg-honeycomb::before,
-body.bg-honeycomb::after {
+body.bg-faceted::before {
   content: "";
   position: fixed;
   inset: 0;
-  pointer-events: none;
-}
-
-/* Balanced honeycomb: visible near the top, quiet behind the content. */
-body.bg-honeycomb::before {
-  z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg width='142' height='123' viewBox='0 0 142 123' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23111827' stroke-opacity='.12' stroke-width='1'%3E%3Cpath d='M35.5 5 67 23v37L35.5 78 4 60V23z'/%3E%3Cpath d='M106.5 5 138 23v37l-31.5 18L75 60V23z'/%3E%3Cpath d='M71 66l31.5 18v37L71 139 39.5 121V84z'/%3E%3C/g%3E%3Cg fill='%23111827' fill-opacity='.07'%3E%3Ccircle cx='35.5' cy='5' r='1.25'/%3E%3Ccircle cx='106.5' cy='5' r='1.25'/%3E%3Ccircle cx='4' cy='60' r='1'/%3E%3Ccircle cx='138' cy='60' r='1'/%3E%3Ccircle cx='71' cy='66' r='1'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 142px 123px;
-  background-position: right -24px top -30px;
-  opacity: .38;
-  mask-image:
-    radial-gradient(circle at 50% 28%, rgba(0,0,0,.46), rgba(0,0,0,.30) 36%, rgba(0,0,0,.13) 58%, transparent 82%),
-    linear-gradient(to bottom, rgba(0,0,0,.74), rgba(0,0,0,.36) 36%, rgba(0,0,0,.10) 64%, transparent 86%);
-  -webkit-mask-image:
-    radial-gradient(circle at 50% 28%, rgba(0,0,0,.46), rgba(0,0,0,.30) 36%, rgba(0,0,0,.13) 58%, transparent 82%),
-    linear-gradient(to bottom, rgba(0,0,0,.74), rgba(0,0,0,.36) 36%, rgba(0,0,0,.10) 64%, transparent 86%);
-  animation: honeycomb-pan 56s ease-in-out infinite alternate;
-}
-
-/* Soft ambient glow behind the honeycomb. */
-body.bg-honeycomb::after {
   z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(167, 139, 250, 0.035) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(94, 234, 212, 0.026) 42%, transparent 74%);
+
+  background-size: 360px 220px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  opacity: 0.58;
+
+  mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+
+  animation: faceted-drift 90s linear infinite;
+}
+
+/* Strong fade layer so the pattern sits behind content instead of becoming content. */
+body.bg-honeycomb::after,
+body.bg-faceted::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    radial-gradient(circle at 12% 9%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 31rem),
-    radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--accent-2) 7%, transparent), transparent 32rem),
-    linear-gradient(to bottom, transparent 0%, transparent 48%, var(--bg) 92%);
-  opacity: .74;
+    linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
 }
 
-[data-theme="dark"] body.bg-honeycomb {
+[data-theme="light"] body.bg-honeycomb,
+[data-theme="light"] body.bg-faceted {
   background:
-    radial-gradient(circle at 14% 3%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 31rem),
-    radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 33rem),
-    var(--bg);
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.10), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(15, 118, 110, 0.08), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
 }
 
-[data-theme="dark"] body.bg-honeycomb::before {
-  background-image: url("data:image/svg+xml,%3Csvg width='142' height='123' viewBox='0 0 142 123' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4b5fd' stroke-opacity='.18' stroke-width='1'%3E%3Cpath d='M35.5 5 67 23v37L35.5 78 4 60V23z'/%3E%3Cpath d='M106.5 5 138 23v37l-31.5 18L75 60V23z'/%3E%3Cpath d='M71 66l31.5 18v37L71 139 39.5 121V84z'/%3E%3C/g%3E%3Cg fill='%235eead4' fill-opacity='.10'%3E%3Ccircle cx='35.5' cy='5' r='1.25'/%3E%3Ccircle cx='106.5' cy='5' r='1.25'/%3E%3Ccircle cx='4' cy='60' r='1'/%3E%3Ccircle cx='138' cy='60' r='1'/%3E%3Ccircle cx='71' cy='66' r='1'/%3E%3C/g%3E%3C/svg%3E");
-  opacity: .36;
-  mask-image:
-    radial-gradient(circle at 50% 28%, rgba(0,0,0,.48), rgba(0,0,0,.32) 34%, rgba(0,0,0,.14) 58%, transparent 82%),
-    linear-gradient(to bottom, rgba(0,0,0,.76), rgba(0,0,0,.38) 36%, rgba(0,0,0,.11) 64%, transparent 86%);
-  -webkit-mask-image:
-    radial-gradient(circle at 50% 28%, rgba(0,0,0,.48), rgba(0,0,0,.32) 34%, rgba(0,0,0,.14) 58%, transparent 82%),
-    linear-gradient(to bottom, rgba(0,0,0,.76), rgba(0,0,0,.38) 36%, rgba(0,0,0,.11) 64%, transparent 86%);
+[data-theme="light"] body.bg-honeycomb::before,
+[data-theme="light"] body.bg-faceted::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(124, 58, 237, 0.025) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(15, 118, 110, 0.020) 42%, transparent 74%);
+  opacity: 0.46;
 }
 
-[data-theme="dark"] body.bg-honeycomb::after {
-  opacity: .62;
-}
-
-/* Keep content above both background layers. */
 .site,
-.topbar,
+.shell,
+.container,
 .wrap,
-.site-foot,
-.progress,
-.lightbox,
-footer {
+.topbar,
+.article-header,
+.grid,
+.site-header,
+site-footer,
+header,
+main,
+footer,
+article,
+.toc {
   position: relative;
   z-index: 2;
 }
 
-@keyframes honeycomb-pan {
-  from { transform: translate3d(-0.45%, -0.28%, 0); }
-  to { transform: translate3d(0.45%, 0.36%, 0); }
+@keyframes faceted-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 360px 220px, 0 0, 0 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body.bg-honeycomb::before { animation: none !important; }
+  body.bg-honeycomb::before,
+  body.bg-faceted::before {
+    animation: none !important;
+  }
 }
-
   </style>
 </head>
 <body class="bg-honeycomb">

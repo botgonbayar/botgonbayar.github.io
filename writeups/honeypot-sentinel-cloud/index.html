@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Building a Cloud SIEM Honeypot, Part 1: Azure Sentinel and Live Attack Telemetry | Bat Otgonbayar</title>
 <meta name="description" content="I exposed a Windows VM on the public internet, wired it to Microsoft Sentinel, and recorded what the internet actually did to it. Part 1 covers the build, self-generated telemetry, event-ID detections, and what 26,000 real authentication attempts looked like.">
-<link rel="canonical" href="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud.html">
+<link rel="canonical" href="https://botgonbayar.github.io/writeups/honeypot-sentinel-cloud/">
 <meta name="author" content="Bat Otgonbayar">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0a0e17">
@@ -638,6 +638,65 @@ article,
   .topbar nav {
     gap: 14px;
     flex-wrap: wrap;
+  }
+}
+
+
+
+
+/* ==========================================================
+   Sticky TOC restore
+   Paste this at the VERY BOTTOM of the <style> block.
+   The background patch added overflow-x:hidden on body, which can
+   interfere with position: sticky in Chromium-based browsers.
+   ========================================================== */
+
+html,
+body {
+  overflow-x: visible !important;
+}
+
+@supports (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: clip !important;
+  }
+}
+
+.grid {
+  align-items: start !important;
+}
+
+.toc {
+  position: sticky !important;
+  top: 96px !important;
+  align-self: start !important;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.toc::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toc::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toc::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.toc .toc-label {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 980px) {
+  .toc {
+    display: none !important;
   }
 }
 

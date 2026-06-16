@@ -584,7 +584,27 @@
           Leave it running and forget it, and that number stops being funny.</p>
         </div>
 
-        <iframe class="hero-embed" src="/images/writeups/sentinel/lab-diagram.html" title="The entire lab at a quick glance. Part 2 included in the next article" loading="eager" scrolling="no"></iframe>
+        <figure style="margin: 2rem 0;">
+  <iframe
+    class="hero-embed"
+    src="/images/writeups/sentinel/lab-diagram.html"
+    title="High-level architecture of the Sentinel honeypot lab"
+    loading="eager"
+    scrolling="no">
+  </iframe>
+
+  <figcaption style="
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    text-align: center;
+    line-height: 1.6;
+    color: #666;
+    max-width: 80ch;
+    margin-inline: auto;
+  ">
+    <strong>Figure 1.</strong> End-to-end architecture of the honeypot environment. This article focuses on telemetry collection, detection development, and observed attacker behavior. The AI triage workflow shown here will be explored in Part 2.
+  </figcaption>
+</figure>
         
         <h2 id="step-1-create-the-vm">Step 1: Create the Honeypot VM<a href="#step-1-create-the-vm" class="anchor">#</a></h2>
 
@@ -1467,6 +1487,7 @@ SecurityEvent
     <aside class="toc" id="toc">
       <div class="toc-label">On this page</div>
       <ul id="toc-list">
+         <li><a href="#what-honeypot-saw">What the Honeypot Saw</a></li>
         <li><a href="#what-youll-need">What You'll Need</a></li>
         <li><a href="#step-1-create-the-vm">Step 1: Create the VM</a></li>
         <li><a href="#step-2-open-it-to-the-internet">Step 2: Open It Up</a></li>
@@ -1478,7 +1499,7 @@ SecurityEvent
         <li><a href="#step-7-analytics-rules">Step 7: Alert Rules</a></li>
         <li><a href="#what-actually-showed-up">What Actually Showed Up</a></li>
         <li><a href="#what-weve-accomplished">What We've Accomplished</a></li>
-        <li><a href="#whats-next">What's Next</a></li>
+        <li><a href="#coming-in-part-2">Coming in Part 2</a></li>
       </ul>
     </aside>
 

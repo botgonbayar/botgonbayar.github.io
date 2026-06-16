@@ -444,9 +444,183 @@
       .role { grid-template-columns: 1fr; gap: 8px; }
       .skills-grid { grid-template-columns: 1fr; }
     }
-  </style>
+  
+
+
+/* ==========================================================
+   Shared nav alignment/icon fix
+   Matches the rest of the refreshed portfolio shell.
+   ========================================================== */
+
+.topbar {
+  max-width: 980px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
+  font-size: 15px;
+}
+
+.brand span {
+  color: var(--accent);
+  font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.02em;
+  margin-right: 0;
+}
+
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.topbar nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0;
+  border: 0;
+  font-weight: 600;
+}
+
+.topbar nav a:hover,
+.topbar nav a[aria-current="page"] {
+  color: var(--accent);
+}
+
+.theme-toggle {
+  margin-left: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--faint);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+
+
+/* ==========================================================
+   Shared soft-faceted background — NO honeycomb / NO hexes
+   This intentionally overrides the older About-page honeycomb CSS.
+   Body class should be:
+     <body class="bg-faceted">
+   ========================================================== */
+
+body.bg-faceted {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 15% -6%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 34rem),
+    radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--accent-2) 13%, transparent), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+body.bg-faceted::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(167, 139, 250, 0.035) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(94, 234, 212, 0.026) 42%, transparent 74%);
+
+  background-size: 360px 220px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  opacity: 0.58;
+
+  mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+
+  animation: faceted-drift 90s linear infinite;
+}
+
+body.bg-faceted::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
+}
+
+[data-theme="light"] body.bg-faceted {
+  background:
+    radial-gradient(circle at 15% -6%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 34rem),
+    radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+[data-theme="light"] body.bg-faceted::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(124, 58, 237, 0.025) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(15, 118, 110, 0.020) 42%, transparent 74%);
+  opacity: 0.46;
+}
+
+.site,
+.topbar,
+header,
+main,
+footer,
+section,
+article {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes faceted-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 360px 220px, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-faceted::before {
+    animation: none !important;
+  }
+}
+
+</style>
 </head>
-<body class="bg-honeycomb">
+<body class="bg-faceted">
   <div class="site">
     <header class="topbar">
       <a class="brand" href="/"><span>./bɑːt</span> Bat Otgonbayar</a>

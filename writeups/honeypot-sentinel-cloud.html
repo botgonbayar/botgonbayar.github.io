@@ -417,9 +417,126 @@
   ::-webkit-scrollbar-track{background:var(--surface);}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
   ::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+
+
+/* ==========================================================
+   Shared article background patch — soft faceted, no honeycomb
+   Use on Sentinel + AD lab articles.
+   Paste this at the VERY BOTTOM of the existing <style> block.
+   Add bg-faceted to the body:
+     <body class="bg-faceted">
+   ========================================================== */
+
+/* Fallback variables for older article pages like AD lab. 
+   Pages that already define these variables, like Sentinel, keep their existing values. */
+:root {
+  --bg: #0a0e17;
+  --surface: #111118;
+  --surface-2: #161b22;
+  --text: #d4d4d8;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
+  --heading: #fafafa;
+  --border: #27272a;
+  --accent: #a78bfa;
+  --teal: #5eead4;
+}
+
+body.bg-honeycomb,
+body.bg-faceted {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.16), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(20, 184, 166, 0.13), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+/* Soft faceted / low-poly texture, not hex/honeycomb outlines. */
+body.bg-honeycomb::before,
+body.bg-faceted::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(167, 139, 250, 0.035) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(94, 234, 212, 0.026) 42%, transparent 74%);
+  background-size: 360px 220px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  opacity: 0.58;
+  mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  animation: faceted-drift 90s linear infinite;
+}
+
+/* Fade overlay so the pattern stays behind the article content. */
+body.bg-honeycomb::after,
+body.bg-faceted::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
+}
+
+[data-theme="light"] body.bg-honeycomb,
+[data-theme="light"] body.bg-faceted {
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.10), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(15, 118, 110, 0.08), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg));
+}
+
+[data-theme="light"] body.bg-honeycomb::before,
+[data-theme="light"] body.bg-faceted::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(124, 58, 237, 0.025) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(15, 118, 110, 0.020) 42%, transparent 74%);
+  opacity: 0.46;
+}
+
+/* Keep existing article shell/content above the fixed background layers. */
+.site,
+.shell,
+.container,
+.wrap,
+.topbar,
+.article-header,
+.grid,
+.site-header,
+.site-footer,
+.site-foot,
+header,
+main,
+footer,
+article,
+.toc,
+.lightbox {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes faceted-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 360px 220px, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-honeycomb::before,
+  body.bg-faceted::before {
+    animation: none !important;
+  }
+}
 </style>
 </head>
-<body>
+<body class="bg-faceted">
 <a class="skip-link" href="#prose">Skip to article</a>
 <div class="progress" id="progress"></div>
 

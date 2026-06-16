@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About | Bat Otgonbayar</title>
-  <meta name="description" content="About Bat Otgonbayar, cybersecurity practitioner focused on identity, endpoint security, infrastructure support, Microsoft Sentinel, and automation." />
+  <title>Writeups | Bat Otgonbayar</title>
+  <meta name="description" content="Cybersecurity writeups, notes, labs, and case studies by Bat Otgonbayar." />
   <style>
 :root {
       --bg: #0b0f17;
@@ -673,6 +673,128 @@ article,
     animation: none !important;
   }
 }
+
+
+
+/* ==========================================================
+   Shared nav alignment/icon fix
+   Matches the AD lab article header style.
+   Paste at the VERY BOTTOM of the <style> block.
+   ========================================================== */
+
+.shell,
+.wrap,
+.topbar,
+.site-header {
+  max-width: 980px;
+}
+
+.site-header,
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand,
+.topbar a.brand,
+.site-header a.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--heading, var(--text));
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  font-size: 15px;
+}
+
+.brand code,
+.topbar a.brand code,
+.site-header a.brand code {
+  color: var(--accent);
+  font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+
+.site-nav,
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--text-dim, var(--muted));
+  font-size: 15px;
+}
+
+.site-nav a,
+.topbar nav a {
+  color: var(--text-dim, var(--muted));
+  text-decoration: none;
+  padding: 0;
+  border: 0;
+  font-weight: 600;
+}
+
+.site-nav a:hover,
+.site-nav a.active,
+.topbar nav a:hover,
+.topbar nav a.active {
+  color: var(--heading, var(--text));
+}
+
+.site-nav a.active,
+.topbar nav a.active {
+  color: var(--accent);
+}
+
+.theme-toggle {
+  margin-left: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim, var(--muted));
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+
+.theme-toggle:hover {
+  color: var(--heading, var(--text));
+  border-color: var(--text-faint, var(--border-strong));
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.icon-sun { display: none; }
+[data-theme="light"] .icon-moon { display: none; }
+[data-theme="light"] .icon-sun { display: block; }
+
+@media (max-width: 700px) {
+  .site-header,
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .site-nav,
+  .topbar nav {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
 </style>
 </head>
 
@@ -684,7 +806,10 @@ article,
         <a href="/">Home</a>
         <a class="active" href="/writeups/">Writeups</a>
         <a href="/about/">About</a>
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme">☼</button>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
       </nav>
     </header>
 
@@ -761,7 +886,7 @@ article,
                 Identity
               </div>
               <div>
-                <h3 class="post-title">Building an Active Directory Home Lab: Part 2</h3>
+                <h3 class="post-title">Building Secora's User Base: Creating 30 Users, OUs, and Security Groups</h3>
                 <p class="post-excerpt">
                   Continuation of the Active Directory home lab series, covering a more realistic internal structure
                   with organizational units, bulk user creation, and security groups for the fictional Secora environment.
@@ -775,6 +900,7 @@ article,
                 </div>
               </div>
             </a>
+
 
             <a class="post" href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" target="_blank" rel="noopener noreferrer">
               <div class="post-meta">
@@ -800,7 +926,7 @@ article,
                 </div>
               </div>
             </a>
-            
+
             <article class="post" aria-label="Coming soon writeup">
               <div class="post-meta">
                 Coming soon<br />
@@ -838,6 +964,7 @@ article,
               <a href="/writeups/">Identity & Access</a>
               <a href="/writeups/">Detection Engineering</a>
               <a href="/writeups/">PowerShell Automation</a>
+              <a href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" target="_blank" rel="noopener noreferrer">PowerShell Scripts</a>
             </div>
           </div>
         </aside>
@@ -854,6 +981,7 @@ article,
     (function () {
       const root = document.documentElement;
       const btn = document.getElementById('themeToggle');
+      if (!btn) return;
 
       try {
         const saved = localStorage.getItem('theme');
@@ -862,17 +990,10 @@ article,
         }
       } catch (e) {}
 
-      function syncLabel() {
-        btn.textContent = root.getAttribute('data-theme') === 'light' ? '☾' : '☼';
-      }
-
-      syncLabel();
-
       btn.addEventListener('click', function () {
         const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
         root.setAttribute('data-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) {}
-        syncLabel();
       });
     })();
   </script>

@@ -1,11 +1,27 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Building an Active Directory Home Lab - Part 1 | Bat Otgonbayar</title>
     <base href="https://botgonbayar.github.io/">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script>
+/* Set theme before paint to avoid a flash. */
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    if (saved === 'light' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+</script>
     <style>
         * {
             margin: 0;
@@ -419,13 +435,335 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #3f3f46;
         }
-    </style>
+    
+
+
+/* ==========================================================
+   AD article complete shell fix
+   Adds the shared soft-faceted background, matching nav,
+   and a working light/dark theme toggle.
+   Paste at the VERY BOTTOM of the existing <style> block.
+   ========================================================== */
+
+:root {
+  --bg: #0a0e17;
+  --surface: #111118;
+  --surface-2: #161b22;
+  --code-bg: #0d1117;
+  --text: #d4d4d8;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
+  --heading: #fafafa;
+  --border: #27272a;
+  --border-soft: #1c1c1f;
+  --accent: #a78bfa;
+  --accent-strong: #8b5cf6;
+  --teal: #5eead4;
+  --inline-code: #5eead4;
+  --shadow: rgba(0,0,0,.4);
+}
+
+[data-theme="light"] {
+  --bg: #fbfbfc;
+  --surface: #f4f4f5;
+  --surface-2: #ececef;
+  --code-bg: #0d1117;
+  --text: #3f3f46;
+  --text-dim: #52525b;
+  --text-faint: #71717a;
+  --heading: #18181b;
+  --border: #e4e4e7;
+  --border-soft: #ececef;
+  --accent: #7c3aed;
+  --accent-strong: #6d28d9;
+  --teal: #0d9488;
+  --inline-code: #0f766e;
+  --shadow: rgba(0,0,0,.08);
+}
+
+/* Shared soft-faceted background */
+body.bg-faceted {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.16), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(20, 184, 166, 0.13), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg)) !important;
+  color: var(--text) !important;
+}
+
+body.bg-faceted::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(167, 139, 250, 0.035) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(94, 234, 212, 0.026) 42%, transparent 74%);
+  background-size: 360px 220px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  opacity: 0.58;
+  mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+  animation: faceted-drift 90s linear infinite;
+}
+
+body.bg-faceted::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
+}
+
+[data-theme="light"] body.bg-faceted {
+  background:
+    radial-gradient(circle at 15% -6%, rgba(124, 58, 237, 0.10), transparent 34rem),
+    radial-gradient(circle at 88% 0%, rgba(15, 118, 110, 0.08), transparent 32rem),
+    linear-gradient(180deg, var(--bg), var(--bg)) !important;
+}
+
+[data-theme="light"] body.bg-faceted::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(120deg, transparent 0%, rgba(124, 58, 237, 0.025) 32%, transparent 58%),
+    linear-gradient(60deg, transparent 8%, rgba(15, 118, 110, 0.020) 42%, transparent 74%);
+  opacity: 0.46;
+}
+
+/* Keep article content above the fixed background layers */
+.container,
+.article-topbar,
+header,
+article,
+.article-header,
+.article-content,
+footer,
+.lightbox {
+  position: relative;
+  z-index: 2;
+}
+
+/* Matching site nav */
+.container {
+  max-width: 980px;
+}
+
+.article-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0;
+  margin-bottom: 54px;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-topbar .brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--heading);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+}
+
+.article-topbar .brand code {
+  color: var(--accent);
+  font: 700 14px/1 'Monaco', 'Menlo', 'Consolas', monospace;
+  letter-spacing: 0.02em;
+}
+
+.article-topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
+.article-topbar nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 0;
+  border: 0;
+  font-weight: 600;
+}
+
+.article-topbar nav a:hover,
+.article-topbar nav a.active {
+  color: var(--heading);
+}
+
+.article-topbar nav a.active {
+  color: var(--accent);
+}
+
+/* Theme toggle */
+.theme-toggle {
+  margin-left: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+
+.theme-toggle:hover {
+  color: var(--heading);
+  border-color: var(--text-faint);
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.icon-sun { display: none; }
+[data-theme="light"] .icon-moon { display: none; }
+[data-theme="light"] .icon-sun { display: block; }
+
+/* Light/dark overrides for the older AD article styles */
+header,
+.article-header,
+footer {
+  border-color: var(--border) !important;
+}
+
+.article-meta,
+.back-link,
+.nav-link,
+.lightbox-caption {
+  color: var(--text-faint) !important;
+}
+
+.logo,
+.article-header h1,
+.article-content h2,
+.article-content h3,
+.article-content strong,
+.req-card h4,
+.nav-title {
+  color: var(--heading) !important;
+}
+
+.article-content,
+.article-content li,
+.article-content p,
+.nav-title {
+  color: var(--text) !important;
+}
+
+.article-content a {
+  color: var(--accent) !important;
+  border-bottom-color: color-mix(in srgb, var(--accent) 25%, transparent) !important;
+}
+
+.article-content a:hover {
+  border-bottom-color: var(--accent) !important;
+}
+
+.tag,
+.info-box,
+.req-card {
+  background: var(--surface-2) !important;
+  border-color: var(--border) !important;
+  color: var(--text-dim) !important;
+}
+
+.info-box {
+  border-left-color: var(--accent) !important;
+}
+
+.info-box strong {
+  color: var(--accent) !important;
+}
+
+.article-content pre {
+  background: var(--code-bg) !important;
+  border-color: var(--border) !important;
+}
+
+.article-content p code,
+.article-content li code {
+  background: var(--surface-2) !important;
+  color: var(--inline-code) !important;
+  border-color: var(--border) !important;
+}
+
+.article-content img {
+  border-color: var(--border) !important;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.article-content img:hover {
+  border-color: var(--accent) !important;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint) !important;
+}
+
+@keyframes faceted-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 360px 220px, 0 0, 0 0; }
+}
+
+@media (max-width: 700px) {
+  .article-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .article-topbar nav {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-faceted::before {
+    animation: none !important;
+  }
+}
+
+</style>
 </head>
-<body>
+<body class="bg-faceted">
     <div class="container">
-        <header>
-            <a href="/" class="back-link">← Back to Home</a>
-            <a href="/" class="logo">Bat Otgonbayar</a>
+        <header class="article-topbar">
+            <a class="brand" href="/"><code>./bɑːt</code><span>Bat Otgonbayar</span></a>
+            <nav aria-label="Site">
+                <a href="/">Home</a>
+                <a class="active" href="/writeups/">Writeups</a>
+                <a href="/about/">About</a>
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+                    <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                </button>
+            </nav>
         </header>
 
         <article>

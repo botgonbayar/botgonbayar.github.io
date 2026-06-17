@@ -1,0 +1,1591 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KQL Investigation Challenge: Call of the Cyber Duty | Bat Otgonbayar</title>
+<meta name="description" content="A spoiler-free portfolio writeup for completing all 10 cases in Kusto Detective Agency's Call of the Cyber Duty challenge, earning the full badge set and certificate of completion.">
+<link rel="canonical" href="https://botgonbayar.github.io/writeups/kusto-cyber-duty/">
+<meta name="author" content="Bat Otgonbayar">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a0e17">
+
+<!-- social cards: how the link renders on LinkedIn, Discord, Slack, etc. -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="KQL Investigation Challenge: Call of the Cyber Duty">
+<meta property="og:description" content="Completed all 10 cases in Kusto Detective Agency's Call of the Cyber Duty challenge. A spoiler-free writeup on KQL investigation workflow, badges, and lessons learned.">
+<meta property="og:url" content="https://botgonbayar.github.io/writeups/kusto-cyber-duty/">
+<meta property="og:site_name" content="Bat Otgonbayar">
+<meta property="og:image" content="https://botgonbayar.github.io/images/writeups/kusto-cyber-duty/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KQL Investigation Challenge: Call of the Cyber Duty">
+<meta name="twitter:description" content="A spoiler-free portfolio writeup for completing all 10 cases in Kusto Detective Agency's Call of the Cyber Duty challenge.">
+<meta name="twitter:image" content="https://botgonbayar.github.io/images/writeups/kusto-cyber-duty/og-card.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "KQL Investigation Challenge: Call of the Cyber Duty",
+  "author": {"@type": "Person", "name": "Bat Otgonbayar", "url": "https://botgonbayar.github.io/"},
+  "datePublished": "2026-06-17",
+  "url": "https://botgonbayar.github.io/writeups/kusto-cyber-duty/",
+  "keywords": "Kusto Detective Agency, KQL, Kusto Query Language, Azure Data Explorer, threat hunting, SIEM, blue team, investigation"
+}
+</script>
+
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+<script>
+// set theme before paint to avoid flash
+(function(){
+  try{
+    var t=localStorage.getItem('theme');
+    if(t==='light'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)){
+      document.documentElement.setAttribute('data-theme','light');
+    }
+  }catch(e){}
+})();
+</script>
+
+<style>
+  :root{
+    --bg:#0a0e17;
+    --surface:#111118;
+    --surface-2:#161b22;
+    --code-bg:#0d1117;
+    --text:#d4d4d8;
+    --text-dim:#a1a1aa;
+    --text-faint:#71717a;
+    --heading:#fafafa;
+    --border:#27272a;
+    --border-soft:#1c1c1f;
+    --accent:#a78bfa;
+    --accent-strong:#8b5cf6;
+    --teal:#5eead4;
+    --amber:#fbbf24;
+    --red:#f87171;
+    --inline-code:#5eead4;
+    --shadow:rgba(0,0,0,.4);
+  }
+
+  [data-theme="light"]{
+    --bg:#fbfbfc;
+    --surface:#f4f4f5;
+    --surface-2:#ececef;
+    --code-bg:#0d1117;
+    --text:#3f3f46;
+    --text-dim:#52525b;
+    --text-faint:#71717a;
+    --heading:#18181b;
+    --border:#e4e4e7;
+    --border-soft:#ececef;
+    --accent:#7c3aed;
+    --accent-strong:#6d28d9;
+    --teal:#0d9488;
+    --amber:#b45309;
+    --red:#dc2626;
+    --inline-code:#0f766e;
+    --shadow:rgba(0,0,0,.08);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.8;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s ease,color .25s ease;
+  }
+
+  /* ---------- top nav ---------- */
+  .topbar{
+    width:min(100% - 48px, 980px);
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:30px 0;
+    border-bottom:1px solid var(--border);
+  }
+
+  .topbar a.brand{
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    color:var(--heading);
+    text-decoration:none;
+    font-weight:800;
+    letter-spacing:-0.03em;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu',sans-serif;
+    font-size:15px;
+  }
+
+  .topbar a.brand code{
+    color:var(--accent);
+    font:700 14px/1 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    letter-spacing:0.02em;
+  }
+
+  .topbar nav{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    color:var(--text-dim);
+    font-size:15px;
+  }
+
+  .topbar nav a{
+    color:var(--text-dim);
+    text-decoration:none;
+    padding:0;
+    border:0;
+    font-weight:600;
+    transition:color .2s;
+  }
+
+  .topbar nav a:hover,
+  .topbar nav a.active{
+    color:var(--accent);
+  }
+
+  .theme-toggle{
+    margin-left:4px;
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .2s;
+  }
+
+  .theme-toggle:hover{
+    color:var(--heading);
+    border-color:var(--text-faint);
+  }
+
+  .theme-toggle svg{width:17px;height:17px;}
+  .icon-sun{display:none;}
+  [data-theme="light"] .icon-moon{display:none;}
+  [data-theme="light"] .icon-sun{display:block;}
+
+  /* ---------- reading progress ---------- */
+  .progress{
+    position:fixed;
+    top:0;
+    left:0;
+    height:2px;
+    width:0;
+    z-index:60;
+    background:linear-gradient(90deg,var(--accent),var(--teal));
+    transition:width .1s;
+  }
+
+  /* ---------- layout ---------- */
+  .wrap{
+    width:min(100% - 48px, 980px);
+    margin:0 auto;
+    padding:0 0 80px;
+  }
+
+  .article-header{
+    text-align:center;
+    padding:54px 0 42px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .pub-date{
+    font-size:14px;
+    color:var(--text-faint);
+    font-weight:500;
+    margin-bottom:18px;
+  }
+
+  .article-header h1{
+    font-size:42px;
+    line-height:1.18;
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:var(--heading);
+    max-width:820px;
+    margin:0 auto;
+  }
+
+  .subtitle{
+    margin:20px auto 0;
+    max-width:700px;
+    font-size:18px;
+    color:var(--text-dim);
+    line-height:1.6;
+  }
+
+  /* grid: article + sidebar */
+  .grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 240px;
+    gap:48px;
+    align-items:start;
+    margin-top:40px;
+  }
+
+  .author{
+    border-bottom:1px solid var(--border);
+    padding-bottom:28px;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+
+  .author .avatar{
+    width:46px;
+    height:46px;
+    border-radius:999px;
+    flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--teal));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#0a0e17;
+    font-weight:700;
+    font-family:'Monaco',monospace;
+    font-size:16px;
+  }
+
+  .author .who{font-size:14px;line-height:1.4;}
+  .author .who .name{color:var(--heading);font-weight:600;}
+  .author .who .role{color:var(--text-faint);}
+  .author .who a{color:var(--accent);text-decoration:none;}
+  .author .who a:hover{text-decoration:underline;}
+
+  /* ---------- sidebar TOC ---------- */
+  .toc{
+    position:sticky;
+    top:96px;
+    align-self:start;
+    max-height:calc(100vh - 120px);
+    overflow-y:auto;
+    padding-right:6px;
+  }
+
+  .toc::-webkit-scrollbar{width:6px;}
+  .toc::-webkit-scrollbar-track{background:transparent;}
+  .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px;}
+
+  .toc .toc-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin-bottom:14px;
+    background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:blur(8px);
+  }
+
+  .toc ul{list-style:none;border-left:1px solid var(--border);}
+
+  .toc li a{
+    display:block;
+    padding:5px 0 5px 16px;
+    margin-left:-1px;
+    color:var(--text-faint);
+    text-decoration:none;
+    font-size:13.5px;
+    line-height:1.4;
+    border-left:2px solid transparent;
+    transition:color .2s,border-color .2s;
+  }
+
+  .toc li a:hover{color:var(--accent);}
+  .toc li a.active{color:var(--accent);border-left-color:var(--accent);}
+  .toc li.sub a{padding-left:28px;font-size:13px;}
+
+  /* ---------- prose ---------- */
+  .prose{
+    font-size:17px;
+    color:var(--text);
+    max-width:760px;
+  }
+
+  .prose p{margin-bottom:22px;}
+
+  .prose h2{
+    font-size:28px;
+    font-weight:700;
+    color:var(--heading);
+    letter-spacing:-.01em;
+    margin:60px 0 18px;
+    scroll-margin-top:96px;
+  }
+
+  .prose h3{
+    font-size:21px;
+    font-weight:600;
+    color:var(--heading);
+    margin:40px 0 14px;
+    scroll-margin-top:96px;
+  }
+
+  .prose h2 a.anchor,
+  .prose h3 a.anchor{
+    color:var(--text-faint);
+    text-decoration:none;
+    opacity:0;
+    margin-left:8px;
+    font-weight:400;
+    transition:opacity .2s;
+  }
+
+  .prose h2:hover a.anchor,
+  .prose h3:hover a.anchor{opacity:1;}
+
+  .prose a{
+    color:var(--accent);
+    text-decoration:none;
+    border-bottom:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+    transition:border-color .2s;
+  }
+
+  .prose a:hover{border-bottom-color:var(--accent);}
+  .prose strong{color:var(--heading);font-weight:600;}
+  .prose em{color:var(--text-dim);}
+  .prose ul,.prose ol{margin:18px 0 22px;padding-left:26px;}
+  .prose li{margin-bottom:9px;}
+  .prose ul li::marker{color:var(--text-faint);}
+  .prose ol li::marker{color:var(--text-faint);font-variant-numeric:tabular-nums;}
+
+  .lede{
+    font-size:19px;
+    line-height:1.7;
+    color:var(--text-dim);
+  }
+
+  /* inline code */
+  .prose p code,
+  .prose li code,
+  .prose td code{
+    background:var(--surface-2);
+    color:var(--inline-code);
+    padding:2px 7px;
+    border-radius:5px;
+    font-size:14px;
+    font-weight:500;
+    font-family:'Monaco','Menlo','Consolas',monospace;
+    border:1px solid var(--border);
+  }
+
+  [data-theme="light"] .prose p code,
+  [data-theme="light"] .prose li code,
+  [data-theme="light"] .prose td code{
+    background:#f0f0f3;
+    border-color:var(--border);
+  }
+
+  /* code blocks */
+  .prose pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:26px 0;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+
+  .prose pre code{
+    display:block;
+    padding:20px;
+    font-size:13px;
+    line-height:1.65;
+    font-family:'Monaco','Menlo','Consolas',monospace;
+    background:transparent!important;
+    color:#e6edf3;
+  }
+
+  .hljs{background:var(--code-bg)!important;}
+
+  .code-cap{
+    font-size:12.5px;
+    color:var(--text-faint);
+    margin:-14px 0 26px;
+    padding-left:2px;
+  }
+
+  .copy-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    font:600 12px/1 -apple-system,'Segoe UI',sans-serif;
+    color:var(--text-dim);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    opacity:0;
+    transition:opacity .2s,color .2s;
+  }
+
+  .prose pre:hover .copy-btn,
+  .copy-btn:focus-visible{opacity:1;}
+  .copy-btn:hover{color:var(--heading);}
+
+  .note{
+    border-left:3px solid var(--accent);
+    background:color-mix(in srgb,var(--accent) 7%,transparent);
+    padding:16px 20px;
+    margin:26px 0;
+    border-radius:0 6px 6px 0;
+    font-size:16px;
+  }
+
+  .note.warn{
+    border-left-color:var(--amber);
+    background:color-mix(in srgb,var(--amber) 8%,transparent);
+  }
+
+  .note p{margin-bottom:10px;}
+  .note p:last-child{margin-bottom:0;}
+  .note strong{color:var(--heading);}
+
+  /* stat callout */
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:14px;
+    margin:26px 0;
+  }
+
+  .stat-card{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 16px;
+  }
+
+  .stat-card .num{
+    font-size:30px;
+    font-weight:800;
+    color:var(--heading);
+    line-height:1.1;
+    letter-spacing:-.02em;
+  }
+
+  .stat-card .lbl{
+    font-size:13px;
+    color:var(--text-dim);
+    margin-top:6px;
+    line-height:1.4;
+  }
+
+  /* screenshots / images */
+  figure.shot{margin:30px 0;}
+
+  figure.shot img{
+    display:block;
+    max-width:100%;
+    height:auto;
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 8px 32px var(--shadow);
+    cursor:zoom-in;
+  }
+
+  figure.shot figcaption{
+    margin-top:12px;
+    font-size:13.5px;
+    color:var(--text-faint);
+    line-height:1.5;
+    text-align:center;
+  }
+
+  .image-placeholder{
+    border:1.5px dashed var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    min-height:150px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-align:center;
+    padding:34px 24px;
+    color:var(--text-faint);
+  }
+
+  .image-placeholder strong{
+    color:var(--text-dim);
+    font-size:13px;
+    letter-spacing:.3px;
+  }
+
+  .image-placeholder code{
+    font-size:12px;
+    color:var(--text-faint);
+    font-family:'Monaco','Menlo','Consolas',monospace;
+  }
+
+  /* badge grid */
+  .badge-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+    gap:18px;
+    margin:28px 0;
+  }
+
+  .badge-grid a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    min-height:130px;
+    transition:transform .2s ease,border-color .2s ease,background .2s ease;
+  }
+
+  .badge-grid a:hover{
+    transform:translateY(-2px);
+    border-color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 8%,var(--surface-2));
+  }
+
+  .badge-grid img{
+    width:100%;
+    max-width:96px;
+    height:auto;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+  }
+
+  .badge-placeholder{
+    width:96px;
+    height:96px;
+    border-radius:999px;
+    border:1px dashed var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--text-faint);
+    font-size:12px;
+    line-height:1.3;
+    padding:10px;
+    background:color-mix(in srgb,var(--accent) 5%,transparent);
+  }
+
+  /* tables */
+  .prose table{
+    width:100%;
+    border-collapse:collapse;
+    margin:26px 0;
+    font-size:14.5px;
+    display:block;
+    overflow-x:auto;
+  }
+
+  .prose thead th{
+    text-align:left;
+    padding:10px 14px;
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+
+  .prose tbody td{
+    padding:11px 14px;
+    border-bottom:1px solid var(--border-soft);
+    vertical-align:top;
+  }
+
+  .prose tbody tr:last-child td{border-bottom:none;}
+  .prose tbody td:first-child{color:var(--heading);font-weight:500;}
+
+  .prose hr{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:48px 0;
+  }
+
+  .article-foot{
+    max-width:760px;
+    margin-top:64px;
+    padding-top:28px;
+    border-top:1px solid var(--border);
+  }
+
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:26px;
+  }
+
+  .tags a{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-weight:600;
+    color:var(--accent);
+    text-decoration:none;
+    border:1px solid var(--border);
+    padding:5px 11px;
+    border-radius:6px;
+    transition:all .2s;
+  }
+
+  .tags a:hover{
+    border-color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 8%,transparent);
+  }
+
+  .foot-nav{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    font-size:14px;
+  }
+
+  .foot-nav a{color:var(--accent);text-decoration:none;}
+  .foot-nav a:hover{text-decoration:underline;}
+
+  .site-foot{
+    text-align:center;
+    color:var(--text-faint);
+    font-size:13px;
+    padding:40px 24px;
+    border-top:1px solid var(--border);
+    margin-top:60px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+  }
+
+  /* collapsible TOC for mobile */
+  .toc-mobile{
+    display:none;
+    margin:24px 0 26px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--surface);
+    position:relative;
+    z-index:3;
+  }
+
+  .toc-mobile summary{
+    padding:12px 16px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    list-style:none;
+  }
+
+  .toc-mobile summary::-webkit-details-marker{display:none;}
+  .toc-mobile summary::after{content:'+';float:right;font-size:16px;color:var(--text-faint);}
+  .toc-mobile[open] summary::after{content:'\2013';}
+  .toc-mobile ul{list-style:none;padding:0 16px 12px;}
+
+  .toc-mobile li a{
+    display:block;
+    padding:7px 0;
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:14.5px;
+  }
+
+  .toc-mobile li a:hover{color:var(--accent);}
+
+  /* lightbox */
+  .lightbox{
+    border:none;
+    padding:0;
+    background:transparent;
+    max-width:none;
+    max-height:none;
+    width:100vw;
+    height:100vh;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:14px;
+    outline:none;
+    position:relative;
+    z-index:100;
+  }
+
+  .lightbox[open]{display:flex;}
+
+  .lightbox::backdrop{
+    background:rgba(8,10,18,.82);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+
+  .lightbox img{
+    max-width:min(1400px,92vw);
+    max-height:84vh;
+    border-radius:10px;
+    box-shadow:0 24px 80px rgba(0,0,0,.55);
+    cursor:zoom-out;
+    animation:lb-in .22s cubic-bezier(.2,.8,.25,1);
+  }
+
+  .lightbox .lb-caption{
+    color:#c8cede;
+    font-size:14.5px;
+    text-align:center;
+    max-width:70ch;
+    line-height:1.5;
+    padding:0 16px;
+  }
+
+  .lightbox .lb-hint{
+    color:#7e879c;
+    font-size:12.5px;
+    letter-spacing:.4px;
+  }
+
+  @keyframes lb-in{
+    from{transform:scale(.94);opacity:0;}
+    to{transform:scale(1);opacity:1;}
+  }
+
+  .skip-link{
+    position:absolute;
+    left:-9999px;
+    top:0;
+    z-index:100;
+    background:var(--accent-strong);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:0 0 8px 0;
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+  }
+
+  .skip-link:focus{left:0;}
+
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+    border-radius:4px;
+  }
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--surface);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+
+  /* ---------- shared soft-faceted background ---------- */
+  body.bg-faceted{
+    position:relative;
+    background:
+      radial-gradient(circle at 15% -6%, rgba(124,58,237,.16), transparent 34rem),
+      radial-gradient(circle at 88% 0%, rgba(20,184,166,.13), transparent 32rem),
+      linear-gradient(180deg,var(--bg),var(--bg));
+  }
+
+  body.bg-faceted::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%238b5cf6' fill-opacity='.055' stroke='%238b5cf6' stroke-opacity='.035'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%235eead4' fill-opacity='.035' stroke='%235eead4' stroke-opacity='.025'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%23ffffff' fill-opacity='.022' stroke='%23ffffff' stroke-opacity='.018'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%238b5cf6' fill-opacity='.04' stroke='%238b5cf6' stroke-opacity='.026'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%235eead4' fill-opacity='.028' stroke='%235eead4' stroke-opacity='.018'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(120deg, transparent 0%, rgba(167,139,250,.035) 32%, transparent 58%),
+      linear-gradient(60deg, transparent 8%, rgba(94,234,212,.026) 42%, transparent 74%);
+    background-size:360px 220px,100% 100%,100% 100%;
+    background-position:0 0,0 0,0 0;
+    opacity:.58;
+    mask-image:linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+    -webkit-mask-image:linear-gradient(to bottom, black 0%, black 26%, rgba(0,0,0,.42) 48%, transparent 78%);
+    animation:faceted-drift 90s linear infinite;
+  }
+
+  body.bg-faceted::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg, var(--bg) 0%, transparent 16%, transparent 84%, var(--bg) 100%),
+      linear-gradient(180deg, transparent 0%, transparent 26%, var(--bg) 76%);
+  }
+
+  [data-theme="light"] body.bg-faceted{
+    background:
+      radial-gradient(circle at 15% -6%, rgba(124,58,237,.10), transparent 34rem),
+      radial-gradient(circle at 88% 0%, rgba(15,118,110,.08), transparent 32rem),
+      linear-gradient(180deg,var(--bg),var(--bg));
+  }
+
+  [data-theme="light"] body.bg-faceted::before{
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='360' height='220' viewBox='0 0 360 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-linejoin='round'%3E%3Cpath d='M0 52 L72 12 L144 52 L72 92 Z' fill='%237c3aed' fill-opacity='.045' stroke='%2318181b' stroke-opacity='.026'/%3E%3Cpath d='M144 52 L216 12 L288 52 L216 92 Z' fill='%230f766e' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M72 132 L144 92 L216 132 L144 172 Z' fill='%2318181b' fill-opacity='.018' stroke='%2318181b' stroke-opacity='.014'/%3E%3Cpath d='M216 132 L288 92 L360 132 L288 172 Z' fill='%237c3aed' fill-opacity='.032' stroke='%2318181b' stroke-opacity='.018'/%3E%3Cpath d='M-72 132 L0 92 L72 132 L0 172 Z' fill='%230f766e' fill-opacity='.026' stroke='%2318181b' stroke-opacity='.014'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(120deg, transparent 0%, rgba(124,58,237,.025) 32%, transparent 58%),
+      linear-gradient(60deg, transparent 8%, rgba(15,118,110,.020) 42%, transparent 74%);
+    opacity:.46;
+  }
+
+  .topbar,
+  .wrap,
+  .article-header,
+  .grid,
+  header,
+  main,
+  footer,
+  article,
+  .toc,
+  .lightbox{
+    position:relative;
+    z-index:2;
+  }
+
+  @keyframes faceted-drift{
+    from{background-position:0 0,0 0,0 0;}
+    to{background-position:360px 220px,0 0,0 0;}
+  }
+
+  html,
+  body{
+    overflow-x:visible!important;
+  }
+
+  @supports (overflow-x:clip){
+    html,
+    body{
+      overflow-x:clip!important;
+    }
+  }
+
+  .prose,
+  .prose p,
+  .prose li,
+  .prose figcaption,
+  .article-header,
+  .subtitle{
+    overflow-wrap:anywhere;
+  }
+
+  .prose figure,
+  .prose img,
+  .prose table,
+  .prose pre{
+    max-width:100%;
+  }
+
+  @media (max-width:980px){
+    .grid{
+      display:block!important;
+    }
+
+    .toc{
+      display:none!important;
+    }
+
+    .toc-mobile{
+      display:block!important;
+    }
+
+    .prose{
+      max-width:none!important;
+      width:100%;
+    }
+
+    .author{
+      max-width:none!important;
+    }
+  }
+
+  @media (max-width:700px){
+    .topbar,
+    .wrap{
+      width:min(100% - 28px, 980px);
+    }
+
+    .topbar{
+      padding-top:20px!important;
+      padding-bottom:20px!important;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:16px;
+    }
+
+    .topbar nav{
+      width:100%;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px 14px;
+    }
+
+    .topbar nav a{
+      font-size:14px;
+    }
+
+    .theme-toggle{
+      margin-left:0;
+    }
+
+    .article-header{
+      padding:34px 0 30px;
+    }
+
+    .article-header h1{
+      font-size:clamp(28px,8.5vw,34px);
+      line-height:1.16;
+    }
+
+    .subtitle{
+      font-size:16px;
+    }
+
+    .prose{
+      font-size:16px;
+    }
+
+    .prose h2{
+      font-size:23px;
+      line-height:1.25;
+    }
+
+    .prose h3{
+      font-size:19px;
+      line-height:1.3;
+    }
+
+    .prose ul,
+    .prose ol{
+      padding-left:1.25rem;
+    }
+
+    .note{
+      padding:14px 16px;
+    }
+
+    .stat-grid{
+      grid-template-columns:1fr;
+    }
+
+    figure.shot{
+      margin:24px 0;
+    }
+
+    .image-placeholder{
+      min-height:120px;
+      padding:24px 16px;
+    }
+
+    .site-foot{
+      flex-direction:column;
+      align-items:center;
+    }
+  }
+
+  @media (max-width:380px){
+    .topbar,
+    .wrap{
+      width:min(100% - 22px, 980px);
+    }
+
+    .topbar nav{
+      gap:10px 12px;
+    }
+
+    .topbar nav a{
+      font-size:13.5px;
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{transition:none!important;animation:none!important;}
+    body.bg-faceted::before{animation:none!important;}
+  }
+</style>
+</head>
+
+<body class="bg-faceted">
+<a class="skip-link" href="#prose">Skip to article</a>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <a href="/" class="brand"><code>./bɑːt</code><span>Bat Otgonbayar</span></a>
+  <nav aria-label="Site">
+    <a href="/">Home</a>
+    <a class="active" href="/writeups/">Writeups</a>
+    <a href="/about/">About</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+      <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+    </button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="article-header">
+    <div class="pub-date">Completed · 10 cases · KQL / Azure Data Explorer / Threat Hunting Practice</div>
+    <h1>KQL Investigation Challenge: Completing Kusto Detective Agency’s Call of the Cyber Duty</h1>
+    <p class="subtitle">
+      A spoiler-free portfolio writeup documenting how I completed all 10 cases in Kusto Detective Agency's Call of the Cyber Duty challenge, earned the full badge set, and strengthened my KQL investigation workflow.
+    </p>
+  </div>
+
+  <div class="grid">
+    <!-- ================= ARTICLE ================= -->
+    <article>
+      <div class="author">
+        <div class="avatar">BO</div>
+        <div class="who">
+          <div class="name">Bat Otgonbayar</div>
+          <div class="role">Systems &amp; Security · <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener">LinkedIn</a></div>
+        </div>
+      </div>
+
+      <details class="toc-mobile">
+        <summary>On this page</summary>
+        <ul>
+          <li><a href="#project-overview">Project Overview</a></li>
+          <li><a href="#completion-certificate">Completion Certificate</a></li>
+          <li><a href="#badges-earned">Badges Earned</a></li>
+          <li><a href="#how-the-challenge-works">How the Challenge Works</a></li>
+          <li><a href="#tools-and-environment">Tools and Environment</a></li>
+          <li><a href="#investigation-methodology">Investigation Methodology</a></li>
+          <li><a href="#kql-skills-practiced">KQL Skills Practiced</a></li>
+          <li><a href="#example-kql-patterns">Example KQL Patterns</a></li>
+          <li><a href="#what-i-learned">What I Learned</a></li>
+          <li><a href="#connection-to-sentinel">Connection to Sentinel</a></li>
+          <li><a href="#what-id-do-differently">What I'd Do Differently</a></li>
+          <li><a href="#outcome">Outcome</a></li>
+        </ul>
+      </details>
+
+      <div class="prose" id="prose">
+        <p class="lede">
+          Kusto Detective Agency's <strong>Call of the Cyber Duty</strong> challenge is a story-driven cyber investigation game built around Kusto Query Language. Each case gives you a new investigation scenario, a dataset to explore, and a problem to solve using KQL.
+        </p>
+
+        <p>
+          I completed all 10 cases, earned the full badge set, and received the certificate of completion as a <strong>Kusto Mentalist Detective</strong>.
+        </p>
+
+        <div class="note warn">
+          <p><strong>Spoiler-free writeup.</strong> I am not publishing case answers, flags, or exact solution queries. This page focuses on the investigation workflow, KQL skills practiced, and how the challenge connects to SIEM analysis and threat hunting.</p>
+        </div>
+
+        <h2 id="project-overview">Project Overview<a href="#project-overview" class="anchor">#</a></h2>
+
+        <table>
+          <tbody>
+            <tr>
+              <td>Challenge</td>
+              <td>Kusto Detective Agency — Call of the Cyber Duty</td>
+            </tr>
+            <tr>
+              <td>Focus</td>
+              <td>KQL, structured data investigation, telemetry analysis, and cyber case solving</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>Completed all 10 cases</td>
+            </tr>
+            <tr>
+              <td>Outcome</td>
+              <td>Earned all badges and certificate of completion</td>
+            </tr>
+            <tr>
+              <td>Tools Used</td>
+              <td>Kusto Query Language, Azure Data Explorer / Kusto query environment, structured datasets, browser-based challenge portal</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          The challenge is organized like a cyber investigation campaign. Each case builds on a narrative and requires you to query data, identify patterns, correlate evidence, and submit the correct answer before moving to the next case.
+        </p>
+
+        <p>
+          What made it valuable is that it was not just about writing queries. It was about reading the scenario carefully, understanding what the data was telling me, and figuring out what question to ask next.
+        </p>
+
+        <h2 id="completion-certificate">Completion Certificate<a href="#completion-certificate" class="anchor">#</a></h2>
+
+        <!-- Upload the certificate image to /images/writeups/kusto-cyber-duty/certificate.png -->
+        <figure class="shot">
+          <img src="/images/writeups/kusto-cyber-duty/certificate.png" alt="Certificate of completion for Kusto Detective Agency Call of the Cyber Duty challenge" loading="eager" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Certificate image placeholder</strong><code>/images/writeups/kusto-cyber-duty/certificate.png</code>'}))">
+          <figcaption>
+            Certificate of completion for Kusto Detective Agency's Call of the Cyber Duty challenge.
+          </figcaption>
+        </figure>
+
+        <h2 id="badges-earned">Badges Earned<a href="#badges-earned" class="anchor">#</a></h2>
+
+        <p>
+          Each completed case awarded a digital badge. I earned all 10 badges from the challenge, giving me a complete visual record of progress across the full investigation path.
+        </p>
+
+        <!-- Replace CREDLY_BADGE_URL_CASE_01 through CREDLY_BADGE_URL_CASE_10 with your public Credly badge URLs. -->
+        <!-- Upload badge images to /images/writeups/kusto-cyber-duty/badge-01.png through badge-10.png. -->
+        <div class="badge-grid">
+          <a href="CREDLY_BADGE_URL_CASE_01" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 1">
+            <img src="/images/writeups/kusto-cyber-duty/badge-01.png" alt="Kusto Detective Agency badge for Case 1" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 01'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_02" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 2">
+            <img src="/images/writeups/kusto-cyber-duty/badge-02.png" alt="Kusto Detective Agency badge for Case 2" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 02'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_03" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 3">
+            <img src="/images/writeups/kusto-cyber-duty/badge-03.png" alt="Kusto Detective Agency badge for Case 3" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 03'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_04" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 4">
+            <img src="/images/writeups/kusto-cyber-duty/badge-04.png" alt="Kusto Detective Agency badge for Case 4" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 04'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_05" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 5">
+            <img src="/images/writeups/kusto-cyber-duty/badge-05.png" alt="Kusto Detective Agency badge for Case 5" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 05'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_06" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 6">
+            <img src="/images/writeups/kusto-cyber-duty/badge-06.png" alt="Kusto Detective Agency badge for Case 6" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 06'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_07" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 7">
+            <img src="/images/writeups/kusto-cyber-duty/badge-07.png" alt="Kusto Detective Agency badge for Case 7" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 07'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_08" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 8">
+            <img src="/images/writeups/kusto-cyber-duty/badge-08.png" alt="Kusto Detective Agency badge for Case 8" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 08'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_09" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 9">
+            <img src="/images/writeups/kusto-cyber-duty/badge-09.png" alt="Kusto Detective Agency badge for Case 9" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 09'}))">
+          </a>
+          <a href="CREDLY_BADGE_URL_CASE_10" target="_blank" rel="noopener" aria-label="Open Credly badge for Case 10">
+            <img src="/images/writeups/kusto-cyber-duty/badge-10.png" alt="Kusto Detective Agency badge for Case 10" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'badge-placeholder',textContent:'Badge 10'}))">
+          </a>
+        </div>
+
+        <h2 id="how-the-challenge-works">How the Challenge Works<a href="#how-the-challenge-works" class="anchor">#</a></h2>
+
+        <p>
+          Call of the Cyber Duty is structured as a sequence of investigation cases. Each case gives you a prompt, a scenario, and access to data that must be explored using KQL.
+        </p>
+
+        <p>The basic flow looks like this:</p>
+
+        <ol>
+          <li>Read the case prompt and understand the objective.</li>
+          <li>Open the Kusto query environment.</li>
+          <li>Explore the available tables and fields.</li>
+          <li>Query the data to identify useful clues.</li>
+          <li>Correlate evidence across records, timestamps, entities, and patterns.</li>
+          <li>Submit the answer to unlock the next case.</li>
+        </ol>
+
+        <p>
+          The cases get more difficult as you progress, which makes the challenge feel similar to a CTF-style investigation. The difference is that instead of reverse engineering binaries or exploiting systems, the work happens through data analysis and query logic.
+        </p>
+
+        <h2 id="tools-and-environment">Tools and Environment<a href="#tools-and-environment" class="anchor">#</a></h2>
+
+        <p>
+          The challenge uses a Kusto cluster as the investigation workspace. The Kusto cluster URI acts as the login method, and the cases are solved by querying the provided data.
+        </p>
+
+        <p>
+          I used KQL to investigate the datasets and work through each case. The challenge can be approached through tools such as:
+        </p>
+
+        <ul>
+          <li>Azure Data Explorer Web UI</li>
+          <li>Real-Time Analytics KQL Queryset</li>
+          <li>Kusto Explorer</li>
+          <li>Browser-based Kusto Detective Agency portal</li>
+        </ul>
+
+        <p>
+          The important part is not the specific interface. The important part is being able to explore unfamiliar data and turn raw records into meaningful evidence.
+        </p>
+
+        <h2 id="investigation-methodology">Investigation Methodology<a href="#investigation-methodology" class="anchor">#</a></h2>
+
+        <p>
+          I treated each case like a small investigation instead of jumping straight into random queries.
+        </p>
+
+        <p>My general workflow was:</p>
+
+        <ol>
+          <li><strong>Understand the prompt.</strong> I started by reading the case text carefully and identifying what the challenge was actually asking for.</li>
+          <li><strong>Inspect the data.</strong> Before filtering too aggressively, I looked at table names, column names, sample records, timestamps, and possible relationships.</li>
+          <li><strong>Start broad.</strong> I used exploratory queries to understand the dataset and find patterns, outliers, and useful fields.</li>
+          <li><strong>Narrow the scope.</strong> Once I had a direction, I filtered by time, entity, event type, user, system, or other fields that seemed relevant.</li>
+          <li><strong>Correlate clues.</strong> Several cases required connecting multiple pieces of evidence instead of relying on one obvious record.</li>
+          <li><strong>Validate before submitting.</strong> Before entering an answer, I tried to verify that the result matched the story and the data.</li>
+        </ol>
+
+        <p>
+          This process is very similar to how I approach SIEM investigations: start wide, identify signal, reduce noise, and keep refining the question until the evidence makes sense.
+        </p>
+
+        <h2 id="kql-skills-practiced">KQL Skills Practiced<a href="#kql-skills-practiced" class="anchor">#</a></h2>
+
+        <p>
+          The challenge helped reinforce practical KQL skills that apply directly to Microsoft Sentinel, Azure Data Explorer, Microsoft Defender, and Microsoft Fabric Real-Time Analytics.
+        </p>
+
+        <ul>
+          <li>Filtering large datasets with <code>where</code></li>
+          <li>Selecting useful fields with <code>project</code></li>
+          <li>Sorting and prioritizing results with <code>order by</code></li>
+          <li>Counting and grouping activity with <code>summarize</code></li>
+          <li>Creating time buckets with <code>bin()</code></li>
+          <li>Building timelines from event data</li>
+          <li>Correlating data across tables with <code>join</code></li>
+          <li>Extracting values from strings with parsing functions</li>
+          <li>Looking for outliers and unusual patterns</li>
+          <li>Iteratively refining queries as new clues appeared</li>
+        </ul>
+
+        <h2 id="example-kql-patterns">Example KQL Patterns<a href="#example-kql-patterns" class="anchor">#</a></h2>
+
+        <p>
+          The examples below are generic practice patterns only. They are not challenge answers and do not reveal any case solutions.
+        </p>
+
+        <h3>Counting Events by Entity</h3>
+
+        <pre><code class="language-kql">TableName
+| summarize EventCount = count() by Entity
+| order by EventCount desc</code></pre>
+
+        <p>
+          This type of query is useful when trying to identify which users, hosts, IPs, or other entities appear most often in a dataset.
+        </p>
+
+        <h3>Building a Timeline</h3>
+
+        <pre><code class="language-kql">TableName
+| where Timestamp &gt; ago(24h)
+| summarize Events = count() by bin(Timestamp, 1h)
+| order by Timestamp asc</code></pre>
+
+        <p>
+          Time-based analysis is important when investigating activity patterns, spikes, or sequences of events.
+        </p>
+
+        <h3>Filtering for Suspicious Activity</h3>
+
+        <pre><code class="language-kql">TableName
+| where ActionType == "SuspiciousActivity"
+| project Timestamp, Entity, ActionType, Result
+| order by Timestamp desc</code></pre>
+
+        <p>
+          A focused filter helps reduce noise and keep only the records that matter to the investigation.
+        </p>
+
+        <h3>Correlating Two Tables</h3>
+
+        <pre><code class="language-kql">TableA
+| join kind=inner TableB on CorrelationId
+| project Timestamp, Entity, Action, Result</code></pre>
+
+        <p>
+          Joins are useful when one table contains the event and another table contains the context needed to understand it.
+        </p>
+
+        <h3>Extracting Useful Values</h3>
+
+        <pre><code class="language-kql">TableName
+| extend ExtractedValue = extract(@"pattern", 1, RawText)
+| summarize Count = count() by ExtractedValue
+| order by Count desc</code></pre>
+
+        <p>
+          Parsing and extraction are useful when important data is buried inside longer text fields.
+        </p>
+
+        <h2 id="what-i-learned">What I Learned<a href="#what-i-learned" class="anchor">#</a></h2>
+
+        <p>
+          The biggest takeaway was that KQL is not just about syntax. It is about investigation.
+        </p>
+
+        <p>
+          A good query starts with a good question. If the question is too broad, the result is noisy. If the question is too narrow too early, it is easy to miss important evidence. The challenge forced me to balance both sides: explore widely enough to understand the data, then narrow down carefully once the evidence started to point somewhere.
+        </p>
+
+        <p>
+          I also got more comfortable with the idea that investigation is iterative. Many cases required multiple attempts, new assumptions, and revised queries before the pattern became clear.
+        </p>
+
+        <p>
+          That is exactly what happens in real blue-team work. You rarely start with the perfect query. You start with a lead, test it, adjust, and keep going.
+        </p>
+
+        <h2 id="connection-to-sentinel">Connection to Microsoft Sentinel and Threat Hunting<a href="#connection-to-sentinel" class="anchor">#</a></h2>
+
+        <p>
+          This project connects directly to my <a href="/writeups/honeypot-sentinel-cloud/">Microsoft Sentinel honeypot project</a>.
+        </p>
+
+        <p>
+          In Sentinel, KQL is used to query security telemetry, investigate incidents, build detections, and support threat hunting. Kusto Detective Agency gave me another way to practice those same skills in a challenge environment.
+        </p>
+
+        <p>
+          The Sentinel honeypot project helped me practice collecting and analyzing real Windows authentication telemetry. This challenge helped me sharpen the investigation side of KQL: exploring data, building hypotheses, and finding the right path through unfamiliar datasets.
+        </p>
+
+        <p>
+          Together, they reinforce the same core skill: using queries to turn raw data into evidence.
+        </p>
+
+        <h2 id="what-id-do-differently">What I Would Do Differently Next Time<a href="#what-id-do-differently" class="anchor">#</a></h2>
+
+        <p>
+          If I replay the challenge or complete another Kusto Detective Agency challenge, I would document my process more carefully while solving each case.
+        </p>
+
+        <p>
+          Since I completed this one before writing the project page, I do not have my original query history or notes for every case. In the future, I would keep a spoiler-free investigation journal with:
+        </p>
+
+        <ul>
+          <li>The investigation goal for each case</li>
+          <li>The KQL concepts used</li>
+          <li>Mistakes or dead ends</li>
+          <li>Key lessons learned</li>
+          <li>Sanitized query patterns that do not reveal the answer</li>
+        </ul>
+
+        <p>
+          That would make the final writeup even stronger without spoiling the challenge for others.
+        </p>
+
+        <h2 id="outcome">Outcome<a href="#outcome" class="anchor">#</a></h2>
+
+        <p>By completing Call of the Cyber Duty, I:</p>
+
+        <ul>
+          <li>Completed all 10 cases</li>
+          <li>Earned the full badge set</li>
+          <li>Received the certificate of completion</li>
+          <li>Practiced KQL in a hands-on investigation environment</li>
+          <li>Strengthened my ability to explore unfamiliar datasets</li>
+          <li>Improved my understanding of timeline analysis, joins, summarization, and pattern recognition</li>
+          <li>Built another portfolio project that connects directly to SIEM analysis, detection engineering, and threat hunting</li>
+        </ul>
+
+        <p>
+          This was a fun and practical way to keep building KQL confidence outside of a traditional lab. It also reinforced something I keep seeing across security projects: tools matter, but the investigation mindset matters more.
+        </p>
+
+        <div class="article-foot">
+          <div class="tags">
+            <a href="/writeups/">KQL</a>
+            <a href="/writeups/">Azure Data Explorer</a>
+            <a href="/writeups/">Threat Hunting</a>
+            <a href="/writeups/">SIEM</a>
+            <a href="/writeups/">Blue Team</a>
+            <a href="/writeups/">CTF</a>
+          </div>
+
+          <nav class="foot-nav" aria-label="Article navigation">
+            <a href="/writeups/honeypot-sentinel-cloud/">← Sentinel Honeypot</a>
+            <a href="/writeups/">All writeups →</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= TOC ================= -->
+    <aside class="toc" aria-label="Table of contents">
+      <div class="toc-label">On this page</div>
+      <ul>
+        <li><a href="#project-overview">Project Overview</a></li>
+        <li><a href="#completion-certificate">Completion Certificate</a></li>
+        <li><a href="#badges-earned">Badges Earned</a></li>
+        <li><a href="#how-the-challenge-works">How the Challenge Works</a></li>
+        <li><a href="#tools-and-environment">Tools and Environment</a></li>
+        <li><a href="#investigation-methodology">Investigation Methodology</a></li>
+        <li><a href="#kql-skills-practiced">KQL Skills Practiced</a></li>
+        <li><a href="#example-kql-patterns">Example KQL Patterns</a></li>
+        <li><a href="#what-i-learned">What I Learned</a></li>
+        <li><a href="#connection-to-sentinel">Connection to Sentinel</a></li>
+        <li><a href="#what-id-do-differently">What I'd Do Differently</a></li>
+        <li><a href="#outcome">Outcome</a></li>
+      </ul>
+    </aside>
+  </div>
+</div>
+
+<footer class="site-foot">
+  <span>© 2026 Bat Otgonbayar</span>
+  <span>·</span>
+  <a href="https://github.com/botgonbayar" target="_blank" rel="noopener" style="color:var(--text-faint);text-decoration:none;">GitHub</a>
+  <span>·</span>
+  <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener" style="color:var(--text-faint);text-decoration:none;">LinkedIn</a>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Expanded image preview">
+  <img alt="">
+  <div class="lb-caption"></div>
+  <div class="lb-hint">Click image, press Esc, or click outside to close</div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<script>
+  // Syntax highlighting
+  if (window.hljs) {
+    hljs.highlightAll();
+  }
+
+  // Theme toggle
+  (function(){
+    const root = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+    function syncThemeColor(){
+      if(!metaTheme) return;
+      metaTheme.setAttribute('content', root.getAttribute('data-theme') === 'light' ? '#fbfbfc' : '#0a0e17');
+    }
+
+    if(btn){
+      btn.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch(e) {}
+        syncThemeColor();
+      });
+    }
+
+    syncThemeColor();
+  })();
+
+  // Reading progress
+  (function(){
+    const progress = document.getElementById('progress');
+    if(!progress) return;
+
+    function updateProgress(){
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progress.style.width = pct + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, {passive:true});
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+  })();
+
+  // Active TOC highlighting
+  (function(){
+    const links = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+    const headings = links
+      .map(link => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    if(!headings.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if(!visible) return;
+
+      const id = visible.target.id;
+      links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }, {
+      rootMargin: '-18% 0px -70% 0px',
+      threshold: [0, 0.25, 0.5, 1]
+    });
+
+    headings.forEach(h => observer.observe(h));
+  })();
+
+  // Copy buttons for code blocks
+  (function(){
+    document.querySelectorAll('.prose pre').forEach(pre => {
+      const code = pre.querySelector('code');
+      if(!code) return;
+
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.type = 'button';
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', 'Copy code block');
+
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          btn.textContent = 'Copied';
+          setTimeout(() => btn.textContent = 'Copy', 1400);
+        } catch(e) {
+          btn.textContent = 'Failed';
+          setTimeout(() => btn.textContent = 'Copy', 1400);
+        }
+      });
+
+      pre.appendChild(btn);
+    });
+  })();
+
+  // Image lightbox
+  (function(){
+    const dialog = document.getElementById('lightbox');
+    if(!dialog) return;
+
+    const lbImg = dialog.querySelector('img');
+    const lbCap = dialog.querySelector('.lb-caption');
+
+    document.querySelectorAll('.prose figure.shot img').forEach(img => {
+      img.addEventListener('click', () => {
+        lbImg.src = img.currentSrc || img.src;
+        lbImg.alt = img.alt || '';
+        const cap = img.closest('figure')?.querySelector('figcaption');
+        lbCap.textContent = cap ? cap.textContent.trim() : img.alt || '';
+        dialog.showModal();
+      });
+    });
+
+    dialog.addEventListener('click', (event) => {
+      const rect = lbImg.getBoundingClientRect();
+      const clickedImage = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      if(!clickedImage) dialog.close();
+    });
+
+    lbImg.addEventListener('click', () => dialog.close());
+  })();
+</script>
+</body>
+</html>

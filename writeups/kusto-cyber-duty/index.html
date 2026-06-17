@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth" data-theme="dark">
 <head>
@@ -537,6 +540,74 @@
     font-family:'Monaco','Menlo','Consolas',monospace;
   }
 
+
+  /* case screenshot gallery */
+  .case-gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+    margin:28px 0 34px;
+  }
+
+  .case-gallery figure.shot{
+    margin:0;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 8px 26px var(--shadow);
+  }
+
+  .case-gallery figure.shot img{
+    width:100%;
+    aspect-ratio:16 / 9;
+    object-fit:cover;
+    border:0;
+    border-bottom:1px solid var(--border);
+    border-radius:0;
+    box-shadow:none;
+  }
+
+  .case-gallery figure.shot figcaption{
+    margin:0;
+    padding:12px 14px 14px;
+    text-align:left;
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  .case-gallery .image-placeholder{
+    min-height:170px;
+    border:0;
+    border-bottom:1px solid var(--border);
+    border-radius:0;
+    background:color-mix(in srgb,var(--surface-2) 72%,transparent);
+  }
+
+  .sanitization-checklist{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:10px;
+    margin:20px 0 28px;
+  }
+
+  .sanitization-checklist span{
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:7px 11px;
+    color:var(--text-dim);
+    background:color-mix(in srgb,var(--surface) 75%,transparent);
+    font-size:13px;
+    line-height:1.4;
+  }
+
+  /* Keep the native dialog fixed even after shared z-index rules later in the stylesheet. */
+  .lightbox{
+    position:fixed!important;
+    inset:0!important;
+    z-index:100!important;
+  }
+
   /* badge grid */
   .badge-grid{
     display:grid;
@@ -1036,6 +1107,14 @@
     *,*::before,*::after{transition:none!important;animation:none!important;}
     body.bg-faceted::before{animation:none!important;}
   }
+
+  /* Final safety override: keep image lightbox fixed above the article content. */
+  .lightbox{
+    position:fixed!important;
+    inset:0!important;
+    z-index:100!important;
+  }
+
 </style>
 </head>
 
@@ -1083,6 +1162,7 @@
           <li><a href="#completion-certificate">Completion Certificate</a></li>
           <li><a href="#badges-earned">Badges Earned</a></li>
           <li><a href="#how-the-challenge-works">How the Challenge Works</a></li>
+          <li><a href="#case-screenshots">Sanitized Case Screenshots</a></li>
           <li><a href="#tools-and-environment">Tools and Environment</a></li>
           <li><a href="#investigation-methodology">Investigation Methodology</a></li>
           <li><a href="#kql-skills-practiced">KQL Skills Practiced</a></li>
@@ -1226,9 +1306,101 @@
         <figure class="shot">
           <img src="/images/writeups/kusto-cyber-duty/kqlexample-case1.png" alt="Sanitized screenshot of a Kusto query workspace used for KQL investigation practice" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Kusto query workspace screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/kusto-query-workspace.png</code>'}))">
           <figcaption>
-            The investigation workflow centered on exploring structured data with KQL, validating assumptions, and refining queries as new clues appeared. Any screenshot here should be sanitized so it does not expose solution queries, case answers, or challenge-specific evidence.
+            The investigation workflow centered on exploring structured data with KQL, validating assumptions, and refining queries as new clues appeared. Screenshots are sanitized so they do not expose solution queries, case answers, or challenge-specific evidence.
           </figcaption>
         </figure>
+
+
+        <h2 id="case-screenshots">Sanitized Case Screenshots<a href="#case-screenshots" class="anchor">#</a></h2>
+
+        <p>
+          I kept the full solution queries and answers out of the public writeup, but I still wanted to show evidence of the hands-on KQL work behind each completed case. The screenshots below are placeholders for sanitized query-workspace captures from each case.
+        </p>
+
+        <div class="note warn">
+          <p><strong>Sanitization checklist before publishing:</strong> blur or crop anything that reveals the answer, the final result row, the cluster URI, case-specific flags, or exact solution-only comments.</p>
+        </div>
+
+        <div class="sanitization-checklist" aria-label="Screenshot sanitization checklist">
+          <span>Blur final answer</span>
+          <span>Blur cluster URI</span>
+          <span>Blur result/output row</span>
+          <span>Crop case-specific prompt text</span>
+          <span>Remove answer comments</span>
+          <span>Keep KQL concepts visible</span>
+        </div>
+
+        <div class="case-gallery">
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-01-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 1" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 1 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-01-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 1</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-02-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 2" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 2 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-02-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 2</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-03-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 3" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 3 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-03-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 3</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-04-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 4" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 4 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-04-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 4</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-05-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 5" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 5 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-05-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 5</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-06-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 6" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 6 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-06-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 6</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-07-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 7" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 7 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-07-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 7</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-08-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 8" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 8 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-08-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 8</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-09-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 9" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 9 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-09-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 9</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+
+          <figure class="shot case-shot">
+            <img src="/images/writeups/kusto-cyber-duty/case-10-kql.png" alt="Sanitized KQL workspace screenshot for Call of the Cyber Duty Case 10" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'image-placeholder',innerHTML:'<strong>Case 10 screenshot placeholder</strong><code>/images/writeups/kusto-cyber-duty/case-10-kql.png</code>'}))">
+            <figcaption>
+              <strong>Case 10</strong> — sanitized KQL workspace screenshot. The answer, cluster URI, final result output, and any solution-revealing details are blurred or cropped.
+            </figcaption>
+          </figure>
+        </div>
 
         <h2 id="tools-and-environment">Tools and Environment<a href="#tools-and-environment" class="anchor">#</a></h2>
 
@@ -1452,6 +1624,7 @@
         <li><a href="#completion-certificate">Completion Certificate</a></li>
         <li><a href="#badges-earned">Badges Earned</a></li>
         <li><a href="#how-the-challenge-works">How the Challenge Works</a></li>
+        <li><a href="#case-screenshots">Sanitized Case Screenshots</a></li>
         <li><a href="#tools-and-environment">Tools and Environment</a></li>
         <li><a href="#investigation-methodology">Investigation Methodology</a></li>
         <li><a href="#kql-skills-practiced">KQL Skills Practiced</a></li>

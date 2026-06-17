@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth" data-theme="dark">
 <head>
@@ -723,19 +721,26 @@
   .lightbox{
     border:none;
     padding:0;
+    margin:0;
     background:transparent;
     max-width:none;
     max-height:none;
     width:100vw;
     height:100vh;
+    height:100dvh;
     display:none;
     align-items:center;
     justify-content:center;
     flex-direction:column;
     gap:14px;
     outline:none;
-    position:relative;
+    position:fixed;
+    inset:0;
     z-index:100;
+  }
+
+  html.lightbox-open{
+    scroll-behavior:auto!important;
   }
 
   .lightbox[open]{display:flex;}
@@ -1584,14 +1589,33 @@
 
     const lbImg = dialog.querySelector('img');
     const lbCap = dialog.querySelector('.lb-caption');
+    let savedScrollY = 0;
+
+    function restoreScroll(){
+      document.documentElement.classList.remove('lightbox-open');
+      window.requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollY);
+      });
+    }
 
     document.querySelectorAll('.prose figure.shot img').forEach(img => {
-      img.addEventListener('click', () => {
+      img.addEventListener('click', (event) => {
+        event.preventDefault();
+        savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
         lbImg.src = img.currentSrc || img.src;
         lbImg.alt = img.alt || '';
         const cap = img.closest('figure')?.querySelector('figcaption');
         lbCap.textContent = cap ? cap.textContent.trim() : img.alt || '';
+
+        document.documentElement.classList.add('lightbox-open');
         dialog.showModal();
+
+        // Some browsers scroll the page when a native dialog receives focus.
+        // Keep the reader anchored at the same spot behind the overlay.
+        window.requestAnimationFrame(() => {
+          window.scrollTo(0, savedScrollY);
+        });
       });
     });
 
@@ -1601,6 +1625,7 @@
       if(!clickedImage) dialog.close();
     });
 
+    dialog.addEventListener('close', restoreScroll);
     lbImg.addEventListener('click', () => dialog.close());
   })();
 </script>

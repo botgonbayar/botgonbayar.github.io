@@ -1,581 +1,402 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Writeups | Bat Otgonbayar</title>
-  <meta name="description" content="Cybersecurity writeups, notes, labs, and case studies by Bat Otgonbayar." />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bat Otgonbayar — Cybersecurity Writeups</title>
+  <meta name="description" content="Cybersecurity portfolio and technical writeups by Bat Otgonbayar, focused on identity, cloud security, Microsoft Sentinel, and automation." />
+  <meta name="author" content="Bat Otgonbayar" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#f7f7f4" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', saved);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
-:root {
-      --bg: #0b0f17;
-      --bg-2: #101624;
-      --text: #f4f4f5;
-      --muted: #a1a1aa;
-      --faint: #71717a;
-      --border: rgba(148, 163, 184, 0.18);
-      --border-strong: rgba(148, 163, 184, 0.28);
-      --surface: rgba(15, 23, 42, 0.52);
-      --surface-2: rgba(15, 23, 42, 0.78);
-      --accent: #a78bfa;
-      --accent-2: #5eead4;
-      --link: #d8b4fe;
-      --shadow: rgba(0, 0, 0, 0.35);
+    :root {
+      --bg: #f7f7f4;
+      --paper: #ffffff;
+      --paper-soft: #fbfbf8;
+      --text: #19191b;
+      --muted: #66666d;
+      --faint: #8a8a92;
+      --line: #deded8;
+      --line-soft: #ecece6;
+      --accent: #5b4bdb;
+      --accent-2: #0f766e;
+      --shadow: rgba(20, 20, 25, 0.06);
+      --radius: 15px;
       --max: 980px;
+      --measure: 720px;
     }
 
-    [data-theme="light"] {
-      --bg: #fafafa;
-      --bg-2: #f4f4f5;
-      --text: #18181b;
-      --muted: #52525b;
-      --faint: #71717a;
-      --border: rgba(24, 24, 27, 0.12);
-      --border-strong: rgba(24, 24, 27, 0.2);
-      --surface: rgba(255, 255, 255, 0.58);
-      --surface-2: rgba(255, 255, 255, 0.86);
-      --accent: #7c3aed;
-      --accent-2: #0f766e;
-      --link: #6d28d9;
-      --shadow: rgba(15, 23, 42, 0.08);
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --paper: #111827;
+      --paper-soft: #0f1722;
+      --text: #f4f4f5;
+      --muted: #b3b3bb;
+      --faint: #85858f;
+      --line: #2a303b;
+      --line-soft: #1d2430;
+      --accent: #a78bfa;
+      --accent-2: #5eead4;
+      --shadow: rgba(0, 0, 0, 0.24);
     }
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background:
-        radial-gradient(circle at 15% 0%, rgba(124, 58, 237, 0.18), transparent 34rem),
-        radial-gradient(circle at 90% 12%, rgba(20, 184, 166, 0.16), transparent 30rem),
-        linear-gradient(180deg, var(--bg), var(--bg) 55%, var(--bg-2));
-      line-height: 1.75;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
+      text-rendering: optimizeLegibility;
     }
 
-    body.bg-honeycomb::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background-image:
-        linear-gradient(30deg, rgba(167, 139, 250, 0.105) 12%, transparent 12.5%, transparent 87%, rgba(167, 139, 250, 0.105) 87.5%, rgba(167, 139, 250, 0.105)),
-        linear-gradient(150deg, rgba(94, 234, 212, 0.075) 12%, transparent 12.5%, transparent 87%, rgba(94, 234, 212, 0.075) 87.5%, rgba(94, 234, 212, 0.075)),
-        linear-gradient(30deg, rgba(167, 139, 250, 0.095) 12%, transparent 12.5%, transparent 87%, rgba(167, 139, 250, 0.095) 87.5%, rgba(167, 139, 250, 0.095)),
-        linear-gradient(150deg, rgba(94, 234, 212, 0.06) 12%, transparent 12.5%, transparent 87%, rgba(94, 234, 212, 0.06) 87.5%, rgba(94, 234, 212, 0.06));
-      background-size: 96px 168px;
-      background-position: 0 0, 0 0, 48px 84px, 48px 84px;
-      opacity: 0.38;
-      mask-image: linear-gradient(to bottom, black 0%, black 38%, rgba(0,0,0,.42) 60%, transparent 88%);
-      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 38%, rgba(0,0,0,.42) 60%, transparent 88%);
-      animation: honey-drift 48s linear infinite;
-    }
+    a { color: inherit; text-underline-offset: 0.2em; }
+    a:hover { color: var(--accent); }
 
-    [data-theme="light"] body.bg-honeycomb::before,
-    [data-theme="light"] .bg-honeycomb::before {
-      background-image:
-        linear-gradient(30deg, rgba(24, 24, 27, 0.09) 12%, transparent 12.5%, transparent 87%, rgba(24, 24, 27, 0.09) 87.5%, rgba(24, 24, 27, 0.09)),
-        linear-gradient(150deg, rgba(15, 118, 110, 0.055) 12%, transparent 12.5%, transparent 87%, rgba(15, 118, 110, 0.055) 87.5%, rgba(15, 118, 110, 0.055)),
-        linear-gradient(30deg, rgba(124, 58, 237, 0.055) 12%, transparent 12.5%, transparent 87%, rgba(124, 58, 237, 0.055) 87.5%, rgba(124, 58, 237, 0.055)),
-        linear-gradient(150deg, rgba(24, 24, 27, 0.065) 12%, transparent 12.5%, transparent 87%, rgba(24, 24, 27, 0.065) 87.5%, rgba(24, 24, 27, 0.065));
-      opacity: 0.30;
-    }
-
-    body.bg-honeycomb::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      background:
-        linear-gradient(90deg, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%),
-        linear-gradient(180deg, transparent 0%, var(--bg) 76%);
-    }
-
-    @keyframes honey-drift {
-      from { background-position: 0 0, 0 0, 48px 84px, 48px 84px; }
-      to { background-position: 96px 168px, 96px 168px, 144px 252px, 144px 252px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { animation: none !important; transition: none !important; }
-    }
-
-    a { color: inherit; }
-    .shell {
-      width: min(var(--max), calc(100% - 40px));
+    .site {
+      max-width: var(--max);
       margin: 0 auto;
+      padding: 28px 24px 56px;
     }
 
-    .site-header {
+    .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
-      padding: 30px 0;
-      border-bottom: 1px solid var(--border);
+      gap: 20px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
     }
 
     .brand {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 8px;
-      color: var(--text);
       text-decoration: none;
       font-weight: 800;
       letter-spacing: -0.03em;
+      font-size: 1.05rem;
+      color: var(--text);
     }
 
-    .brand code {
+    .brand span {
       color: var(--accent);
-      font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.02em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 800;
+      letter-spacing: 0;
+      margin-right: 0.35rem;
     }
 
-    .site-nav {
+    nav {
       display: flex;
       align-items: center;
       gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.94rem;
       color: var(--muted);
-      font-size: 15px;
     }
 
-    .site-nav a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-
-    .site-nav a:hover,
-    .site-nav a.active {
-      color: var(--text);
-    }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--accent); }
 
     .theme-toggle {
       width: 34px;
       height: 34px;
+      border: 1px solid var(--line);
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--surface);
+      background: transparent;
       color: var(--muted);
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
     }
 
     .theme-toggle:hover {
-      color: var(--text);
-      border-color: var(--border-strong);
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 7%, transparent);
     }
 
-    .intro {
-      padding: 80px 0 46px;
-      border-bottom: 1px solid var(--border);
+    .theme-toggle svg { width: 17px; height: 17px; }
+    .icon-sun { display: none; }
+    [data-theme="light"] .icon-moon { display: none; }
+    [data-theme="light"] .icon-sun { display: block; }
+    [data-theme="dark"] .icon-moon { display: none; }
+    [data-theme="dark"] .icon-sun { display: block; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 48px;
+      align-items: end;
+      padding: 78px 0 54px;
+      border-bottom: 1px solid var(--line);
     }
 
     .eyebrow {
       color: var(--accent);
-      font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.16em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 { line-height: 1.15; letter-spacing: -0.035em; margin: 0; }
+    h1 { font-size: clamp(2.6rem, 7vw, 5.25rem); max-width: 850px; }
+    h2 { font-size: clamp(1.55rem, 3.2vw, 2.25rem); margin-bottom: 16px; }
+    h3 { font-size: 1.08rem; letter-spacing: -0.015em; }
+
+    .intro {
+      margin: 26px 0 0;
+      max-width: var(--measure);
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+    }
+
+    .hero-aside {
+      border-left: 1px solid var(--line);
+      padding-left: 22px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hero-aside strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .links a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 2px;
+      font-weight: 650;
+    }
+
+    .links a:hover { color: var(--accent); border-color: var(--accent); }
+
+    .section {
+      padding: 54px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 20px;
       margin-bottom: 24px;
     }
 
-    h1 {
+    .section-head p {
+      max-width: 520px;
       margin: 0;
-      max-width: 760px;
-      font-size: clamp(46px, 8vw, 86px);
-      line-height: 0.98;
-      letter-spacing: -0.075em;
-      font-weight: 900;
-    }
-
-    .intro p {
-      max-width: 690px;
-      margin: 28px 0 0;
       color: var(--muted);
-      font-size: clamp(17px, 2vw, 20px);
+      font-size: 0.98rem;
     }
 
-    .tabs {
+    .featured {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 34px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--paper) 78%, transparent);
+      box-shadow: 0 16px 44px var(--shadow);
+    }
+
+    .kicker {
+      color: var(--faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .featured h3 { font-size: clamp(1.45rem, 3vw, 2.1rem); margin-bottom: 13px; }
+    .featured h3 a { text-decoration-thickness: 1px; }
+    .featured p { color: var(--muted); margin: 0 0 18px; }
+
+    .small-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 30px;
-    }
-
-    .tab {
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: var(--surface);
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 13px;
-      backdrop-filter: blur(12px);
-    }
-
-    .tab.active {
-      color: var(--text);
-      border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-    }
-
-    .content {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 250px;
-      gap: 64px;
-      padding: 54px 0 90px;
-    }
-
-    .section-title {
-      margin: 0 0 22px;
+      gap: 8px 14px;
       color: var(--faint);
-      font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 0.9rem;
     }
+
+    .quiet-stats {
+      border-left: 1px solid var(--line);
+      padding-left: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      color: var(--muted);
+    }
+
+    .quiet-stats div {
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .quiet-stats div:last-child { border-bottom: 0; padding-bottom: 0; }
+    .quiet-stats strong { color: var(--text); font-size: 1.15rem; display: block; line-height: 1.2; }
+    .quiet-stats span { font-size: 0.88rem; }
 
     .post-list {
       display: grid;
       gap: 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--line);
     }
 
     .post {
       display: grid;
       grid-template-columns: 150px minmax(0, 1fr);
-      gap: 30px;
-      padding: 30px 0;
-      border-bottom: 1px solid var(--border);
-      text-decoration: none;
+      gap: 24px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
     }
 
-    .post:hover .post-title {
-      color: var(--link);
-    }
-
-    .post-meta {
+    .post time {
       color: var(--faint);
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 0.9rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    .post-title {
-      margin: 0;
-      color: var(--text);
-      font-size: clamp(22px, 2.5vw, 30px);
-      line-height: 1.15;
-      letter-spacing: -0.035em;
-      transition: color 0.18s ease;
+    .post h3 { margin-bottom: 8px; }
+    .post h3 a { text-decoration-thickness: 1px; }
+    .post p { margin: 0 0 10px; color: var(--muted); }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { color: var(--faint); font-size: 0.84rem; }
+    .tag::before { content: "#"; color: var(--line); margin-right: 1px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 42px;
     }
 
-    .post-excerpt {
-      margin: 12px 0 0;
-      color: var(--muted);
-      max-width: 650px;
-      font-size: 16px;
-    }
+    .prose p { margin: 0 0 18px; color: var(--muted); }
+    .prose ul { margin: 0; padding-left: 1.1rem; color: var(--muted); }
+    .prose li { margin-bottom: 8px; }
+    .prose strong { color: var(--text); }
 
-    .post-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .cert-groups {
+      display: grid;
+      gap: 18px;
       margin-top: 18px;
     }
 
-    .post-tag {
-      color: var(--faint);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 3px 9px;
-      font-size: 12px;
-      line-height: 1.4;
-      background: color-mix(in srgb, var(--surface) 70%, transparent);
-    }
-
-    .post.featured {
-      padding: 34px 0;
-    }
-
-    .post.featured .post-title {
-      font-size: clamp(28px, 4vw, 42px);
-    }
-
-    .sidebar {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .side-card {
-      position: sticky;
-      top: 24px;
-      border-left: 1px solid var(--border);
-      padding-left: 22px;
-    }
-
-    .side-card h2 {
-      margin: 0 0 12px;
+    .cert-group h3 {
+      font-size: 0.92rem;
       color: var(--text);
-      font-size: 16px;
-      letter-spacing: -0.02em;
+      margin-bottom: 9px;
+      letter-spacing: -0.01em;
     }
 
-    .side-card p {
-      margin: 0 0 18px;
+    .certs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .side-links {
-      display: grid;
-      gap: 8px;
-    }
-
-    .side-links a {
+    .certs a, .certs span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 11px;
       color: var(--muted);
       text-decoration: none;
-      width: fit-content;
-      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      background: color-mix(in srgb, var(--paper) 70%, transparent);
     }
 
-    .side-links a:hover {
-      color: var(--text);
-      border-bottom-color: var(--accent);
+    .certs a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 7%, transparent);
     }
 
-    .site-footer {
-      border-top: 1px solid var(--border);
-      padding: 34px 0 50px;
+    .contact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .contact-row a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 2px;
+      font-weight: 650;
+    }
+
+    .contact-row a:hover { color: var(--accent); border-color: var(--accent); }
+
+    footer {
+      padding-top: 34px;
       color: var(--faint);
-      font-size: 14px;
+      font-size: 0.92rem;
       display: flex;
       justify-content: space-between;
-      gap: 20px;
+      gap: 18px;
+      flex-wrap: wrap;
     }
 
-    .site-footer a {
-      color: var(--muted);
-      text-decoration: none;
-      border-bottom: 1px solid var(--border);
+    footer a { color: var(--muted); }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
     }
 
-    @media (max-width: 820px) {
-      .site-header, .site-footer {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .content {
-        grid-template-columns: 1fr;
-        gap: 42px;
-      }
-
-      .side-card {
-        position: static;
-        border-left: 0;
-        padding-left: 0;
-        border-top: 1px solid var(--border);
-        padding-top: 24px;
-      }
-
-      .post {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .intro {
-        padding-top: 58px;
-      }
+    @media (max-width: 780px) {
+      .site { padding: 22px 18px 44px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      nav { gap: 14px; }
+      .hero { grid-template-columns: 1fr; gap: 28px; padding: 56px 0 42px; }
+      .hero-aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 20px; }
+      .section-head { flex-direction: column; }
+      .featured { grid-template-columns: 1fr; padding: 22px; }
+      .quiet-stats { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 18px; }
+      .post { grid-template-columns: 1fr; gap: 7px; }
+      .two-col { grid-template-columns: 1fr; gap: 32px; }
     }
-
-    @media (max-width: 560px) {
-      .shell { width: min(var(--max), calc(100% - 28px)); }
-      .site-nav { gap: 12px; font-size: 14px; }
-      .post { padding: 26px 0; }
-    }
-
-
-/* ---------- about page additions using the exact Writeups shell/background ---------- */
-.about-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 250px;
-  gap: 64px;
-  padding: 54px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.about-copy {
-  max-width: 720px;
-}
-
-.about-copy p {
-  margin: 0 0 20px;
-  color: var(--muted);
-  font-size: 17px;
-}
-
-.profile-card {
-  position: sticky;
-  top: 24px;
-  border-left: 1px solid var(--border);
-  padding-left: 22px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.profile-image {
-  width: 148px;
-  height: 148px;
-  border-radius: 999px;
-  padding: 4px;
-  margin-bottom: 22px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-}
-
-.profile-image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-  background: var(--surface-2);
-}
-
-.profile-card h2,
-.profile-card h3 {
-  margin: 0 0 10px;
-  color: var(--text);
-  font-size: 16px;
-  letter-spacing: -0.02em;
-}
-
-.profile-card p {
-  margin: 0 0 18px;
-  color: var(--muted);
-}
-
-.timeline {
-  display: grid;
-  gap: 0;
-  border-top: 1px solid var(--border);
-}
-
-.role {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 30px;
-  padding: 30px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.role-meta {
-  color: var(--faint);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.role h3 {
-  margin: 0;
-  color: var(--text);
-  font-size: clamp(22px, 2.5vw, 30px);
-  line-height: 1.15;
-  letter-spacing: -0.035em;
-}
-
-.role-company {
-  margin-top: 5px;
-  color: var(--accent);
-  font-weight: 800;
-  font-size: 14px;
-}
-
-.role p {
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 16px;
-}
-
-.skill-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
-}
-
-.skill {
-  border-top: 1px solid var(--border);
-  padding-top: 18px;
-}
-
-.skill h3 {
-  margin: 0 0 10px;
-  color: var(--text);
-  font-size: 18px;
-  letter-spacing: -0.025em;
-}
-
-.skill p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 15px;
-}
-
-.contact-block {
-  padding: 54px 0 90px;
-}
-
-.contact-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-
-.contact-links a {
-  color: var(--text);
-  font-weight: 800;
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-strong);
-}
-
-.contact-links a:hover {
-  color: var(--link);
-  border-bottom-color: var(--link);
-}
-
-@media (max-width: 820px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 34px;
-  }
-
-  .profile-card {
-    position: static;
-    border-left: 0;
-    padding-left: 0;
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-  }
-
-  .role {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .skill-list {
-    grid-template-columns: 1fr;
-  }
-}
-
-  
-
 /* ==========================================================
    Shared soft-faceted background — NO honeycomb / NO hexes
    Paste this at the VERY BOTTOM of the <style> block.
    It intentionally overrides older bg-honeycomb CSS.
 
    Existing body class can stay:
-     <body class="bg-honeycomb">
+     <body class="bg-faceted">
    Recommended rename:
      <body class="bg-faceted">
    ========================================================== */
@@ -673,326 +494,190 @@ article,
     animation: none !important;
   }
 }
-
-
-
-/* ==========================================================
-   Shared nav alignment/icon fix
-   Matches the AD lab article header style.
-   Paste at the VERY BOTTOM of the <style> block.
-   ========================================================== */
-
-.shell,
-.wrap,
-.topbar,
-.site-header {
-  max-width: 980px;
-}
-
-.site-header,
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 30px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.brand,
-.topbar a.brand,
-.site-header a.brand {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  color: var(--heading, var(--text));
-  text-decoration: none;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-  font-size: 15px;
-}
-
-.brand code,
-.topbar a.brand code,
-.site-header a.brand code {
-  color: var(--accent);
-  font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  letter-spacing: 0.02em;
-}
-
-.site-nav,
-.topbar nav {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  color: var(--text-dim, var(--muted));
-  font-size: 15px;
-}
-
-.site-nav a,
-.topbar nav a {
-  color: var(--text-dim, var(--muted));
-  text-decoration: none;
-  padding: 0;
-  border: 0;
-  font-weight: 600;
-}
-
-.site-nav a:hover,
-.site-nav a.active,
-.topbar nav a:hover,
-.topbar nav a.active {
-  color: var(--heading, var(--text));
-}
-
-.site-nav a.active,
-.topbar nav a.active {
-  color: var(--accent);
-}
-
-.theme-toggle {
-  margin-left: 4px;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim, var(--muted));
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s;
-}
-
-.theme-toggle:hover {
-  color: var(--heading, var(--text));
-  border-color: var(--text-faint, var(--border-strong));
-}
-
-.theme-toggle svg {
-  width: 17px;
-  height: 17px;
-}
-
-.icon-sun { display: none; }
-[data-theme="light"] .icon-moon { display: none; }
-[data-theme="light"] .icon-sun { display: block; }
-
-@media (max-width: 700px) {
-  .site-header,
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .site-nav,
-  .topbar nav {
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-}
-
-</style>
+  </style>
 </head>
-
-<body class="bg-honeycomb">
-  <div class="shell">
-    <header class="site-header">
-      <a class="brand" href="/"><code>./bɑːt</code><span>Bat Otgonbayar</span></a>
-      <nav class="site-nav" aria-label="Primary navigation">
+<body class="bg-faceted">
+  <div class="site">
+    <header class="topbar">
+      <a class="brand" href="/"><span>./bɑːt</span> Bat Otgonbayar</a>
+      <nav aria-label="Main navigation">
         <a href="/">Home</a>
-        <a class="active" href="/writeups/">Writeups</a>
+        <a href="/writeups/">Writeups</a>
         <a href="/about/">About</a>
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
-          <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-          <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
         </button>
       </nav>
     </header>
 
     <main>
-      <section class="intro">
-        <div class="eyebrow">Blog · Labs · Case Studies</div>
-        <p>
-          Technical notes, lab builds, investigations, and lessons learned from identity, cloud security,
-          Microsoft Sentinel, PowerShell automation, and blue-team projects.
-        </p>
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="eyebrow">Cybersecurity notes, labs, and case studies</div>
+          <p class="intro">
+            I'm Bat Otgonbayar, a cybersecurity practitioner focused on identity, cloud security, Microsoft 365, Sentinel, and PowerShell automation. This site is where I document hands-on labs, investigations, and lessons learned from real technical projects.
+          </p>
+          <div class="links" aria-label="Primary links">
+            <a href="/writeups/">Read writeups</a>
+            <a href="/about/">About me</a>
+            <a href="https://github.com/botgonbayar" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          </div>
+        </div>
+        <aside class="hero-aside">
+          <strong>Current focus</strong>
+          Microsoft Sentinel, KQL investigations, detection engineering, identity security, and turning raw telemetry into readable blue-team case studies.
+        </aside>
+      </section>
 
-        <div class="tabs" aria-label="Topic filters">
-          <span class="tab active">All</span>
-          <span class="tab">Cloud Security</span>
-          <span class="tab">Identity</span>
-          <span class="tab">Detection Engineering</span>
-          <span class="tab">Automation</span>
+      <section class="section" aria-labelledby="featured-title">
+        <div class="section-head">
+          <h2 id="featured-title">Featured writeup</h2>
+        </div>
+
+        <article class="featured">
+          <div>
+            <div class="kicker">Cloud Security / Microsoft Sentinel</div>
+            <h3><a href="/writeups/honeypot-sentinel-cloud/">Building a Cloud SIEM Honeypot, Part 1: Watching the Internet Find a Windows VM</a></h3>
+            <p>
+              I exposed a throwaway Windows VM to the public internet, wired it into Microsoft Sentinel, and analyzed what showed up: failed logons, source IP concentration, username patterns, and one telemetry detail that challenged my assumptions.
+            </p>
+            <div class="small-meta">
+              <span>June 2026</span>
+              <span>~12 min read</span>
+              <span>Azure</span>
+              <span>KQL</span>
+              <span>Blue Team</span>
+            </div>
+          </div>
+          <aside class="quiet-stats" aria-label="Honeypot summary">
+            <div><strong>26,066</strong><span>failed authentication attempts</span></div>
+            <div><strong>253</strong><span>unique source IP addresses</span></div>
+            <div><strong>75.7%</strong><span>from one dominant source</span></div>
+          </aside>
+        </article>
+      </section>
+
+      <section class="section" id="writeups" aria-labelledby="writeups-title">
+        <div class="section-head">
+          <h2 id="writeups-title">Writeups</h2>
+        </div>
+
+        <div class="post-list">
+          <article class="post">
+            <time datetime="2026-06">Jun 2026</time>
+            <div>
+              <h3><a href="/writeups/honeypot-sentinel-cloud/">Building a Cloud SIEM Honeypot, Part 1</a></h3>
+              <p>Azure VM exposure, Sentinel telemetry, Windows Event ID 4625, KQL detections, and real-world brute-force observations.</p>
+              <div class="tags"><span class="tag">sentinel</span><span class="tag">azure</span><span class="tag">kql</span><span class="tag">honeypot</span></div>
+            </div>
+          </article>
+
+          <article class="post">
+            <time datetime="2026-06">Jun 2026</time>
+            <div>
+              <h3><a href="/writeups/kusto-cyber-duty/">KQL Investigation Challenge: Call of the Cyber Duty</a></h3>
+              <p>Completed all 10 cases in Kusto Detective Agency's Call of the Cyber Duty challenge, earning the full badge set and certificate while practicing KQL investigation workflows.</p>
+              <div class="tags"><span class="tag">kql</span><span class="tag">azure-data-explorer</span><span class="tag">threat-hunting</span><span class="tag">ctf</span></div>
+            </div>
+          </article>
+
+          <article class="post">
+            <time datetime="2025-07">Jul 2025</time>
+            <div>
+              <h3><a href="/writeups/ad-lab-part1/">Building an Active Directory Home Lab: Part 1</a></h3>
+              <p>Windows Server 2025, VMware Workstation Pro, host-only networking, and the foundation for a practical identity lab.</p>
+              <div class="tags"><span class="tag">active-directory</span><span class="tag">windows-server</span><span class="tag">identity</span></div>
+            </div>
+          </article>
+
+          <article class="post">
+            <time datetime="2025-07">Jul 2025</time>
+            <div>
+              <h3><a href="https://medium.com/@botgonbayar/building-secoras-user-base-creating-30-users-ous-and-security-groups-b4a22e2f1d73" target="_blank" rel="noopener noreferrer">Building an Active Directory Home Lab: Part 2</a></h3>
+              <p>Creating 30 users, organizing OUs, and building security groups to turn the Secora lab into a more realistic identity environment.</p>
+              <div class="tags"><span class="tag">active-directory</span><span class="tag">ous</span><span class="tag">security-groups</span><span class="tag">identity</span><span class="tag">medium</span></div>
+            </div>
+          </article>
+
+
+          <article class="post">
+            <time datetime="2025">GitHub</time>
+            <div>
+              <h3><a href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" target="_blank" rel="noopener noreferrer">Active Directory PowerShell Script Collection</a></h3>
+              <p>Reusable PowerShell scripts for bulk user creation, inactive-account cleanup, ACL auditing, authentication review, secure backup auditing, and system health reporting.</p>
+              <div class="tags"><span class="tag">powershell</span><span class="tag">active-directory</span><span class="tag">automation</span><span class="tag">github</span></div>
+            </div>
+          </article>
+
         </div>
       </section>
 
-      <div class="content">
-        <section aria-labelledby="latest-posts">
-          <h2 class="section-title" id="latest-posts">Latest</h2>
-
-          <div class="post-list">
-            <a class="post featured" href="/writeups/honeypot-sentinel-cloud/">
-              <div class="post-meta">
-                June 2026<br />
-                ~12 min read<br />
-                Case Study
-              </div>
-              <div>
-                <h3 class="post-title">Building a Cloud SIEM Honeypot, Part 1: Watching the Internet Find a Windows VM</h3>
-                <p class="post-excerpt">
-                  I exposed a Windows VM to the public internet, wired it into Microsoft Sentinel, and analyzed
-                  26,066 failed logons from 253 source IPs. This writeup focuses on telemetry, detections,
-                  attacker behavior, and the assumptions the data challenged.
-                </p>
-                <div class="post-tags">
-                  <span class="post-tag">Microsoft Sentinel</span>
-                  <span class="post-tag">Azure</span>
-                  <span class="post-tag">KQL</span>
-                  <span class="post-tag">Honeypot</span>
-                  <span class="post-tag">Blue Team</span>
-                </div>
-              </div>
-            </a>
-
-            <a class="post" href="/writeups/ad-lab-part1/">
-              <div class="post-meta">
-                Lab Series<br />
-                Part 1<br />
-                Identity
-              </div>
-              <div>
-                <h3 class="post-title">Building an Active Directory Home Lab: Part 1</h3>
-                <p class="post-excerpt">
-                  Setting up a complete Active Directory environment using VMware Workstation Pro, Windows Server,
-                  networking configuration, and a first domain controller.
-                </p>
-                <div class="post-tags">
-                  <span class="post-tag">Active Directory</span>
-                  <span class="post-tag">VMware</span>
-                  <span class="post-tag">Windows Server</span>
-                  <span class="post-tag">Identity</span>
-                </div>
-              </div>
-            </a>
-
-            <a class="post" href="https://medium.com/@botgonbayar/building-secoras-user-base-creating-30-users-ous-and-security-groups-b4a22e2f1d73" target="_blank" rel="noopener noreferrer">
-              <div class="post-meta">
-                Medium<br />
-                Part 2<br />
-                Identity
-              </div>
-              <div>
-                <h3 class="post-title">Building an Active Directory Home Lab: Part 2</h3>
-                <p class="post-excerpt">
-                  Continuation of the Active Directory home lab series, covering a more realistic internal structure
-                  with organizational units, bulk user creation, and security groups for the fictional Secora environment.
-                </p>
-                <div class="post-tags">
-                  <span class="post-tag">Active Directory</span>
-                  <span class="post-tag">OUs</span>
-                  <span class="post-tag">Security Groups</span>
-                  <span class="post-tag">Identity</span>
-                  <span class="post-tag">External</span>
-                </div>
-              </div>
-            </a>
-
-
-            <a class="post" href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" target="_blank" rel="noopener noreferrer">
-              <div class="post-meta">
-                GitHub<br />
-                Script Collection<br />
-                PowerShell
-              </div>
-              <div>
-                <h3 class="post-title">Active Directory PowerShell Script Collection</h3>
-                <p class="post-excerpt">
-                  A companion script collection for the AD lab series, including bulk user creation, inactive-user cleanup,
-                  ACL/security auditing, authentication-event review, system health reporting, secure backup auditing,
-                  and endpoint hardening.
-                </p>
-                <div class="post-tags">
-                  <span class="post-tag">Create-UsersBulk.ps1</span>
-                  <span class="post-tag">Disable-InactiveUsers.ps1</span>
-                  <span class="post-tag">Audit-ACLPermissions.ps1</span>
-                  <span class="post-tag">Audit-AuthenticationEvents.ps1</span>
-                  <span class="post-tag">Report-SystemHealth.ps1</span>
-                  <span class="post-tag">PowerShell</span>
-                  <span class="post-tag">External</span>
-                </div>
-              </div>
-            </a>
-
-            <article class="post" aria-label="Coming soon writeup">
-              <div class="post-meta">
-                Coming soon<br />
-                Part 2<br />
-                Automation
-              </div>
-              <div>
-                <h3 class="post-title">Turning Microsoft Sentinel Alerts into Analyst-Ready Incidents with AI</h3>
-                <p class="post-excerpt">
-                  Planned follow-up covering Logic Apps, Sentinel incidents, alert enrichment, MITRE mapping,
-                  and automated triage summaries.
-                </p>
-                <div class="post-tags">
-                  <span class="post-tag">Sentinel</span>
-                  <span class="post-tag">Logic Apps</span>
-                  <span class="post-tag">AI Triage</span>
-                  <span class="post-tag">SOAR</span>
-                </div>
-              </div>
-            </article>
+      <section class="section two-col" id="about" aria-labelledby="about-title">
+        <div class="prose">
+          <h2 id="about-title">About</h2>
+          <p>
+            I'm a detail-oriented cybersecurity practitioner with experience across identity management, access controls, Microsoft 365, endpoint support, and IT infrastructure. I like practical security projects that leave behind something useful: detections, scripts, diagrams, notes, or a repeatable process someone else can learn from.
+          </p>
+          <p>
+            My focus areas include Active Directory, Microsoft Entra ID, Intune, Microsoft Sentinel, Splunk, KQL, PowerShell, Azure, Okta, and security automation.
+          </p>
+          <div class="contact-row">
+            <a href="mailto:batotgonbayar@proton.me">Email</a>
+            <a href="https://github.com/botgonbayar" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           </div>
-        </section>
+        </div>
 
-        <aside class="sidebar" aria-label="About the blog">
-          <div class="side-card">
-            <h2>About these writeups</h2>
-            <p>
-              I use this space to document practical security labs and investigations in a way that is useful
-              after the lab is over: what I built, what broke, what the logs showed, and what I would improve.
-            </p>
-
-            <h2>Topics</h2>
-            <div class="side-links">
-              <a href="/writeups/">Cloud Security</a>
-              <a href="/writeups/">Identity & Access</a>
-              <a href="/writeups/">Detection Engineering</a>
-              <a href="/writeups/">PowerShell Automation</a>
-              <a href="https://github.com/botgonbayar/Active-Directory-Series/tree/main/scripts" target="_blank" rel="noopener noreferrer">PowerShell Scripts</a>
-            </div>
+        <div class="prose" id="certs">
+          <h2>Certifications</h2>
+          <div class="cert-groups">
+            <section class="cert-group" aria-labelledby="giac-certs">
+              <h3 id="giac-certs">GIAC</h3>
+              <div class="certs">
+                <a href="https://www.credly.com/badges/af4eeb8e-daee-4e04-8db1-83c5b17c4da9/public_url" target="_blank" rel="noopener noreferrer">GFACT</a>
+                <a href="https://www.credly.com/badges/aded5bdf-de76-48fc-964e-79cf7140ab21/public_url" target="_blank" rel="noopener noreferrer">GSEC</a>
+                <a href="https://www.credly.com/badges/dd6cb0e5-a380-4e42-9c90-ff430bb02ce9/public_url" target="_blank" rel="noopener noreferrer">GCIH</a>
+              </div>
+            </section>
+            <section class="cert-group" aria-labelledby="comptia-certs">
+              <h3 id="comptia-certs">CompTIA</h3>
+              <div class="certs">
+                <a href="https://www.credly.com/badges/20b32b43-0f40-4f7f-ac28-d12f21266722/public_url" target="_blank" rel="noopener noreferrer">A+</a>
+                <a href="https://www.credly.com/badges/86131170-d47e-4d95-add6-3dfffac7adc7/public_url" target="_blank" rel="noopener noreferrer">Network+</a>
+                <a href="https://www.credly.com/badges/977908cd-5185-4032-b589-bc41cfc65e8e/public_url" target="_blank" rel="noopener noreferrer">Security+</a>
+                <a href="https://www.credly.com/badges/126e9b15-d17a-44ef-b092-af702449d2c6/public_url" target="_blank" rel="noopener noreferrer">CySA+</a>
+              </div>
+            </section>
+            <section class="cert-group" aria-labelledby="vendor-certs">
+              <h3 id="vendor-certs">Microsoft / Okta</h3>
+              <div class="certs">
+                <a href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/97888B3F00375EFF?sharingId=8DD8699F73824EBC" target="_blank" rel="noopener noreferrer">SC-300</a>
+                <a href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/2925161AE4093D5?sharingId=8DD8699F73824EBC" target="_blank" rel="noopener noreferrer">AZ-900</a>
+                <a href="https://learn.microsoft.com/api/credentials/share/en-us/batorgil/B6C0CB7731DF1205?sharingId=8DD8699F73824EBC" target="_blank" rel="noopener noreferrer">SC-900</a>
+                <a href="https://www.credly.com/badges/1cdc8d72-278f-4e05-9478-e0be9ed52cb9/public_url" target="_blank" rel="noopener noreferrer">Okta Certified Professional</a>
+              </div>
+            </section>
           </div>
-        </aside>
-      </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="site-footer">
+    <footer>
       <span>© 2026 Bat Otgonbayar</span>
-      <span><a href="https://github.com/botgonbayar" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener">LinkedIn</a></span>
+      <span><a href="mailto:batotgonbayar@proton.me">Email</a> · <a href="https://github.com/botgonbayar" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://linkedin.com/in/botgonbayar" target="_blank" rel="noopener noreferrer">LinkedIn</a></span>
     </footer>
   </div>
 
   <script>
     (function () {
-      const root = document.documentElement;
-      const btn = document.getElementById('themeToggle');
-      if (!btn) return;
-
-      try {
-        const saved = localStorage.getItem('theme');
-        if (saved === 'light' || saved === 'dark') {
-          root.setAttribute('data-theme', saved);
-        }
-      } catch (e) {}
-
-      btn.addEventListener('click', function () {
-        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        root.setAttribute('data-theme', next);
+      var button = document.getElementById('themeToggle');
+      if (!button) return;
+      button.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) {}
       });
     })();
